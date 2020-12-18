@@ -10,6 +10,7 @@
 #include <vector>
 #include <cstring>
 #include <cctype>
+#include <sstream>
 
 /*
 **==========================
@@ -22,8 +23,19 @@
 
 /*
 **==========================
+**       Configurate
+**==========================
+*/
+
+#define DEF_HOST "127.0.0.1"
+#define DEF_PORT "7777"
+#define DEF_PASS "123456789"
+
+/*
+**==========================
 **       Prototype
 **==========================
 */
 
 bool check_av(int ac, char const **av);
+std::vector<std::string> split(std::string str, char type);

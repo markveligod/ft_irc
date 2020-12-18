@@ -1,7 +1,7 @@
 NAME = ircserv
 FLAGS = -Wall -Wextra -Werror -std=c++98
 SRC = ./main.cpp
-UTILS = ./utils/check_av.cpp
+UTILS = ./utils/check_av.cpp ./utils/vector_split.cpp
 OBJ=$(SRC:.cpp=.o) $(UTILS:.cpp=.o)
 DEBUG = -g
 
