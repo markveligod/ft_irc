@@ -1,8 +1,8 @@
 NAME_SERVER 	= server
 NAME_CLIENT 	= client
 
-SRC_SERVER 		= ./server.cpp
-SRC_CLIENT 		= ./client.cpp
+SRC_SERVER 		= ./Server.cpp ./server_main.cpp
+SRC_CLIENT 		= ./Client.cpp ./client_main.cpp
 
 HEADER_SERVER 	= ./Server.hpp
 HEADER_CLIENT	= ./Client.hpp
