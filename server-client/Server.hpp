@@ -3,6 +3,7 @@
 
 # include <iostream>
 # include <string>
+# include <cstring> //bzero strcpy
 # include <stdlib.h>
 # include <unistd.h>
 # include <arpa/inet.h>
@@ -12,7 +13,7 @@
 # include <netdb.h>
 # include <netinet/in.h>
 
-# define SERVER_PORT	1080
+# define SERVER_PORT	1280
 # define BUFFER_SIZE	1024
 # define SERVER_IP		"127.0.0.1"
 
