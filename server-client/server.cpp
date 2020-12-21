@@ -48,7 +48,7 @@ void			Server::chat()
 	if (Server::end_connection(this->buffer))
 		return ;
 
-	while (1)
+	/*while (1)
 	{
 		std::cout << "Server: ";
 		std::cin.getline(this->buffer, BUFFER_SIZE);
@@ -61,7 +61,7 @@ void			Server::chat()
 		std::cout << this->buffer << std::endl;
 		if (Server::end_connection(this->buffer))
 			break;
-	}
+	}*/
 	std::cout << "\nEnd\n";
 }
 

@@ -15,7 +15,7 @@ void	Client::create_socket()
 
 	bzero(&this->server_addr, sizeof(this->server_addr));
 	this->server_addr.sin_family = AF_INET;
-	this->server_addr.sin_port = htons(SERVER_PORT);
+	this->server_addr.sin_port = htons(this->port);
 	inet_pton(AF_INET, SERVER_IP, &this->server_addr.sin_addr);
 
 	std::cout << "Client socket created\n";
@@ -27,7 +27,7 @@ void	Client::connection()
 		std::cout << "Connection to server...\n"
 				  << inet_ntoa(server_addr.sin_addr)
 				  << " with port number "
-				  << this->port << std::endl;
+				  << this->port << "!!!" << std::endl;
 	else
 		Client::error("Connection error");
 
@@ -35,22 +35,43 @@ void	Client::connection()
 	std::cout << "Connection established!" << std::endl;
 }
 
+void Client::connection_server()
+{
+	if ((connect(this->client, reinterpret_cast<struct sockaddr *>(&this->server_addr), sizeof(this->server_addr))) == 0)
+		std::cout << "Connection to server...\n"
+				  << inet_ntoa(server_addr.sin_addr)
+				  << " with port number "
+				  << this->port << "!!!" << std::endl;
+	else
+		Client::error("Connection error");
+
+	//recv(this->client, this->buffer, BUFFER_SIZE, 0);
+	std::cout << "Connection established!" << std::endl;
+}
+
 void	Client::chat()
 {
-	while (1)
-	{
+	//while (1)
+//	{
 		std::cout << "Client: ";
 		std::cin.getline(this->buffer, BUFFER_SIZE);
 		send(this->client, this->buffer, BUFFER_SIZE, 0);
-		if (Client::end_connection(this->buffer))
-			break;
+		//if (Client::end_connection(this->buffer))
+		//	break;
 
-		std::cout << "Server: ";
+		/*std::cout << "Server: ";
 		recv(this->client, this->buffer, BUFFER_SIZE, 0);
 		std::cout << this->buffer << std::endl;
 		if (Client::end_connection(this->buffer))
-			break;
-	}
+			break;*/
+//	}
+}
+
+void	Client::send_to_server()
+{
+
+	std::cout << "Sending message to server: " << this->buffer;
+	send(this->client, this->buffer, BUFFER_SIZE, 0);
 }
 
 void	Client::close_connection()
@@ -58,7 +79,6 @@ void	Client::close_connection()
 	close(this->client);
 	std::cout << "\nEnd\n";
 }
-
 
 // --------------------------Helpful functions----------------------------
 

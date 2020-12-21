@@ -1,10 +1,10 @@
 NAME_SERVER 	= server
 NAME_CLIENT 	= client
 
-SRC_SERVER 		= ./server.cpp ./server_main.cpp
+SRC_SERVER 		= ./Server.cpp ./server_main.cpp ./Client.cpp
 SRC_CLIENT 		= ./Client.cpp ./client_main.cpp
 
-HEADER_SERVER 	= ./Server.hpp
+HEADER_SERVER 	= ./Server.hpp ./Client.hpp
 HEADER_CLIENT	= ./Client.hpp
 
 OBJ_SERVER		= $(SRC_SERVER:.cpp=.o)

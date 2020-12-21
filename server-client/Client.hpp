@@ -12,7 +12,7 @@
 # include <netdb.h>
 # include <netinet/in.h>
 
-# define SERVER_PORT	1080
+# define SERVER_PORT	1777
 # define BUFFER_SIZE	1024
 # define SERVER_IP		"127.0.0.1"
 
@@ -34,8 +34,11 @@ public:
 
 	void				create_socket();
 	void				connection();
+	void				connection_server();
 	void				chat();
 	void				close_connection();
+	void				send_to_server();
+	void set_buffer(char const *buffer) { strcpy(this->buffer, buffer);};
 };
 
 #endif
