@@ -4,11 +4,8 @@ Server::Server()
 {
     this->FdServer = socket(AF_INET, SOCK_STREAM, 0);
     if (this->FdServer < 0)
-    {
-        std::cerr << "[SERVER]: " << RED << "ERROR: " << RESET << "code: " << ERR_FDSERVER << YELLOW << "Socket don't work\n" << RESET;
-        exit(ERR_FDSERVER);
-    }
-    std::cout << "[SERVER]: " << GREEN << "Socker was created\n" << RESET;
+        exit_error(ERR_FDSERVER, "Socket fail!");
+    print_line("Socket was created");
 }
 
 Server::Server(const Server& other)
@@ -18,7 +15,7 @@ Server::Server(const Server& other)
 
 Server::~Server()
 {
-    std::cout << "[SERVER]: " << RED << "Destroy\n" << RESET;
+    print_line("Destroy");
 }
 
 Server &Server::operator=(const Server& other)

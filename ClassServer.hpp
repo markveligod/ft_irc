@@ -5,7 +5,6 @@ class Server
 {
     private:
         int FdServer;
-        struct sockaddr_in server_address;
 
     public:
         Server();
