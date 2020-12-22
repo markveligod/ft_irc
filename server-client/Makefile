@@ -1,32 +1,47 @@
-NAME_SERVER 	= server
+CC				= clang++
+STD				= -std=c++98
+CFLAGS			= -MMD -g
+# CFLAGS			+= $(STD)
+# CFLAGS			+= -Wall -Werror -Wextra
+
+OBJ_DIR			= ./objects/
+
 NAME_CLIENT 	= client
-
-SRC_SERVER 		= ./Server.cpp ./server_main.cpp ./Client.cpp
-SRC_CLIENT 		= ./Client.cpp ./client_main.cpp
-
-HEADER_SERVER 	= ./Server.hpp ./Client.hpp
-HEADER_CLIENT	= ./Client.hpp
-
-OBJ_SERVER		= $(SRC_SERVER:.cpp=.o)
+SRC_CLIENT 		= client_main.cpp \
+				  Client.cpp
 OBJ_CLIENT		= $(SRC_CLIENT:.cpp=.o)
+OBJ_CLIENT		= $(patsubst %.cpp,$(OBJ_DIR)%.o,$(SRC_CLIENT))
 
-server: $(NAME_SERVER)
+NAME_SERVER		= server
+SRC_SERVER 		= server_main.cpp \
+				  Server.cpp \
+				  Client.cpp
+OBJ_SERVER		= $(SRC_SERVER:.cpp=.o)
+OBJ_SERVER		= $(patsubst %.cpp,$(OBJ_DIR)%.o,$(SRC_SERVER))
 
-$(NAME_SERVER): $(OBJ_SERVER) $(HEADER_SERVER)
-	clang++ -o $(NAME_SERVER) $(OBJ_SERVER)
+OBJ				= $(OBJ_CLIENT) $(OBJ_SERVER)
+DEP				= $(OBJ:.o=.d)
 
-client: $(NAME_CLIENT)
+all: $(NAME_CLIENT) $(NAME_SERVER)
 
-$(NAME_CLIENT): $(OBJ_CLIENT) $(HEADER_CLIENT)
-	clang++ -o $(NAME_CLIENT) $(OBJ_CLIENT)
+$(NAME_SERVER): $(OBJ_SERVER)
+	$(CC) -o $@ $(OBJ_SERVER) $(CFLAGS)
+
+$(NAME_CLIENT): $(OBJ_CLIENT)
+	$(CC) -o $@ $(OBJ_CLIENT) $(CFLAGS)
+
+-include $(DEP)
+
+$(OBJ_DIR)%.o: %.cpp
+	@test -d $(OBJ_DIR) || mkdir $(OBJ_DIR)
+	$(CC) -g -o $@ -c $< $(CFLAGS)
 
 clean:
-	rm -rf $(OBJ_CLIENT) $(OBJ_SERVER)
+	rm -rf $(OBJ_DIR)
 
 fclean: clean
-	rm -rf $(NAME_CLIENT) $(NAME_SERVER)
+	rm -rf $(NAME_SERVER) $(NAME_CLIENT)
 
 re: fclean all
 
-%.o:%.cpp
-	clang++ -g -o $@ -c $<
+.PHONY: all clean fclean re
