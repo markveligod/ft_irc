@@ -2,7 +2,7 @@ NAME = ircserv
 FLAGS = -Wall -Wextra -Werror -std=c++98
 SRC = ./main.cpp
 CLASS = ClassUtils.cpp AServer.cpp ClassClient.cpp ClassServer.cpp 
-OBJ=$(SRC:.cpp=.o) $(UTILS:.cpp=.o) $(CLASS:.cpp=.o)
+OBJ=$(SRC:.cpp=.o) $(CLASS:.cpp=.o)
 DEBUG = -g
 
 #colors

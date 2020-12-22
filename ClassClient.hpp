@@ -1,7 +1,6 @@
 #ifndef CLASSCLIENT_HPP
 # define CLASSCLIENT_HPP
 
-# pragma once
 # include "./AServer.hpp"
 
 class Client : public AServer

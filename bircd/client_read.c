@@ -14,10 +14,12 @@ void	client_read(t_env *e, int cs)
     {
       close(cs);
       clean_fd(&e->fds[cs]);
-      printf("client #%d gone away\n", cs);
-    }
+	  //printf("!!!%s!!!\n", e->fds[cs].buf_read);
+	  printf("client #%d gone away\n", cs);
+	}
   else
     {
+		printf("!!!%s!!!\n", e->fds[cs].buf_read);
       i = 0;
       while (i < e->maxfd)
 	{

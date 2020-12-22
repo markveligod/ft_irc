@@ -1,6 +1,6 @@
-//#include "main.hpp"
-#include "ClassServer.hpp"
+#include "main.hpp"
 #include "ClassClient.hpp"
+#include "ClassServer.hpp"
 
 int main(int ac, char const **av)
 {
@@ -28,7 +28,7 @@ int main(int ac, char const **av)
 
 	//test connection with client and server
 	Server server_part = Server(ac == 4 ? av[2] : av[1]);
-	Client client_part = Client(stoi(network[1]), network[0]);
+	Client client_part = Client(atoi(network[1].c_str()), network[0]);
 
 	server_part.create_socket();
 	server_part.connection();

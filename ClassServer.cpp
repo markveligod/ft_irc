@@ -1,6 +1,6 @@
 #include "ClassServer.hpp"
 
-Server::Server(const std::string &port_server): AServer(stoi(port_server))
+Server::Server(const std::string &port_server): AServer(atoi(port_server.c_str()))
 {
     Utils::print_line("Constructor server done!");
 }
