@@ -1,8 +1,8 @@
 NAME = ircserv
 FLAGS = -Wall -Wextra -Werror -std=c++98
 SRC = ./main.cpp
-UTILS = ./utils/check_av.cpp ./utils/vector_split.cpp ./utils/get_port.cpp ./utils/print_line.cpp
-CLASS = ClassServer.cpp
+#UTILS = ./utils/check_av.cpp ./utils/vector_split.cpp ./utils/get_port.cpp ./utils/print_line.cpp
+CLASS = ClassUtils.cpp
 OBJ=$(SRC:.cpp=.o) $(UTILS:.cpp=.o) $(CLASS:.cpp=.o)
 DEBUG = -g
 

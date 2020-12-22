@@ -27,7 +27,7 @@
 #include <netinet/in.h> //struct sockaddr_in
 #include <sys/socket.h> //socket
 
-#include "ClassServer.hpp"
+#include "ClassUtils.hpp"
 
 /*
 **==========================
@@ -48,18 +48,3 @@
 #define DEF_HOST "127.0.0.1"
 //#define DEF_PORT "7777"
 #define DEF_PASS "123456789"
-
-/*
-**==========================
-**       Prototype
-**==========================
-*/
-
-bool check_av(int ac, char const **av);
-std::vector<std::string> split(std::string str, char type);
-std::string get_random_port();
-
-//print_line.cpp
-void exit_error(int num_error, std::string fail_msg);
-void print_error(int num_error, std::string fail_msg);
-void print_line(std::string msg);
