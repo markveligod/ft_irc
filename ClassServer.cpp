@@ -26,41 +26,65 @@ void Server::create_socket()
 
 /*
 **==========================
-** connection - 
+** connection - соединяет сокет с портом
 **==========================
 */
 
 void Server::connection()
 {
-    socklen_t size = sizeof(this->server_addr);
+    this->size = sizeof(this->server_addr);
 
 	if (bind(this->fd_socket, reinterpret_cast<struct sockaddr *>(&this->server_addr), sizeof(this->server_addr)) < 0)
 		Utils::exit_error(ERR_BIND, "Binding error");
     Utils::print_line("Socket binded!");
-	if (listen(this->fd_socket, 10) < 0)
-		Utils::exit_error(ERR_LISTEN, "Listening error");
-    Utils::print_line("Listening...");
-	if ((this->server = accept(this->fd_socket, reinterpret_cast<struct sockaddr *>(&this->server_addr), &size)) < 0)
-		Utils::exit_error(ERR_ACCEPT, "Accepting error");
-    Utils::print_line("Connection accepted!");
 }
 
 /*
 **==========================
-** send_message - 
+** socket_listen - при вызове слушает сокет
+**==========================
+*/
+
+void Server::socket_listen()
+{
+	if (listen(this->fd_socket, 10) < 0)
+		Utils::exit_error(ERR_LISTEN, "Listening error");
+    Utils::print_line("Listening...");
+}
+
+/*
+**==========================
+** socket_accept - при вызове соединяет сокет с клиентом
+**==========================
+*/
+
+void Server::socket_accept()
+{
+	if ((this->server = accept(this->fd_socket, reinterpret_cast<struct sockaddr *>(&this->server_addr), &(this->size))) < 0)
+		Utils::exit_error(ERR_ACCEPT, "Accepting error");
+    Utils::print_line("Connection accepted!");
+	strcpy(this->buffer, "Server connected!\n");
+	send(this->server, this->buffer, BUFFER_SIZE, 0);
+	Utils::print_line("Connected to the client");
+}
+
+/*
+**==========================
+** send_message - отправляет буфер
 **==========================
 */
 
 void Server::send_message()
 {
-    strcpy(this->buffer, "Server connected!\n");
+	char buffer[BUFFER_SIZE];
+	Utils::print_line(" ");
+	std::cin.getline(buffer, BUFFER_SIZE);
 	send(this->server, this->buffer, BUFFER_SIZE, 0);
-	Utils::print_line("Connected to the client 1");
 }
 
 /*
 **==========================
-** recv_message - 
+** recv_message - принимает буфер
 **==========================
 */
 
@@ -70,7 +94,15 @@ void Server::recv_message()
 	recv(this->server, this->buffer, BUFFER_SIZE, 0);
 	std::cout << this->buffer << std::endl;
 	if (AServer::end_connection())
-		return ;
+	{
+		Utils::print_line("Client closed");
+		this->server = 0;
+	}
+}
+
+bool Server::check_fd_server()
+{
+	return ((this->server > 0));
 }
 
 /*

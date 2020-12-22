@@ -6,7 +6,7 @@ bool AServer::end_connection()
 {
 	std::string str(this->buffer);
 
-	if (str == "end connection" || str == "end connectin\n")
+	if (str == "#" || str == "#\n")
 		return (true);
 	return (false);
 }

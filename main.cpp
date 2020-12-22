@@ -22,9 +22,9 @@ int main(int ac, char const **av)
     }
  
     //test cout 
-    std::cout << network[0] << std::endl;
-    std::cout << network[1] << std::endl;
-    std::cout << network[2] << std::endl;
+    // std::cout << network[0] << std::endl;
+    // std::cout << network[1] << std::endl;
+    // std::cout << network[2] << std::endl;
 
 	//test connection with client and server
 	Server server_part = Server(ac == 4 ? av[2] : av[1]);
@@ -32,15 +32,22 @@ int main(int ac, char const **av)
 
 	server_part.create_socket();
 	server_part.connection();
-	client_part.create_socket();
-	client_part.connection();
+	
 
-	server_part.send_message();
+	// client_part.create_socket();
+	// client_part.connection();
+
 	while (1)
 	{
-		server_part.recv_message();
-		client_part.set_buffer(server_part.get_buffer().c_str());
-		client_part.send_message();
+		server_part.socket_listen();
+		server_part.socket_accept();
+		while (server_part.check_fd_server())
+		{
+			//server_part.send_message();
+			server_part.recv_message();
+			// client_part.set_buffer(server_part.get_buffer().c_str());
+			// client_part.send_message();
+		}
 	}
 
 	return (0);

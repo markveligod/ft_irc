@@ -106,7 +106,7 @@ void Utils::print_line(std::string msg)
 
 void Utils::print_error(int num_error, std::string fail_msg)
 {
-    std::cerr << CYAN << "[SERVER]: " << RED << "ERROR: " << RESET << "code: " << num_error << YELLOW << fail_msg << std::endl << RESET;
+    std::cerr << CYAN << "[SERVER]: " << RED << "ERROR: " << RESET << "code: " << num_error << " " << YELLOW << fail_msg << std::endl << RESET;
 }
 
 void Utils::exit_error(int num_error, std::string fail_msg)

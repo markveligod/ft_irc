@@ -9,6 +9,7 @@ class Server: public AServer
 {
     private:
         int server;
+        socklen_t size;
 
         Server();
     public:
@@ -18,6 +19,9 @@ class Server: public AServer
 	    virtual void    connection();
         virtual void	send_message();
 	    void            recv_message();
+        void            socket_listen();
+        void            socket_accept();
+        bool            check_fd_server();
 	    std::string const get_buffer();
 };
 
