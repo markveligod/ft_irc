@@ -1,7 +1,8 @@
 #pragma once
 #include "./main.hpp"
+#include "./AServer.hpp"
 
-class Server
+class Server: public AServer
 {
     private:
         int FdServer;

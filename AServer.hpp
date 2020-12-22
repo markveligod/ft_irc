@@ -1,27 +1,13 @@
 #ifndef ASERVER_HPP
 # define ASERVER_HPP
 
-# include <iostream>
-# include <string>
-# include <stdlib.h>
-# include <unistd.h>
-# include <arpa/inet.h>
-# include <sys/socket.h>
-# include <sys/ioctl.h>
-# include <fcntl.h>
-# include <netdb.h>
-# include <netinet/in.h>
-# include <cstring>			// for bzero and strcpy in Linux
-
-# define SERVER_PORT	1777
-# define BUFFER_SIZE	1024
-# define SERVER_IP		"127.0.0.1"
+#include "./main.hpp"
 
 class AServer
 {
-private:
+protected:
 	int					port;
-	int					fd_client;
+	int					fd_socket;
 	char				buffer[BUFFER_SIZE];
 	struct sockaddr_in	server_addr;
 

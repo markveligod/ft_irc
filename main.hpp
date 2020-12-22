@@ -20,14 +20,19 @@
 
 #include <iostream>
 #include <vector>
-#include <cstring>
+#include <cstring> // for bzero and strcpy in Linux
 #include <cctype>
 #include <sstream>
 #include <cstdlib>
 #include <netinet/in.h> //struct sockaddr_in
 #include <sys/socket.h> //socket
-
-#include "ClassUtils.hpp"
+#include <string>
+#include <stdlib.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <sys/ioctl.h>
+#include <fcntl.h>
+#include <netdb.h>	
 
 /*
 **==========================
@@ -47,4 +52,13 @@
 
 #define DEF_HOST "127.0.0.1"
 //#define DEF_PORT "7777"
+#define BUFFER_SIZE	1024
 #define DEF_PASS "123456789"
+
+/*
+**==========================
+**       Class
+**==========================
+*/
+
+#include "ClassUtils.hpp"
