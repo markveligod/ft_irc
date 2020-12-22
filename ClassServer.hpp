@@ -5,6 +5,7 @@
 class Server: public AServer
 {
     private:
+        int server;
         std::string HostIp4_network;
         int port_network;
         std::string pass_network;
@@ -12,9 +13,11 @@ class Server: public AServer
 
         Server();
     public:
-        Server(const std::vector<std::string> &network, const std::string &port, const std::string &password);
+        Server(const std::string &port_server);
 
-        virtual void create_socket();
-	    virtual void connection();
-	    virtual void send_message();
+        virtual void    create_socket();
+	    virtual void    connection();
+	    void            chat();
+	    void            recv_message();
+	    std::string const get_buffer();
 };

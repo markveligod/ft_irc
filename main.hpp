@@ -43,6 +43,10 @@
 #define ERR_COUNT 11
 #define ERR_CHECKAV 12
 #define ERR_FDSERVER 13
+#define ERR_SOCKET 14
+#define ERR_BIND 15
+#define ERR_ACCEPT 16
+#define ERR_LISTEN 17
 
 /*
 **==========================
