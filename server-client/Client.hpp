@@ -13,7 +13,7 @@
 # include <netinet/in.h>
 # include <cstring>			// for bzero and strcpy in Linux
 
-# define SERVER_PORT	1777
+# define SERVER_PORT	1280
 # define BUFFER_SIZE	1024
 # define SERVER_IP		"127.0.0.1"
 

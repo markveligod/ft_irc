@@ -13,7 +13,7 @@
 # include <netdb.h>
 # include <netinet/in.h>
 
-# define SERVER_PORT	1777
+# define SERVER_PORT	1280
 # define BUFFER_SIZE	1024
 # define SERVER_IP		"127.0.0.1"
 
