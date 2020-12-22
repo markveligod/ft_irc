@@ -34,10 +34,6 @@
 #include <fcntl.h>
 #include <netdb.h>
 
-#include "AServer.hpp"
-#include "ClassServer.hpp"
-#include "ClassClient.hpp"
-
 /*
 **==========================
 **       Error's

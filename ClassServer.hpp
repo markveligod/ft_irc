@@ -1,3 +1,6 @@
+#ifndef CLASSSERVER_HPP
+# define CLASSSERVER_HPP
+
 #pragma once
 
 #include "./AServer.hpp"
@@ -17,3 +20,5 @@ class Server: public AServer
 	    void            recv_message();
 	    std::string const get_buffer();
 };
+
+#endif

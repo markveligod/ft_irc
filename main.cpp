@@ -1,4 +1,6 @@
-#include "main.hpp"
+//#include "main.hpp"
+#include "ClassServer.hpp"
+#include "ClassClient.hpp"
 
 int main(int ac, char const **av)
 {
