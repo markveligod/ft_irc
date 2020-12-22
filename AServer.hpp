@@ -1,7 +1,8 @@
 #ifndef ASERVER_HPP
 # define ASERVER_HPP
 
-#include "./main.hpp"
+# include "./main.hpp"
+# define BUFFER_SIZE 1024
 
 class AServer
 {

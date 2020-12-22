@@ -32,7 +32,11 @@
 #include <arpa/inet.h>
 #include <sys/ioctl.h>
 #include <fcntl.h>
-#include <netdb.h>	
+#include <netdb.h>
+
+#include "AServer.hpp"
+#include "ClassServer.hpp"
+#include "ClassClient.hpp"
 
 /*
 **==========================

@@ -2,7 +2,6 @@
 # define CLASSCLIENT_HPP
 
 # pragma once
-# include "./main.hpp"
 # include "./AServer.hpp"
 
 class Client : public AServer

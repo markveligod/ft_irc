@@ -2,8 +2,8 @@
 
 int main(int ac, char const **av)
 {
-    std::vector<std::string> network;
-    srand(time(NULL));
+	std::vector<std::string> network;
+	srand(time(NULL));
     
     if (ac != 3 && ac != 4)
         Utils::exit_error(ERR_COUNT, "ARG: ./ircserv [host:port_network:password_network] <port> <password>");
@@ -24,5 +24,22 @@ int main(int ac, char const **av)
     std::cout << network[1] << std::endl;
     std::cout << network[2] << std::endl;
 
-    return (0);
+	//test connection with client and server
+	Server server_part = Server(ac == 4 ? av[2] : av[1]);
+	Client client_part = Client(stoi(network[1]), network[0]);
+
+	server_part.create_socket();
+	server_part.connection();
+	client_part.create_socket();
+	client_part.connection();
+
+	server_part.send_message();
+	while (1)
+	{
+		server_part.recv_message();
+		client_part.set_buffer(server_part.get_buffer().c_str());
+		client_part.send_message();
+	}
+
+	return (0);
 }
