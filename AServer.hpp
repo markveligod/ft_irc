@@ -12,11 +12,16 @@ protected:
 	struct sockaddr_in	server_addr;
 
 public:
+	AServer(int port);
+
 	virtual void		create_socket() = 0;
 	virtual void		connection() = 0;
 	virtual void		send_message() = 0;
 	virtual bool		end_connection();
 };
+
+
+AServer::AServer(int port) : port(port) {}
 
 bool AServer::end_connection()
 {
