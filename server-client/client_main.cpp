@@ -6,7 +6,8 @@ int main()
 
 	client.create_socket();
 	client.connection();
-	client.chat();
+	while (1)
+		client.chat();
 	client.close_connection();
 
 	return (0);

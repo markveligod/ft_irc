@@ -36,7 +36,8 @@ public:
 	void				create_socket();
 	void				connection();
 	void				chat();
-	std::string const 	get_buffer() { return (std::string(this->buffer)); };
+	void				recv_message();
+	std::string const get_buffer() { return (std::string(this->buffer)); };
 };
 
 #endif

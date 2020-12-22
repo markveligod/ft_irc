@@ -36,6 +36,15 @@ void			Server::connection()
 	std::cout << "Connection accepted!\n";
 }
 
+void			Server::recv_message()
+{
+	std::cout << "Client: ";
+	recv(this->server, this->buffer, BUFFER_SIZE, 0);
+	std::cout << this->buffer << std::endl;
+	if (Server::end_connection(this->buffer))
+		return ;
+}
+
 void			Server::chat()
 {
 	strcpy(this->buffer, "Server connected!\n");

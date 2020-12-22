@@ -8,13 +8,16 @@ int main()
 
 	server.create_socket();
 	server.connection();
-	server.chat();
-
-	client.set_buffer(server.get_buffer().c_str());
 
 	client.create_socket();
 	client.connection_server();
-	client.send_to_server();
+
+	while (1)
+	{
+		server.chat();
+		client.set_buffer(server.get_buffer().c_str());
+		client.send_to_server();
+	}
 
 	return (0);
 }
