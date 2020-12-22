@@ -1,6 +1,6 @@
 #include "ClassServer.hpp"
 
-Server::Server(const std::string &port_server): AServer(stoi(port_server))
+Server::Server(const std::string &port_server): AServer(std::stoi(port_server))
 {
     Utils::print_line("Constructor server done!");
 }
@@ -77,8 +77,7 @@ void Server::chat()
 		if (Server::end_connection(this->buffer))
 			break;
 	}*/
-    Utils::print_line("nEnd");
-	std::cout << "\nEnd\n";
+    Utils::print_line("End");
 }
 
 /*
