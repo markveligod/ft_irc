@@ -1,6 +1,6 @@
 #include "ClassServer.hpp"
 
-Server::Server(const std::string &port_server): AServer(std::stoi(port_server))
+Server::Server(const std::string &port_server): AServer(stoi(port_server))
 {
     Utils::print_line("Constructor server done!");
 }
@@ -47,37 +47,15 @@ void Server::connection()
 
 /*
 **==========================
-** chat - 
+** send_message - 
 **==========================
 */
 
-void Server::chat()
+void Server::send_message()
 {
     strcpy(this->buffer, "Server connected!\n");
 	send(this->server, this->buffer, BUFFER_SIZE, 0);
 	Utils::print_line("Connected to the client 1");
-
-	std::cout << "Client: ";
-	recv(this->server, this->buffer, BUFFER_SIZE, 0);
-	std::cout << this->buffer << std::endl;
-	if (AServer::end_connection())
-		return ;
-
-	/*while (1)
-	{
-		std::cout << "Server: ";
-		std::cin.getline(this->buffer, BUFFER_SIZE);
-		send(this->server, this->buffer, BUFFER_SIZE, 0);
-		if (Server::end_connection(this->buffer))
-			break;
-
-		std::cout << "Client: ";
-		recv(this->server, this->buffer, BUFFER_SIZE, 0);
-		std::cout << this->buffer << std::endl;
-		if (Server::end_connection(this->buffer))
-			break;
-	}*/
-    Utils::print_line("End");
 }
 
 /*
