@@ -1,25 +1,32 @@
 #include "ClassServer.hpp"
 
-Server::Server()
+Server::Server(const std::vector<std::string> &network, const std::string &port, const std::string &password)
 {
-    this->FdServer = socket(AF_INET, SOCK_STREAM, 0);
-    if (this->FdServer < 0)
-        exit_error(ERR_FDSERVER, "Socket fail!");
-    print_line("Socket was created");
+    this->HostIp4_network = network[0];
+    this->port_network = std::stoi(network[1]);
+    this->pass_network = network[2];
+    this->port = std::stoi(port);
+    this->password = password;
+    Utils::print_line("Constructor server Done!");
 }
 
-Server::Server(const Server& other)
+/*
+**==========================
+** create_socket
+**==========================
+*/
+
+void Server::create_socket()
 {
-    *this = other;
+
 }
 
-Server::~Server()
+void Server::connection()
 {
-    print_line("Destroy");
+
 }
 
-Server &Server::operator=(const Server& other)
+void Server::send_message()
 {
-    this->FdServer = other.FdServer;
-    return (*this);
+
 }

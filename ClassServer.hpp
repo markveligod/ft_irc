@@ -1,16 +1,20 @@
 #pragma once
-#include "./main.hpp"
+
 #include "./AServer.hpp"
 
 class Server: public AServer
 {
     private:
-        int FdServer;
+        std::string HostIp4_network;
+        int port_network;
+        std::string pass_network;
+        std::string password;
 
-    public:
         Server();
-        Server(const Server& other);
-        ~Server();
+    public:
+        Server(const std::vector<std::string> &network, const std::string &port, const std::string &password);
 
-        Server &operator=(const Server& other);
+        virtual void create_socket();
+	    virtual void connection();
+	    virtual void send_message();
 };

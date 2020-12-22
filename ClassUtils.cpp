@@ -59,12 +59,12 @@ bool Utils::check_av(int ac, char const **av)
 {
     if (ac == 3)
     {
-        if (!this->check_port(av[1]))
+        if (!Utils::check_port(av[1]))
             return (false);
     }
     else if (ac == 4)
     {
-        if (!this->check_network(av[1]) || !this->check_port(av[2]))
+        if (!Utils::check_network(av[1]) || !Utils::check_port(av[2]))
             return (false);
     }
     return (true);
