@@ -16,6 +16,7 @@ public:
 	void				create_socket();
 	void				connection();
 	void				send_message();
+	void				set_buffer(char const *buffer);
 };
 
 #endif
