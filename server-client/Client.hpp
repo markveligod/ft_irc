@@ -11,6 +11,7 @@
 # include <fcntl.h>
 # include <netdb.h>
 # include <netinet/in.h>
+# include <cstring>			// for bzero and strcpy in Linux
 
 # define SERVER_PORT	1777
 # define BUFFER_SIZE	1024
