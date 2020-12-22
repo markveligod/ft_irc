@@ -35,3 +35,10 @@ void	Client::send_message()
 	Utils::print_line("Sending message to server: " + (std::string)this->buffer);
 	send(this->fd_socket, this->buffer, BUFFER_SIZE, 0);
 }
+
+// ---------------------------Setter------------------------------
+
+void	Client::set_buffer(char const *buffer)
+{
+	strcpy(this->buffer, buffer);
+}
