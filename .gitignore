@@ -1,0 +1,7 @@
+*.o
+*.d
+*/objects
+*ircservz
+*client
+*server
+!server-client
