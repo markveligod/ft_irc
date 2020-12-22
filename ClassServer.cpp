@@ -104,6 +104,7 @@ void Server::recv_message(int i)
 	{
 		std::cout << CYAN << "[SERVER]: " << YELLOW << "Client#" << i << " closed" << std::endl << RESET;
 		this->server = 0;
+		this->socket_type[i] = FD_FREE;
 	}
 }
 
@@ -135,8 +136,10 @@ void Server::init_fd_select()
 
 void Server::do_select()
 {
+	std::cout << "1\n";
 	if ((this->select_res = select(1024, &this->client_sockets, NULL, NULL, NULL)) < 0)
 		Utils::print_error(16, "SELECT");
+	std::cout << "2\n";
 }
 
 /*
@@ -167,7 +170,6 @@ void Server::check_fd_select(Client *client_part)
 			}
 			if (this->socket_type[i] == FD_SERVER)
 			{
-				std::cout << i << "accept" << std::endl;
 				this->socket_accept();
 				this->socket_type[this->server] = FD_CLIENT;
 			}
