@@ -20,6 +20,7 @@
 
 #include <iostream>
 #include <vector>
+#include <map>
 #include <cstring> // for bzero and strcpy in Linux
 #include <cctype>
 #include <sstream>

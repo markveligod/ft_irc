@@ -16,6 +16,7 @@ class Server: public AServer
         socklen_t	size;
 		fd_set		client_sockets;
 		int			socket_type[1024];
+		// std::map<int, int>			socket_type;
 		int			select_res;
         std::string pass;
 

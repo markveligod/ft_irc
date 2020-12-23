@@ -3,9 +3,9 @@
 Server::Server(const std::string &port_server, const std::string &pass): AServer(atoi(port_server.c_str()))
 {
 	this->pass = pass;
-	int i = 0;
-	while (i < 1024)
-		this->socket_type[i++] = FD_FREE;
+	for (int i = 0; i < 1024; i++)
+		this->socket_type[i] = FD_FREE;
+	// цикл не нужен
 	Utils::print_line("Constructor server done!");
 }
 
@@ -56,6 +56,7 @@ void Server::socket_listen()
     Utils::print_line("Listening...");
 
 	this->socket_type[this->fd_socket] = FD_SERVER;
+	// без изменений
 }
 
 /*
@@ -115,6 +116,7 @@ void Server::recv_message(int i)
 		std::cout << CYAN << "[SERVER]: " << YELLOW << "Client#" << i << " closed" << std::endl << RESET;
 		this->server = 0;
 		this->socket_type[i] = FD_FREE;
+		// socket_type.erase(i);
 	}
 }
 
@@ -126,15 +128,14 @@ void Server::recv_message(int i)
 
 void Server::init_fd_select()
 {
-	int i;
-
-	i = 0;
 	FD_ZERO(&this->client_sockets);
-	while (i < 1024)
+	for (int i = 0; i < 1024; i++)
+	// for (std::map<int, int>::iterator it = socket_type.begin(); it != socket_type.end(); it++)
 	{
 		if (this->socket_type[i] != FD_FREE)
+		// if (it->second != FD_FREE)
 			FD_SET(i, &this->client_sockets);
-		i++;
+			// FD_SET(it->first, &this->client_sockets);
 	}
 }
 
@@ -163,27 +164,29 @@ void Server::do_select()
 
 void Server::check_fd_select(Client *client_part)
 {
-	int i;
-
-	i = 0;
-	while ((i < 1024) && (this->select_res > 0))
+	for (int i = 0; i < 1024 && this->select_res > 0; i++)
+	// for (std::map<int, int>::iterator it = socket_type.begin(); it != socket_type.end(); it++)
 	{
 		if (FD_ISSET(i, &this->client_sockets))
+		// if (FD_ISSET(it->first, &this->client_sockets))
 		{
 			if (this->socket_type[i] == FD_CLIENT)
+			// if (it->second == FD_CLIENT)
 			{
 				this->recv_message(i);
+				// this->recv_message(it->first);
 				client_part->set_buffer(this->get_buffer().c_str());
 				client_part->send_message();
 			}
 			if (this->socket_type[i] == FD_SERVER)
+			// if (it->second == FD_SERVER)
 			{
 				this->socket_accept();
 				this->socket_type[this->server] = FD_CLIENT;
+				// без изменений
 			}
 			this->select_res--;
 		}
-		i++;
 	}
 }
 
