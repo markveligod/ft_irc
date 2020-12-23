@@ -98,8 +98,11 @@ void Server::send_message()
 void Server::recv_message(int i)
 {
     std::cout << "Client#" << i << ": ";
-	recv(i, this->buffer, BUFFER_SIZE, 0);
-	std::cout << this->buffer << std::endl;
+	// recv(i, this->buffer, BUFFER_SIZE, 0);
+	if (recv(i, this->buffer, BUFFER_SIZE, 0) == 0)
+		strcpy(AServer::buffer, "#");
+	else
+		std::cout << this->buffer << std::endl;
 	if (AServer::end_connection())
 	{
 		std::cout << CYAN << "[SERVER]: " << YELLOW << "Client#" << i << " closed" << std::endl << RESET;
