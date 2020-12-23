@@ -27,9 +27,9 @@ int main(int ac, char const **av)
     // std::cout << network[2] << std::endl;
 
 	//test connection with client and server
-	Server server_part = Server(ac == 4 ? av[2] : av[1]);
+	Server server_part = Server(ac == 4 ? av[2] : av[1], ac == 4 ? av[3] : av[2]);
 	//Server server_part2 = Server(ac == 4 ? av[2] : av[1]);
-	Client client_part = Client(atoi(network[1].c_str()), network[0]);
+	Client client_part = Client(atoi(network[1].c_str()), network[0], network[2]);
 
 	if (ac == 4)
 	{

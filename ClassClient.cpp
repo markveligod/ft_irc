@@ -6,7 +6,7 @@
 **==========================
 */
 
-Client::Client(int port, std::string const &ip) : AServer(port), ip(ip) {}
+Client::Client(int port, std::string const &ip, std::string const &pass) : AServer(port), ip(ip), pass(pass) {}
 
 /*
 **==========================
@@ -41,7 +41,15 @@ void	Client::connection()
 				  << " with port number "
 				  << this->port << " established\n";
 	else
-		Utils::print_error(0, "Unable to connect to server");
+		Utils::exit_error(ERR_CONNECT_TO_SERVER, "Unable to connect to server");
+	
+	Utils::print_line("Wait status password...");
+	strcpy(this->buffer, this->pass.c_str());
+	send(this->fd_socket, this->buffer, BUFFER_SIZE, 0);
+	recv(this->fd_socket, this->buffer, BUFFER_SIZE, 0);
+	if ((std::string)this->buffer == "FAIL")
+		Utils::exit_error(ERR_CONNECT_TO_SERVER, "Incorrect password");
+	Utils::print_line("Correct password!");
 }
 
 /*

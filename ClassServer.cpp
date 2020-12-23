@@ -1,10 +1,9 @@
 #include "ClassServer.hpp"
 
-Server::Server(const std::string &port_server): AServer(atoi(port_server.c_str()))
+Server::Server(const std::string &port_server, const std::string &pass): AServer(atoi(port_server.c_str()))
 {
-	int i;
-
-	i = 0;
+	this->pass = pass;
+	int i = 0;
 	while (i < 1024)
 		this->socket_type[i++] = FD_FREE;
 	Utils::print_line("Constructor server done!");
@@ -70,10 +69,20 @@ void Server::socket_accept()
 	if ((this->server = accept(this->fd_socket, reinterpret_cast<struct sockaddr *>(&this->server_addr), &(this->size))) < 0)
 		Utils::exit_error(ERR_ACCEPT, "Accepting error");
     Utils::print_line("Connection accepted!");
-	strcpy(this->buffer, "Server connected!\n");
-	send(this->server, this->buffer, BUFFER_SIZE, 0);
-	Utils::print_line("Connected to the client#" + Utils::convert_int_to_str(this->server));
-	//std::cout << CYAN << "[SERVER]: " << YELLOW << "Connected to the client#" << this->server << std::endl << RESET;
+	Utils::print_line("Check password...");
+	recv(this->server, this->buffer, BUFFER_SIZE, 0);
+	if ((std::string)this->buffer == this->pass)
+	{
+		strcpy(this->buffer, "Server connected!\n");	
+		send(this->server, this->buffer, BUFFER_SIZE, 0);
+		Utils::print_line("Connected to the client#" + Utils::convert_int_to_str(this->server));
+	}
+	else
+	{
+		strcpy(this->buffer, "FAIL");	
+		send(this->server, this->buffer, BUFFER_SIZE, 0);
+		Utils::print_line("Incorrect password from client#" + Utils::convert_int_to_str(this->server));
+	}
 }
 
 /*
@@ -84,10 +93,7 @@ void Server::socket_accept()
 
 void Server::send_message()
 {
-	char buffer[BUFFER_SIZE];
-	Utils::print_line(" ");
-	std::cin.getline(buffer, BUFFER_SIZE);
-	send(this->server, this->buffer, BUFFER_SIZE, 0);
+
 }
 
 /*

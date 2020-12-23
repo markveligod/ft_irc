@@ -7,9 +7,10 @@ class Client : public AServer
 {
 private:
 	std::string const	ip;
+	std::string pass;
 
 public:
-	Client(int port, std::string const & ip);
+	Client(int port, std::string const & ip, std::string const &pass);
 
 	void				create_socket();
 	void				connection();

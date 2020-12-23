@@ -47,6 +47,7 @@
 #define ERR_BIND 15
 #define ERR_ACCEPT 16
 #define ERR_LISTEN 17
+#define ERR_CONNECT_TO_SERVER 18
 
 /*
 **==========================

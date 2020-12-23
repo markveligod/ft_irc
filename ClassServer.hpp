@@ -17,10 +17,11 @@ class Server: public AServer
 		fd_set		client_sockets;
 		int			socket_type[1024];
 		int			select_res;
+        std::string pass;
 
         Server();
     public:
-        Server(const std::string &port_server);
+        Server(const std::string &port_server, const std::string &pass);
 
         virtual void    	create_socket();
 	    virtual void    	connection();
