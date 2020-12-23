@@ -31,19 +31,36 @@ int main(int ac, char const **av)
 	//Server server_part2 = Server(ac == 4 ? av[2] : av[1]);
 	Client client_part = Client(atoi(network[1].c_str()), network[0]);
 
-	server_part.create_socket();
-	server_part.connection();
-	
-
-	client_part.create_socket();
-	client_part.connection();
-	server_part.socket_listen();
-
-	while (1)
+	if (ac == 4)
 	{
-		server_part.init_fd_select();
-		server_part.do_select();
-		server_part.check_fd_select(&client_part);
+		server_part.create_socket();
+		server_part.connection();
+
+		client_part.create_socket();
+		client_part.connection();
+
+		server_part.socket_listen();
+
+		while (1)
+		{
+			server_part.init_fd_select();
+			server_part.do_select();
+			server_part.check_fd_select(&client_part);
+		}
+	}
+	else if (ac == 3)
+	{
+		server_part.create_socket();
+		server_part.connection();
+
+		server_part.socket_listen();
+
+		while (1)
+		{
+			server_part.init_fd_select();
+			server_part.do_select();
+			server_part.check_fd_select(&client_part);
+		}
 	}
 
 /*	while (1)

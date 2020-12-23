@@ -132,3 +132,16 @@ std::vector<std::string> Utils::split(std::string str, char type)
     }
     return (temp_vec);
 }
+
+/*
+**==========================
+** convert_int_to_str - конвертирует int в std::string
+**==========================
+*/
+
+std::string Utils::convert_int_to_str(int num)
+{
+    std::stringstream ss;
+    ss << num;
+    return (ss.str());
+}

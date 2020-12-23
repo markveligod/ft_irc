@@ -72,7 +72,8 @@ void Server::socket_accept()
     Utils::print_line("Connection accepted!");
 	strcpy(this->buffer, "Server connected!\n");
 	send(this->server, this->buffer, BUFFER_SIZE, 0);
-	std::cout << CYAN << "[SERVER]: " << YELLOW << "Connected to the client#" << this->server << std::endl << RESET;
+	Utils::print_line("Connected to the client#" + Utils::convert_int_to_str(this->server));
+	//std::cout << CYAN << "[SERVER]: " << YELLOW << "Connected to the client#" << this->server << std::endl << RESET;
 }
 
 /*
@@ -139,10 +140,8 @@ void Server::init_fd_select()
 
 void Server::do_select()
 {
-	std::cout << "1\n";
 	if ((this->select_res = select(1024, &this->client_sockets, NULL, NULL, NULL)) < 0)
 		Utils::print_error(16, "SELECT");
-	std::cout << "2\n";
 }
 
 /*

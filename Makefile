@@ -34,7 +34,7 @@ $(NAME): $(OBJ)
 	@echo "$(CYAN)      /|/|"
 	@echo "     ( @ @)"
 	@echo "      ) ^ $(RESET)   ft_irc (project 2020-2021) $(CYAN)"
-	@echo "     / |||       $(RESET) by ckakuna and leweathe$(CYAN)"
+	@echo "     / |||       $(RESET) by ckakuna, leweathe and pdemocri$(CYAN)"
 	@echo "    / )|||_"
 	@echo "   (_______)$(RESET)"
 	@echo ""
