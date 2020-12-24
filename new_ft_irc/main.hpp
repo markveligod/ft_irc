@@ -49,6 +49,7 @@
 #define ERR_ACCEPT 16
 #define ERR_LISTEN 17
 #define ERR_CONNECT_TO_SERVER 18
+#define ERR_SELECT 19
 
 /*
 **==========================
@@ -60,6 +61,8 @@
 #define DEF_PORT "0"
 #define BUFFER_SIZE	512
 #define DEF_PASS "123"
+#define FD_REQUEST 1
+#define FD_COMMIT 2
 
 /*
 **==========================

@@ -12,13 +12,16 @@
 class Server
 {
     private:
-        std::string ip_network;
-        int port_network;
-        std::string pass_network;
-        int port_curr;
-        std::string pass_curr;
-        Socket server_locale;
-        Socket server_network;
+        std::string         ip_network;
+        int                 port_network;
+        std::string         pass_network;
+        int                 port_curr;
+        std::string         pass_curr;
+        Socket              server_locale;
+        Socket              server_network;
+        std::vector<int>    array_fd_select;
+        fd_set              fd_set_sockets;
+        int                 select_res;
 
     public:
         Server();
@@ -29,6 +32,7 @@ class Server
         void create_socket_network();
         void create_socket_locale();
 
-        void bind_socket_network();
-        void bind_socket_locale();
+        void init_fd_select();
+        void do_select();
+        void check_fd_select();
 };

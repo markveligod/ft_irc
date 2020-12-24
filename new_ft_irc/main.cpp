@@ -28,7 +28,23 @@ int main(int ac, char **av)
 
     Server server(network[0], network[1], network[2], (ac == 4) ? av[2] : av[1], (ac == 4) ? av[3] : av[2]);
 
-    server.create_socket_locale();
+    if (ac == 4)
+    {
+        server.create_socket_network();
+        server.create_socket_locale();
+        while (true)
+        {
+
+        }
+    }
+    else if (ac == 3)
+    {
+        server.create_socket_locale();
+        while (true)
+        {
+            
+        }
+    }
 
 	return (0);
 }

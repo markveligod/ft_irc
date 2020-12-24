@@ -61,7 +61,6 @@ int Socket::_listen(int backlog) {
 
 	if ((res = listen(_fd, backlog)) < 0)
 		Utils::exit_error(ERR_LISTEN, "Listening error");
-    Utils::print_line("Listening...");
 	return res;
 }
 
