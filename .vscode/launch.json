@@ -5,12 +5,31 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(gdb) Launch",
+            "name": "Test",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/new_ft_irc/ircserv",
-            "args": ["127.0.0.1:1280:wap", "1080", "lol"],
+            "args": ["1080", "lol"],
             "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        }
+        {
+            "name": "Main",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/ircserv",
+            "args": ["1080", "lol"],
+            "stopAtEntry": true,
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,

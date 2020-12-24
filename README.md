@@ -5,3 +5,11 @@
 [RFC 2812](https://tools.ietf.org/html/rfc2812)  
 [RFC 2813](https://tools.ietf.org/html/rfc2813)  
 [RFC 7194](https://tools.ietf.org/html/rfc7194)
+
+netstat -atnp
+
+./bircd 1080
+
+./ircserv 127.0.0.1:1080:123 1280 123
+
+./client 1280

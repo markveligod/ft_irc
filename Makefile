@@ -9,6 +9,7 @@ CC		= clang++
 RM		= rm -rf
 DEBUG	= -g
 FLAGS	= -Wall -Wextra -Werror -MMD -std=c++98
+# FLAGS	+= -lcrypto -lssl
 
 NAME	= ircserv
 SRC		= main.cpp

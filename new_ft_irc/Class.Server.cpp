@@ -15,6 +15,7 @@ Server::Server(std::string ip_network, std::string port_network,  std::string pa
 void Server::create_socket_locale()
 {
     this->server_locale = Socket(this->ip_network.c_str(), this->port_curr);
+    // this->server_locale = Socket(0, this->port_curr);
     Utils::print_line("Socket locale done!");
     this->server_locale._socket();
     Utils::print_line("Socket locale FD done!");
