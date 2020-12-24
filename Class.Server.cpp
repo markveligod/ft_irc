@@ -1,4 +1,4 @@
-#include "ClassServer.hpp"
+#include "Class.Server.hpp"
 
 Server::Server(const std::string &port_server, const std::string &pass): AServer(atoi(port_server.c_str()))
 {

@@ -3,8 +3,8 @@
 
 # pragma once
 
-# include "./AServer.hpp"
-# include "ClassClient.hpp"
+# include "AServer.hpp"
+# include "Class.Client.hpp"
 # define FD_FREE 0
 # define FD_CLIENT 1
 # define FD_SERVER 2

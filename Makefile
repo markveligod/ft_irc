@@ -12,7 +12,11 @@ FLAGS	= -Wall -Wextra -Werror -MMD -std=c++98
 
 NAME	= ircserv
 SRC		= main.cpp
-CLASS	= ClassUtils.cpp AServer.cpp ClassClient.cpp ClassServer.cpp 
+CLASS	= Class.Utils.cpp \
+		  AServer.cpp \
+		  Class.Client.cpp \
+		  Class.Server.cpp \
+		  Class.Socket.cpp
 OBJ_DIR	= ./objects/
 OBJS	= $(SRC:.cpp=.o) $(CLASS:.cpp=.o)
 OBJ		= $(addprefix $(OBJ_DIR), $(OBJS))
