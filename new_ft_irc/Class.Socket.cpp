@@ -1,10 +1,11 @@
 #include <cstring>
 #include "Class.Socket.hpp"
 
+Socket::Socket() {}
+
 Socket::Socket(const char *host_ip, int port, int fd, int sin_family, int type, int protocol)
 				: _port(port), _fd(fd), _sin_family(sin_family),
 				  _type(type), _protocol(protocol) {
-	
 	bzero(&_addr, _addr_size);
 	if (host_ip) {
 		inet_pton(_sin_family, host_ip, &_addr.sin_addr);
@@ -15,6 +16,16 @@ Socket::Socket(const char *host_ip, int port, int fd, int sin_family, int type, 
 								: htons(INADDR_ANY);
 	_addr.sin_port			= htons(_port);
 	_addr_size				= sizeof(_addr);
+				  }
+
+Socket &Socket::operator=(const Socket &other)
+{
+	this->_port = other._port;
+	this->_fd = other._fd;
+	this->_sin_family = other._sin_family;
+	this->_type = other._type;
+	this->_protocol = other._protocol;
+	return (*this);
 }
 
 int Socket::_socket() {

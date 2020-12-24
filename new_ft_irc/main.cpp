@@ -26,7 +26,7 @@ int main(int ac, char **av)
     std::cout << ((ac == 4) ? av[2] : av[1]) << std::endl;
     std::cout << ((ac == 4) ? av[3] : av[2]) << std::endl;
 
-    Server server = Server(network[0], atoi(network[1].c_str()), network[2], atoi((ac == 4) ? av[2] : av[1]), std::string((ac == 4) ? av[3] : av[2]));
+    Server server(network[0], network[1], network[2], (ac == 4) ? av[2] : av[1], (ac == 4) ? av[3] : av[2]);
 
     server.create_socket_locale();
 

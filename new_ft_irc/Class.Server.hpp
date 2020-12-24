@@ -9,7 +9,7 @@
 //#include "./Class.Getting.hpp"
 //#include "./Class.Sending.hpp"
 
-class Server: public Socket
+class Server
 {
     private:
         std::string ip_network;
@@ -22,7 +22,7 @@ class Server: public Socket
 
     public:
         Server();
-        Server(std::string ip_network, int port_network, std::string pass_network, int port_curr, std::string pass_curr);
+        Server(std::string ip_network, std::string port_network, std::string pass_network, std::string port_curr, std::string pass_curr);
 
         Server &operator=(const Server &other);
 
