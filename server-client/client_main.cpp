@@ -2,12 +2,12 @@
 
 int main(int ac, char **av)
 {
-	if (ac != 2)
+	if (ac != 3)
 	{
-		std::cout << "./client <port>\n";
+		std::cout << "./client <port> <pass>\n";
 		exit(EXIT_FAILURE);
 	}
-	Client client = Client(atoi(av[1]), SERVER_IP);
+	Client client = Client(atoi(av[1]), SERVER_IP, av[2]);
 
 	client.create_socket();
 	client.connection();

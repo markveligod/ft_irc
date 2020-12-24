@@ -25,10 +25,11 @@ private:
 	std::string			ip;
 	struct sockaddr_in	server_addr;
 	char				buffer[BUFFER_SIZE];
+	std::string			pass;
 
 public:
 	Client();
-	Client(int port, std::string const & ip);
+	Client(int port, std::string const & ip, std::string const & pass);
 
 	static bool			end_connection(const char *line);
 	static void 		error(std::string const &str);

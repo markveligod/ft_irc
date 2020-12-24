@@ -3,7 +3,7 @@
 // --------------------------------Constructors--------------------------------
 
 Client::Client() : port(SERVER_PORT), ip(SERVER_IP) {}
-Client::Client(int port, std::string const & ip) : port(port), ip(ip) {}
+Client::Client(int port, std::string const & ip, std::string const & pass) : port(port), ip(ip), pass(pass) {}
 
 
 // ---------------------------Creating connection------------------------------
@@ -30,8 +30,16 @@ void	Client::connection()
 				  << this->port << "!!!" << std::endl;
 	else
 		Client::error("Connection error");
-
+	strcpy(this->buffer, this->pass.c_str());
+	std::cout << "Sending...\n";
+	send(this->client, this->buffer, BUFFER_SIZE, 0);
+	std::cout << "Getting...\n";
 	recv(this->client, this->buffer, BUFFER_SIZE, 0);
+	if ((std::string)this->buffer == "FAIL")
+	{
+		std::cout << "Incorrect password\n";
+		exit(EXIT_FAILURE);
+	}
 	std::cout << "Connection established!" << std::endl;
 }
 
@@ -46,6 +54,7 @@ void Client::connection_server()
 		Client::error("Connection error");
 
 	//recv(this->client, this->buffer, BUFFER_SIZE, 0);
+	
 	std::cout << "Connection established!" << std::endl;
 }
 
@@ -86,7 +95,7 @@ bool	Client::end_connection(const char *line)
 {
 	std::string str(line);
 
-	if (str == "end connection" || str == "end connectin\n")
+	if (str == "#" || str == "#\n")
 		return (true);
 	return (false);
 }
