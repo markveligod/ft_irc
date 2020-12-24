@@ -64,3 +64,8 @@ int Socket::_accept(struct sockaddr *addr, socklen_t *__restrict addrlen) {
 	// size_t	Socket::_send() { }
 
 	// size_t	Socket::_recv() { }
+
+	Socket::~Socket() {
+		if (_fd)
+			close(_fd);
+	}

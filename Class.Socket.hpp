@@ -19,6 +19,8 @@ protected:
 public:
 	Socket(const char *host_ip = NULL, int port = 0, int fd = 0,
 			int sin_family = AF_INET, int type = SOCK_STREAM, int protocol = 0);
+	
+	~Socket();
 
 	int		_socket();
 	int		_bind();
