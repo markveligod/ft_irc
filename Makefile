@@ -22,7 +22,6 @@ SRCS	= main.cpp \
 		  Class.Socket.cpp
 SRC		= $(addprefix $(SRC_DIR), $(SRCS))
 OBJS	= $(SRC:.cpp=.o) $(CLASS:.cpp=.o)
-# OBJ		= $(addprefix $(OBJ_DIR), $(OBJS))
 OBJ		= $(patsubst %.cpp,$(OBJ_DIR)%.o,$(SRCS))
 DEP		= $(OBJ:.o=.d)
 
