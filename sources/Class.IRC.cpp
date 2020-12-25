@@ -37,8 +37,8 @@ void IRC::create_socket_local()
 
 void IRC::create_socket_network()
 {
-    _network = Socket(_network_ip.c_str(), _network_port);
-    Utils::print_line("Socket network done!");
+	_network = Socket(_network_ip.c_str(), _network_port);
+	Utils::print_line("Socket network done!");
     _network._socket();
     Utils::print_line("Socket network FD done!");
     _network._connect();
@@ -102,6 +102,7 @@ void IRC::check_fd_select()
 				else {
 					buffer[n] = '\0';
 					std::cout << buffer << std::endl;
+					_network._send(buffer);
 				}
 			}
 			//Раздел для приемки сообщений из селекта
@@ -112,6 +113,7 @@ void IRC::check_fd_select()
 				int client = _localhost._accept();
 				_array_fd_select[client] = FD_CLIENT;
 				char response[] = "Accepted\n";
+				std::cout << "New client#" << client << " joined server\n";
 				send(client, reinterpret_cast<void *>(response), 10, 0);
 			}
 			_select_res--;

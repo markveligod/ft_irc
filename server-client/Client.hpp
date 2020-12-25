@@ -14,7 +14,7 @@
 # include <cstring>			// for bzero and strcpy in Linux
 
 # define SERVER_PORT	1280
-# define BUFFER_SIZE	1024
+# define BUFFER_SIZE	512
 # define SERVER_IP		"127.0.0.1"
 
 class Client

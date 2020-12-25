@@ -28,14 +28,27 @@ int main(int ac, char **av)
 
     IRC server(network[0], network[1], network[2], (ac == 4) ? av[2] : av[1], (ac == 4) ? av[3] : av[2]);
 
-    if (ac == 4)
-    {
-        server.create_socket_network();
-        server.create_socket_local();
-        while (true)
-        {
+	if (ac == 4)
+		server.create_socket_network();
 
-        }
+	server.create_socket_local();
+	while (true)
+	{
+		server.init_fd_select();
+		server.do_select();
+		server.check_fd_select();
+	}
+
+  /*  if (ac == 4)
+    {
+		server.create_socket_network();
+		server.create_socket_local();
+		while (true)
+        {
+			server.init_fd_select();
+			server.do_select();
+			server.check_fd_select();
+		}
     }
     else if (ac == 3)
     {
@@ -46,7 +59,7 @@ int main(int ac, char **av)
 			server.do_select();
 			server.check_fd_select();
         }
-    }
+    }*/
 
 	return (0);
 }

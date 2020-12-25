@@ -34,7 +34,7 @@ int Socket::_socket() {
 
 	if ((_fd = socket(_sin_family, _type, _protocol)) < 0)
 		Utils::exit_error(ERR_SOCKET, "Establishing socket error");
-	fcntl(_fd, F_SETFL, O_NONBLOCK);
+	//fcntl(_fd, F_SETFL, O_NONBLOCK); // с этим не работает подсоединение к серверу
 	return _fd;
 }
 
@@ -76,11 +76,13 @@ int Socket::_accept() {
 	return client;
 }
 
-	// size_t	Socket::_send() { }
+size_t	Socket::_send(char const * buffer) {
+	return (send(_fd, buffer, 512, 0));
+}
 
 	// size_t	Socket::_recv() { }
 
-	Socket::~Socket() {
-		if (_fd)
-			close(_fd);
-	}
+Socket::~Socket() {
+	if (_fd)
+		close(_fd);
+}

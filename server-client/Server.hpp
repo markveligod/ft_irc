@@ -14,10 +14,10 @@
 # include <netinet/in.h>
 
 # define SERVER_PORT	1280
-# define BUFFER_SIZE	1024
+# define BUFFER_SIZE	512
 # define SERVER_IP		"127.0.0.1"
 
-class IRC
+class Server
 {
 private:
 	int					port;
@@ -27,8 +27,8 @@ private:
 	char				buffer[BUFFER_SIZE];
 
 public:
-	IRC();
-	IRC(int port);
+	Server();
+	Server(int port);
 
 	static bool			end_connection(const char *line);
 	static void 		error(std::string const &str);

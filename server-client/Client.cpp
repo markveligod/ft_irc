@@ -31,16 +31,16 @@ void	Client::connection()
 	else
 		Client::error("Connection error");
 	strcpy(this->buffer, this->pass.c_str());
-	this->buffer[strlen(this->buffer)] = '\n';
+	//this->buffer[strlen(this->buffer)] = '\n';
 	std::cout << "Sending...\n";
 	send(this->client, this->buffer, BUFFER_SIZE, 0);
-	std::cout << "Getting...\n";
+	/*std::cout << "Getting...\n";
 	recv(this->client, this->buffer, BUFFER_SIZE, 0);
 	if ((std::string)this->buffer == "FAIL")
 	{
 		std::cout << "Incorrect password\n";
 		exit(EXIT_FAILURE);
-	}
+	}*/
 	std::cout << "Connection established!" << std::endl;
 }
 

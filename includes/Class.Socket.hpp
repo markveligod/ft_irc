@@ -39,7 +39,8 @@ public:
 	int		_connect();
 	int		_listen(int backlog = 5);
 	int		_accept();
+
 	// int		_accept(struct sockaddr *addr = NULL, socklen_t *__restrict addrlen = NULL);
-	// size_t	_send();
+	size_t	_send(char const *buffer);
 	// size_t	_recv();
 };
