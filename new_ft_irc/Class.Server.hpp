@@ -9,7 +9,7 @@
 //#include "./Class.Getting.hpp"
 //#include "./Class.Sending.hpp"
 
-class Server
+class Server	// иземенить на Irc
 {
     private:
         std::string         ip_network;
@@ -17,10 +17,11 @@ class Server
         std::string         pass_network;
         int                 port_curr;
         std::string         pass_curr;
-        Socket              server_locale;
+        Socket              server_local;
         Socket              server_network;
-        // std::vector<int>    array_fd_select;
 		std::map<int, int>	array_fd_select;
+		// std::map<std::string, User>	users;
+		// std::map<std::string, Server>	servers;
         fd_set              fd_set_sockets;
         int                 select_res;
 
