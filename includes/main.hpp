@@ -50,6 +50,8 @@
 #define ERR_LISTEN 17
 #define ERR_CONNECT_TO_SERVER 18
 #define ERR_SELECT 19
+#define ERR_PASSWORD 20
+#define ERR_NICKNAME 21
 
 /*
 **==========================
@@ -71,3 +73,4 @@
 */
 
 #include "Class.Utils.hpp"
+#include "Class.Message.hpp"

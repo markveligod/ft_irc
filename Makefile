@@ -19,7 +19,8 @@ OBJ_DIR	= ./objects/
 SRCS	= main.cpp \
 		  Class.Utils.cpp \
 		  Class.IRC.cpp \
-		  Class.Socket.cpp
+		  Class.Socket.cpp \
+		  Class.Message.cpp
 SRC		= $(addprefix $(SRC_DIR), $(SRCS))
 OBJS	= $(SRC:.cpp=.o) $(CLASS:.cpp=.o)
 OBJ		= $(patsubst %.cpp,$(OBJ_DIR)%.o,$(SRCS))

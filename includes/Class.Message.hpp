@@ -18,14 +18,19 @@ struct User {
 class Message
 {
     private:
-        Message();
+        struct User curr_user;
+        std::vector<std::string> temp;
+
         Message(const Message &other);
         Message &operator=(const Message &other);
+
+        bool pass(std::string password);
+        bool nick(std::string nickname);
+    public:
+        Message();
         ~Message();
 
-        void pass(std::string password);
-        void nick(std::string nickname, std::map<std::string, User> &users);
-    public:
-        Message(const std::string & str, std::map<std::string, User> &users);
+        void pars_str(std::string str);
+        struct User get_user();
         
 };

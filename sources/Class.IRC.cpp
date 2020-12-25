@@ -108,6 +108,14 @@ void IRC::check_fd_select()
 			//Раздел для приемки сообщений из селекта
 			if (it->second == FD_SERVER)
 			{
+				//Перед тем как добавлять user проверяем пароль и заполняем структуру
+				Message mess;
+
+				mess.pars_str("PASS 123");
+				mess.pars_str("NICK mark");
+				struct User user = mess.get_user();
+				Utils::print_line("User.nickname -> " + user.nickname);
+
 				// _accept() возвращает fd клиента, который мы добавляем в map
 				// в качестве ключа, в качестве значения добавляем FD_CLIENT
 				int client = _localhost._accept();
