@@ -1,9 +1,9 @@
-#include "Server.hpp"
+#include "IRChpp"
 #include "Client.hpp"
 
 int main(int ac, char **av)
 {
-	Server server = Server();
+	IRC server = IRC();
 	Client client = Client(1080, SERVER_IP, av[2]);
 
 	server.create_socket();

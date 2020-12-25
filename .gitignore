@@ -1,6 +1,6 @@
 *.o
 *.d
-*/objects
+*objects/
 *ircserv
 *client
 *server

@@ -9,31 +9,34 @@ CC		= clang++
 RM		= rm -rf
 DEBUG	= -g
 FLAGS	= -Wall -Wextra -Werror -MMD -std=c++98
-# FLAGS	+= -lcrypto -lssl
+INCLUDES= -I ./includes
 
 NAME	= ircserv
-SRC		= main.cpp
-CLASS	= Class.Utils.cpp \
-		  AServer.cpp \
-		  Class.Client.cpp \
-		  Class.Server.cpp \
-		  Class.Socket.cpp
+
+SRC_DIR = ./sources/
 OBJ_DIR	= ./objects/
+
+SRCS	= main.cpp \
+		  Class.Utils.cpp \
+		  Class.IRC.cpp \
+		  Class.Socket.cpp
+SRC		= $(addprefix $(SRC_DIR), $(SRCS))
 OBJS	= $(SRC:.cpp=.o) $(CLASS:.cpp=.o)
-OBJ		= $(addprefix $(OBJ_DIR), $(OBJS))
+# OBJ		= $(addprefix $(OBJ_DIR), $(OBJS))
+OBJ		= $(patsubst %.cpp,$(OBJ_DIR)%.o,$(SRCS))
 DEP		= $(OBJ:.o=.d)
 
 all: $(NAME)
 
 -include $(DEP)
 
-$(OBJ_DIR)%.o:%.cpp
+$(OBJ_DIR)%.o:$(SRC_DIR)%.cpp
 	@test -d $(OBJ_DIR) || mkdir $(OBJ_DIR)
-	@$(CC) $(DEBUG) -o $@ -c $< $(FLAGS)
+	@$(CC) $(DEBUG) -o $@ -c $< $(FLAGS) $(INCLUDES)
 	@echo "[$(GREEN)OK$(RESET)]$(YELLOW) Compiling $<$(RESET)"
 
 $(NAME): $(OBJ)
-	@$(CC) -o $(NAME) $(DEBUG) $(OBJ) $(FLAGS)
+	@$(CC) -o $(NAME) $(DEBUG) $(OBJ) $(FLAGS) $(INCLUDES)
 	@echo "[$(GREEN)Success$(RESET)]$(GREEN) Successfully compiled $(NAME) project.$(RESET)"
 	@echo ""
 	@echo "$(CYAN)      /|/|"
@@ -58,7 +61,7 @@ fclean: clean
 re: fclean all
 
 test: all
-	./$(NAME) 127.1.0.1:5555:jgirejgi 4444 grjgi
-	./$(NAME) 4444 grjgi
+	./$(NAME) 1280 wap
+	# ./$(NAME) 4444 grjgi
 
 .PHONY: all clean fclean re

@@ -1,45 +1,47 @@
-#include "./Class.Server.hpp"
+#include "Class.IRC.hpp"
 
 # define FD_FREE 0
 # define FD_CLIENT 1
 # define FD_SERVER 2
 
-Server::Server() {}
+IRC::IRC() {}
 
-Server::Server(std::string ip_network, std::string port_network,  std::string pass_network, std::string port_curr, std::string pass_curr)
+IRC::IRC(std::string network_ip,
+				std::string network_port,
+				std::string network_pass,
+				std::string localhost_port,
+				std::string localhost_pass)
 {
-    this->ip_network = ip_network;
-    this->port_network = std::atoi(port_network.c_str());
-    this->pass_network = pass_network;
-    this->port_curr = std::atoi(port_curr.c_str());
-    this->pass_curr = pass_curr;
-    Utils::print_line("Constructor Server done!");
+    _network_ip = network_ip;
+    _network_port = std::atoi(network_port.c_str());
+    _network_pass = network_pass;
+    _localhost_pass = localhost_pass;
+	_localhost = Socket(LOCALHOST, std::atoi(localhost_port.c_str()));
+    Utils::print_line("Constructor IRC done!");
+	Utils::print_line("Socket local done!");
 }
 
-void Server::create_socket_locale()
+void IRC::create_socket_local()
 {
-    this->server_locale = Socket(this->ip_network.c_str(), this->port_curr);
-    Utils::print_line("Socket locale done!");
+	// local socket created on IRC conctructor
 
-	array_fd_select[this->server_locale._socket()] = FD_SERVER;
-    // int first_fd = this->server_locale._socket();
-    // this->array_fd_select.push_back(first_fd);
-    Utils::print_line("Socket locale FD done!");
+	_array_fd_select[_localhost._socket()] = FD_SERVER;
+    Utils::print_line("Socket local FD done!");
 
-    this->server_locale._bind();
-    Utils::print_line("Socket locale bind done!");
+    _localhost._bind();
+    Utils::print_line("Socket local bind done!");
 
-    this->server_locale._listen();
-    Utils::print_line("Socket locale listen...");
+    _localhost._listen();
+    Utils::print_line("Socket local listen...");
 }
 
-void Server::create_socket_network()
+void IRC::create_socket_network()
 {
-    this->server_network = Socket(this->ip_network.c_str(), this->port_network);
+    _network = Socket(_network_ip.c_str(), _network_port);
     Utils::print_line("Socket network done!");
-    this->server_network._socket();
+    _network._socket();
     Utils::print_line("Socket network FD done!");
-    this->server_network._connect();
+    _network._connect();
     Utils::print_line("Socket network connection!");
 }
 
@@ -49,12 +51,12 @@ void Server::create_socket_network()
 **==========================
 */
 
-void Server::init_fd_select()
+void IRC::init_fd_select()
 {
-    FD_ZERO(&this->fd_set_sockets);
-	for (std::map<int, int>::iterator it = array_fd_select.begin(); it != array_fd_select.end(); it++)
+    FD_ZERO(&_fd_set_sockets);
+	for (std::map<int, int>::iterator it = _array_fd_select.begin(); it != _array_fd_select.end(); it++)
     {
-		FD_SET(it->first, &this->fd_set_sockets);
+		FD_SET(it->first, &_fd_set_sockets);
     }
 }
 
@@ -64,9 +66,9 @@ void Server::init_fd_select()
 **==========================
 */
 
-void Server::do_select()
+void IRC::do_select()
 {
-	if ((this->select_res = select(FD_SETSIZE, &fd_set_sockets, NULL, NULL, NULL)) < 0)
+	if ((_select_res = select(FD_SETSIZE, &_fd_set_sockets, NULL, NULL, NULL)) < 0)
 		Utils::print_error(ERR_SELECT, "SELECT");
 }
 
@@ -81,11 +83,11 @@ void Server::do_select()
 **==========================
 */
 
-void Server::check_fd_select()
+void IRC::check_fd_select()
 {
-	for (std::map<int, int>::iterator it = array_fd_select.begin(); it != array_fd_select.end() && this->select_res > 0; it++)
+	for (std::map<int, int>::iterator it = _array_fd_select.begin(); it != _array_fd_select.end() && _select_res > 0; it++)
 	{
-		if (FD_ISSET(it->first, &this->fd_set_sockets))
+		if (FD_ISSET(it->first, &_fd_set_sockets))
 		{
 			if (it->second == FD_CLIENT)
 			{
@@ -95,7 +97,7 @@ void Server::check_fd_select()
 				if (((n = recv(it->first, buffer, 512, 0))) == 0)
 				{
 					std::cout << "connection closed\n";
-					array_fd_select.erase(it->first);
+					_array_fd_select.erase(it->first);
 				}
 				else {
 					buffer[n] = '\0';
@@ -107,12 +109,12 @@ void Server::check_fd_select()
 			{
 				// _accept() возвращает fd клиента, который мы добавляем в map
 				// в качестве ключа, в качестве значения добавляем FD_CLIENT
-				int client = server_locale._accept();
-				this->array_fd_select[client] = FD_CLIENT;
+				int client = _localhost._accept();
+				_array_fd_select[client] = FD_CLIENT;
 				char response[] = "Accepted\n";
 				send(client, reinterpret_cast<void *>(response), 10, 0);
 			}
-			this->select_res--;
+			_select_res--;
 		}
 	}
 }

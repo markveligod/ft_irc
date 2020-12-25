@@ -17,7 +17,7 @@
 # define BUFFER_SIZE	1024
 # define SERVER_IP		"127.0.0.1"
 
-class Server
+class IRC
 {
 private:
 	int					port;
@@ -27,8 +27,8 @@ private:
 	char				buffer[BUFFER_SIZE];
 
 public:
-	Server();
-	Server(int port);
+	IRC();
+	IRC(int port);
 
 	static bool			end_connection(const char *line);
 	static void 		error(std::string const &str);
