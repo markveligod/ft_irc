@@ -5,4 +5,4 @@
 *client
 *server
 !server-client
-*/.vscode
+*.vscode/

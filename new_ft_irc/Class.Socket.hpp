@@ -19,7 +19,7 @@ protected:
 	int					_protocol;
 	char				_buffer[BUFFER_SIZE];
 	struct sockaddr_in	_addr;
-	size_t				_addr_size;
+	socklen_t			_addr_size;
 
 public:
 	Socket();
@@ -35,7 +35,8 @@ public:
 	int		_bind();
 	int		_connect();
 	int		_listen(int backlog = 5);
-	int		_accept(struct sockaddr *addr = NULL, socklen_t *__restrict addrlen = NULL);
+	int		_accept();
+	// int		_accept(struct sockaddr *addr = NULL, socklen_t *__restrict addrlen = NULL);
 	// size_t	_send();
 	// size_t	_recv();
 };

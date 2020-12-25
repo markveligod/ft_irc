@@ -19,13 +19,18 @@ class Server
         std::string         pass_curr;
         Socket              server_locale;
         Socket              server_network;
-        std::vector<int>    array_fd_select;
+        // std::vector<int>    array_fd_select;
+		std::map<int, int>	array_fd_select;
         fd_set              fd_set_sockets;
         int                 select_res;
 
     public:
         Server();
-        Server(std::string ip_network, std::string port_network, std::string pass_network, std::string port_curr, std::string pass_curr);
+        Server(std::string ip_network,
+			   std::string port_network,
+			   std::string pass_network,
+			   std::string port_curr,
+			   std::string pass_curr);
 
         Server &operator=(const Server &other);
 

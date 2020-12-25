@@ -55,7 +55,7 @@ fclean: clean
 re: fclean all
 
 test: all
-	./$(NAME) 127.1.0.1:5555:jgirejgi 4444 grjgi
-	./$(NAME) 4444 grjgi
+	./$(NAME) 1280 wap
+	# ./$(NAME) 4444 grjgi
 
 .PHONY: all clean fclean re

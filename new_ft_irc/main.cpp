@@ -42,7 +42,9 @@ int main(int ac, char **av)
         server.create_socket_locale();
         while (true)
         {
-            
+            server.init_fd_select();
+			server.do_select();
+			server.check_fd_select();
         }
     }
 

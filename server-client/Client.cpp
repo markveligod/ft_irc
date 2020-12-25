@@ -31,6 +31,7 @@ void	Client::connection()
 	else
 		Client::error("Connection error");
 	strcpy(this->buffer, this->pass.c_str());
+	this->buffer[strlen(this->buffer)] = '\n';
 	std::cout << "Sending...\n";
 	send(this->client, this->buffer, BUFFER_SIZE, 0);
 	std::cout << "Getting...\n";
@@ -60,20 +61,20 @@ void Client::connection_server()
 
 void	Client::chat()
 {
-	//while (1)
-//	{
+	while (1)
+	{
 		std::cout << "Client: ";
-		std::cin.getline(this->buffer, BUFFER_SIZE);
+		std::cin.getline(this->buffer, BUFFER_SIZE - 1);
 		send(this->client, this->buffer, BUFFER_SIZE, 0);
-		//if (Client::end_connection(this->buffer))
-		//	break;
+		if (Client::end_connection(this->buffer))
+			break;
 
 		/*std::cout << "Server: ";
 		recv(this->client, this->buffer, BUFFER_SIZE, 0);
 		std::cout << this->buffer << std::endl;
 		if (Client::end_connection(this->buffer))
 			break;*/
-//	}
+	}
 }
 
 void	Client::send_to_server()

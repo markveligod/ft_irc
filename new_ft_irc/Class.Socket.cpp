@@ -34,6 +34,7 @@ int Socket::_socket() {
 
 	if ((_fd = socket(_sin_family, _type, _protocol)) < 0)
 		Utils::exit_error(ERR_SOCKET, "Establishing socket error");
+	fcntl(_fd, F_SETFL, O_NONBLOCK);
 	return _fd;
 }
 
@@ -64,12 +65,14 @@ int Socket::_listen(int backlog) {
 	return res;
 }
 
-int Socket::_accept(struct sockaddr *addr, socklen_t *__restrict addrlen) {
+// int Socket::_accept(struct sockaddr *addr, socklen_t *__restrict addrlen) {
+int Socket::_accept() {
 	
 	int client = 0;
 
-	if ((client = accept(_fd, addr, addrlen)) < 0)
+	if ((client = accept(_fd, reinterpret_cast<struct sockaddr *>(&_addr), &_addr_size)) < 0)
 		Utils::exit_error(ERR_ACCEPT, "Accepting error");
+	fcntl(client, F_SETFL, O_NONBLOCK);
 	return client;
 }
 

@@ -1,5 +1,9 @@
 #include "./Class.Server.hpp"
 
+# define FD_FREE 0
+# define FD_CLIENT 1
+# define FD_SERVER 2
+
 Server::Server() {}
 
 Server::Server(std::string ip_network, std::string port_network,  std::string pass_network, std::string port_curr, std::string pass_curr)
@@ -16,11 +20,15 @@ void Server::create_socket_locale()
 {
     this->server_locale = Socket(this->ip_network.c_str(), this->port_curr);
     Utils::print_line("Socket locale done!");
-    int first_fd = this->server_locale._socket();
-    this->array_fd_select.push_back(first_fd);
+
+	array_fd_select[this->server_locale._socket()] = FD_SERVER;
+    // int first_fd = this->server_locale._socket();
+    // this->array_fd_select.push_back(first_fd);
     Utils::print_line("Socket locale FD done!");
+
     this->server_locale._bind();
     Utils::print_line("Socket locale bind done!");
+
     this->server_locale._listen();
     Utils::print_line("Socket locale listen...");
 }
@@ -44,15 +52,11 @@ void Server::create_socket_network()
 void Server::init_fd_select()
 {
     FD_ZERO(&this->fd_set_sockets);
-    for (size_t i = 0; i < this->array_fd_select.size(); i++)
+	for (std::map<int, int>::iterator it = array_fd_select.begin(); it != array_fd_select.end(); it++)
     {
-        if (this->array_fd_select[i] != 0)
-        {
-            FD_SET(i, &this->fd_set_sockets);
-        }
+		FD_SET(it->first, &this->fd_set_sockets);
     }
 }
-
 
 /*
 **==========================
@@ -62,7 +66,7 @@ void Server::init_fd_select()
 
 void Server::do_select()
 {
-	if ((this->select_res = select(this->array_fd_select.size(), &this->fd_set_sockets, NULL, NULL, NULL)) < 0)
+	if ((this->select_res = select(FD_SETSIZE, &fd_set_sockets, NULL, NULL, NULL)) < 0)
 		Utils::print_error(ERR_SELECT, "SELECT");
 }
 
@@ -79,11 +83,35 @@ void Server::do_select()
 
 void Server::check_fd_select()
 {
-	for (size_t i = 0; i < this->array_fd_select.size() && this->select_res > 0; i++)
+	for (std::map<int, int>::iterator it = array_fd_select.begin(); it != array_fd_select.end() && this->select_res > 0; it++)
 	{
-		if (FD_ISSET(i, &this->fd_set_sockets))
+		if (FD_ISSET(it->first, &this->fd_set_sockets))
 		{
+			if (it->second == FD_CLIENT)
+			{
+				char buffer[512 + 1];
+				int n = 0;
+				std::cout << "Client#" << it->first << ": ";
+				if (((n = recv(it->first, buffer, 512, 0))) == 0)
+				{
+					std::cout << "connection closed\n";
+					array_fd_select.erase(it->first);
+				}
+				else {
+					buffer[n] = '\0';
+					std::cout << buffer << std::endl;
+				}
+			}
 			//Раздел для приемки сообщений из селекта
+			if (it->second == FD_SERVER)
+			{
+				// _accept() возвращает fd клиента, который мы добавляем в map
+				// в качестве ключа, в качестве значения добавляем FD_CLIENT
+				int client = server_locale._accept();
+				this->array_fd_select[client] = FD_CLIENT;
+				char response[] = "Accepted\n";
+				send(client, reinterpret_cast<void *>(response), 10, 0);
+			}
 			this->select_res--;
 		}
 	}
