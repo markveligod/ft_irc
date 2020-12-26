@@ -9,6 +9,7 @@ CC		= clang++
 RM		= rm -rf
 DEBUG	= -g
 FLAGS	= -Wall -Wextra -Werror -MMD -std=c++98
+SSL		= -lssl -lcrypto
 INCLUDES= -I ./includes
 
 NAME	= ircserv
@@ -38,7 +39,7 @@ $(OBJ_DIR)%.o:$(SRC_DIR)%.cpp
 	@echo "[$(GREEN)OK$(RESET)]$(YELLOW) Compiling $<$(RESET)"
 
 $(NAME): $(OBJ)
-	@$(CC) -o $(NAME) $(DEBUG) $(OBJ) $(FLAGS) $(INCLUDES)
+	@$(CC) -o $(NAME) $(DEBUG) $(OBJ) $(FLAGS) $(INCLUDES) $(SSL)
 	@echo "[$(GREEN)Success$(RESET)]$(GREEN) Successfully compiled $(NAME) project.$(RESET)"
 	@echo ""
 	@echo "$(CYAN)      /|/|"

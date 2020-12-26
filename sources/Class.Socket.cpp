@@ -71,7 +71,7 @@ int Socket::_accept() {
 
 	if ((client = accept(_fd, reinterpret_cast<struct sockaddr *>(&_addr), &_addr_size)) < 0)
 		Utils::exit_error(ERR_ACCEPT, "Accepting error");
-	fcntl(client, F_SETFL, O_NONBLOCK);
+	// fcntl(client, F_SETFL, O_NONBLOCK);
 	return client;
 }
 

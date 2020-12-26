@@ -13,21 +13,21 @@
 
 class Message
 {
-    private:
+	private:
 		std::vector<std::string>	temp;
 
 		Message(const Message &other);
-        Message &operator=(const Message &other);
+		Message &operator=(const Message &other);
 
-        bool pass(std::string password);
-        bool nick(std::string nickname, std::vector<Client *> users);
+		bool pass(std::string password);
+		bool nick(std::string nickname, std::vector<Client *> users);
 		bool user(Client *curr_client);
-    public:
-        Message();
+	public:
+		Message();
 		~Message();
 
-		void 	cmd_nick(void * var_1, void * var_2);
-		void 	cmd_pass(void * var_1, void * var_2);
+		void	cmd_nick(void * var_1, void * var_2);
+		void	cmd_pass(void * var_1, void * var_2);
 		void	cmd_user(void * var_1, void * var_2);
 		
 		void	pars_str(std::string str);

@@ -4,6 +4,9 @@
 # define FD_CLIENT 1
 # define FD_SERVER 2
 
+# define CERTIFICATE "cert/cert.pem"
+# define PRIVATE_KEY "cert/key.pem"
+
 /*
 ** ----------------------------------------------------------
 ** Constructors
@@ -16,13 +19,18 @@ IRC::IRC(std::string network_ip,
 				std::string network_port,
 				std::string network_pass,
 				std::string localhost_port,
-				std::string localhost_pass)
+				std::string localhost_pass,
+				bool ssl)
 {
     _network_ip = network_ip;
     _network_port = std::atoi(network_port.c_str());
     _network_pass = network_pass;
     _localhost_pass = localhost_pass;
-	_localhost = Socket(LOCALHOST, std::atoi(localhost_port.c_str()));
+	_ssl = ssl;
+	int port = (_ssl == true) // для ssl-соединения слушаем порт+1
+						? (std::atoi(localhost_port.c_str()) + 1)
+						: std::atoi(localhost_port.c_str());
+	_localhost = Socket(LOCALHOST, port);
     Utils::print_line("Constructor IRC done!");
 	Utils::print_line("Socket local done!");
 }
@@ -171,12 +179,69 @@ void IRC::check_fd_select()
 				_array_fd_select[client_socket] = FD_CLIENT;
 				char response[] = "Accepted\n";
 				std::cout << "New client#" << client_socket << " joined server\n";
-				send(client_socket, reinterpret_cast<void *>(response), 10, 0);
+				if (!_ssl)
+				{
+					send(client_socket, reinterpret_cast<void *>(response), 10, 0);
 
-				Client *newclient = new Client(client_socket);
-				this->_clients.push_back(newclient);
+					Client *newclient = new Client(client_socket);
+					this->_clients.push_back(newclient);
+				} else
+				{
+					ssl_connection(client_socket);
+				}
+				
 			}
 			_select_res--;
 		}
 	}
+}
+
+/*
+**==========================
+** init_ctx - инициализация конфигурации для SSL
+**==========================
+*/
+
+void IRC::init_ssl()
+{
+	SSL_library_init();					/*load encryption and hash algo's in ssl*/
+	OpenSSL_add_all_algorithms();		/* load & register all cryptos, etc. */
+	ERR_load_crypto_strings();		
+	SSL_load_error_strings();			/* load all error messages */
+}
+
+void IRC::init_ctx()
+{
+	const SSL_METHOD *method;
+
+	// if (server)
+		method = TLS_server_method();	/* create new server-method instance */
+	// if (client)
+	// 	method = TLS_client_method();
+	if (!(_ctx = SSL_CTX_new(method)))	/* create new context from method */
+		Utils::print_error(1, "SSL: SSL_CTX_new failed\n");
+
+	if (SSL_CTX_use_certificate_file(_ctx, CERTIFICATE, SSL_FILETYPE_PEM) <= 0)
+		Utils::print_error(1, "SSL: SSL_CTX_use_certificate_file failed\n");
+	if (SSL_CTX_use_PrivateKey_file(_ctx, PRIVATE_KEY, SSL_FILETYPE_PEM) <= 0)
+		Utils::print_error(1, "SSL: SSL_CTX_use_PrivateKey_file SSL failed\n");
+	if (!SSL_CTX_check_private_key(_ctx))
+		Utils::print_error(1, "SSL: SSL_CTX_check_private_key failed\n");
+}
+
+void IRC::ssl_connection(int fd)
+{
+	SSL *ssl = SSL_new(_ctx);
+
+	if (SSL_set_fd(ssl, fd) <= 0)
+		Utils::print_error(1, "SSL: SSL_set_fd failed\n");
+
+	if (SSL_accept(ssl) < 0)		/* do SSL-protocol accept */
+        Utils::print_error(1, "SSL: SSL_accept failed\n");
+
+	char response[] = "Accepted\n";
+	// char buffer[512 + 1];
+	// SSL_read(ssl, reinterpret_cast<void *>(buffer), 510);
+	// std::cout << buffer << std::endl;
+	SSL_write(ssl, reinterpret_cast<void *>(response), 10);
 }
