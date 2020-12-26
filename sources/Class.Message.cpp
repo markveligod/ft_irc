@@ -98,7 +98,9 @@ void  Message::cmd_nick(void * var_1, void * var_2)
 {
 	(void)var_2;
 	std::vector<Client *> *vect = (std::vector<Client *> *)var_1;
-	if (this->nick(this->temp[1], *vect))
+	if ((*vect)[0]->getPassword() == false)
+		Utils::print_error(123, "Enter PASS before NICK!");
+	else if (this->nick(this->temp[1], *vect))
 	{
 		Utils::print_line("NickName is avalible!");
 		(*vect)[0]->setNickname(this->temp[1]);
