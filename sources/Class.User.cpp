@@ -1,9 +1,11 @@
 #include "Class.User.hpp"
 #include "Class.Client.hpp"
 
-// -------------
-// Constructors
-// -------------
+/*
+** ----------------------------------------------------------
+** Constructor
+** ----------------------------------------------------------
+*/
 
 User::User(Client const &src) : Client(src)
 {
@@ -13,52 +15,19 @@ User::User(Client const &src) : Client(src)
 	this->socket_fd = src.getSocketFd();
 }
 
-/*User::User() {}
-
-User::User(User const & src)
-		  : nickname(src.nickname), username(src.username),
-		    hostname(src.hostname), servername(src.servername),
-			realname(src.realname), hopcount(src.hopcount), 
-			status(src.status), mode(src.mode) {}
-
-User::User(std::string nickname, int hopcount) :
-			nickname(nickname), hopcount(hopcount)
-{
-	this->status = CLIENT;
-}
-
-User::User(std::string nickname, std::string username,
-		   std::string hostname, std::string servername,
-		   std::string realname, int hopcount)
-	: nickname(nickname), username(username), hostname(hostname),
-	  servername(servername), realname(realname), hopcount(hopcount)
-{
-	this->status = USER;
-	this->mode.i = 0;
-	this->mode.o = 0;
-	this->mode.s = 0;
-	this->mode.w = 0;
-}
-
-User::User(std::string nickname, std::string username,
-		   std::string hostname, std::string servername,
-		   std::string realname, ModeUser mode, int hopcount)
-	: nickname(nickname), username(username), hostname(hostname),
-	  servername(servername), realname(realname), hopcount(hopcount),
-	  mode(mode)
-{
-	this->status = USER;
-}
+/*
+** ----------------------------------------------------------
+** creating user from client
+**
+** когда клиент уже ввел пароль и задал nick, и командой USER
+** хочет создать юзера, вызываем эту функцию
+** 
+** она перегружена - первый вариант без задания модов юзера
+**					 (например, когда создается новый юзер)
+**				   - второй вариант с заданием модов
+**					 (например, когда юзеры приходят от сервера)
+** ----------------------------------------------------------
 */
-// ----------------------------------------------
-// Creating user from client (with USER command)
-// ----------------------------------------------
-
-/*void User::client_from_pass(std::string nickname, int hopcount)
-{
-	this->nickname = nickname;
-	this->hopcount = hopcount;
-}*/
 
 void User::user_from_client(std::string username, std::string hostname,
 					  std::string servername, std::string realname)
@@ -82,12 +51,3 @@ void User::user_from_client(std::string username, std::string hostname,
 	this->realname = realname;
 	this->mode = mode;
 }
-/*
-int User::getHopcount() const {return (this->hopcount);}
-std::string const & User::getNickname() const {return (this->nickname);}
-*/
-/*std::ostream &operator<<(std::ostream &o, User const &src)
-{
-	o << src.getName() << ", bureaucrat grade " << src.getGrade();
-	return (o);
-}*/
