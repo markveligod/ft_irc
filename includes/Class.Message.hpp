@@ -33,10 +33,11 @@ class Message
 		//Message(std::vector<User *> all_users);
 		~Message();
 
-		void *	cmd_nick();
-		void *	cmd_pass();
-		void *	do_cmd();
+		void 	cmd_nick(void * var);
+		void 	cmd_pass(void * var);
+		//void *	do_cmd();
 		void	pars_str(std::string str);
 		//struct User get_user();
-        
+
+		std::string const &getCommand() const;
 };

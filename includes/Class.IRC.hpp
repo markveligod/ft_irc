@@ -19,9 +19,10 @@ class IRC	// иземенить на Irc
         Socket              _localhost;
         std::string         _localhost_pass;
 		std::map<int, int>	_array_fd_select;
+		std::vector<User *> _users;
 		// std::map<std::string, User>	users;
 		// std::map<std::string, Server> servers;
-        fd_set              _fd_set_sockets;
+		fd_set              _fd_set_sockets;
         int                 _select_res;
 
     public:
@@ -40,4 +41,5 @@ class IRC	// иземенить на Irc
         void init_fd_select();
         void do_select();
         void check_fd_select();
+		void do_command(Message * message);
 };

@@ -4,6 +4,8 @@
 // Constructors
 // -------------
 
+User::User() {}
+
 User::User(User const & src)
 		  : nickname(src.nickname), username(src.username),
 		    hostname(src.hostname), servername(src.servername),
@@ -42,6 +44,12 @@ User::User(std::string nickname, std::string username,
 // ----------------------------------------------
 // Creating user from client (with USER command)
 // ----------------------------------------------
+
+void User::client_from_pass(std::string nickname, int hopcount)
+{
+	this->nickname = nickname;
+	this->hopcount = hopcount;
+}
 
 void User::user_from_client(std::string username, std::string hostname,
 					  std::string servername, std::string realname)

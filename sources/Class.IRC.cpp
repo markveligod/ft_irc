@@ -72,6 +72,26 @@ void IRC::do_select()
 		Utils::print_error(ERR_SELECT, "SELECT");
 }
 
+typedef void (Message::*doCommand)(void *);
+
+void IRC::do_command(Message * message)
+{
+	std::string cmd_name[2] = {"NICK",
+							   "PASS"};
+	doCommand cmd_func[2] = {&Message::cmd_nick,
+							 &Message::cmd_pass};
+	void *cmd_var[2] = {(void *)&this->_users,
+						(void *)&this->_users};
+
+	for (int i = 0; i < 2; i++)
+		if (cmd_name[i] == message->getCommand())
+		{
+			(message->*(cmd_func[i]))(cmd_var[i]);
+			return ;
+		}
+	Utils::print_error(123, "Command not found");
+}
+
 /*
 **==========================
 ** check_fd_select - проходимся по всем дескрипторам, если встречаем тот, который
@@ -110,13 +130,14 @@ void IRC::check_fd_select()
 			{
 				//Перед тем как добавлять user проверяем пароль и заполняем структуру
 				Message mess;
-				User	*user;
+				//User	*user;
 
-				//mess.pars_str("PASS 123");
+				mess.pars_str("PASS 123");
+				this->do_command(&mess);
 				//mess.do_cmd();
 				mess.pars_str("NICK mark");
-				user = (User *)mess.do_cmd();
-				std::cout << user->getNickname() << std::endl;
+				this->do_command(&mess);
+				std::cout << this->_users[0]->getNickname() << std::endl;
 				//struct User user = mess.get_user();
 				//Utils::print_line("User.nickname -> " + user.nickname);
 

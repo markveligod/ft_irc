@@ -28,6 +28,7 @@ private:
 
 public:
 	User(User const &src);
+	User();
 	User(std::string nickname, int hopcount = 0);
 	User(std::string nickname, std::string username,
 		 std::string hostname, std::string servername,
@@ -36,6 +37,7 @@ public:
 		 std::string hostname, std::string servername,
 		 std::string realname, ModeUser mode, int hopcount = 0);
 
+	void			client_from_pass(std::string nickname, int hopcount = 0);
 	void			user_from_client(std::string username, std::string hostname, 
 									 std::string servername, std::string realname);
 	void			user_from_client(std::string username, std::string hostname,

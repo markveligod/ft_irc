@@ -65,34 +65,49 @@ void Message::pars_str(std::string str)
     this->temp.clear();*/
 }
 
-void * Message::cmd_nick()
+void  Message::cmd_nick(void * var)
 {
-	User *new_user = new User(this->temp[1], std::stoi(this->temp[2]));
-
-	return ((void *)new_user);
+	//User *new_user = new User(this->temp[1]);
+	std::vector<User *> *vect = (std::vector<User *> *)var;
+	(*vect)[0]->client_from_pass(this->temp[1]);
+	this->temp.clear();
+	//vect->push_back(new_user);
 }
 
-void * Message::cmd_pass()
+void	Message::cmd_pass(void * var)
 {
 	if (this->temp[1] == DEF_PASS)
+	{
+		User *new_user = new User();
+		std::vector<User *> *vect = (std::vector<User *> *)var;
+		vect->push_back(new_user);
+	}
+	this->temp.clear();
+	/*if (this->temp[1] == DEF_PASS)
 		return ((void *)true);
-	return ((void *)false);
+	return ((void *)false);*/
 }
 
-typedef void *(Message::*doCommand)(void);
+//typedef void *(Message::*doCommand)(void);
 
-void * Message::do_cmd()
+/*void * Message::do_cmd()
 {
 	std::string cmd_name[2] = {"NICK",
 							   "PASS"};
 	doCommand cmd_func[2] 	= {&Message::cmd_nick,
 							   &Message::cmd_pass};
+	void *		attribute[2] = 
 	for (int i = 0; i < 2; i++)
 	{
 		if (cmd_name[i] == this->temp[0])
 			return ((this->*(cmd_func[i]))());
 	}
 	return (NULL);
+}*/
+
+std::string const & Message::getCommand() const
+{
+	return (this->temp[0]);
 }
 
 /*struct User Message::get_user()
