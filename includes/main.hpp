@@ -74,3 +74,4 @@
 
 #include "Class.Utils.hpp"
 #include "Class.Message.hpp"
+#include "Class.User.hpp"

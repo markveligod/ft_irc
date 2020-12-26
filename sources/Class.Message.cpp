@@ -8,8 +8,9 @@
 
 Message::Message() {}
 
-Message::~Message() {}
+//Message::Message(std::vector<User *> all_users) : all_users(all_users) {}
 
+Message::~Message() {}
 
 bool Message::pass(std::string password)
 {
@@ -44,7 +45,7 @@ void Message::pars_str(std::string str)
         this->temp.push_back(ff);
     }
 
-    if (this->temp[0] == "PASS")
+    /*if (this->temp[0] == "PASS")
     {
         if (this->pass(this->temp[1]))
             Utils::print_line("Password Correct!");
@@ -56,15 +57,45 @@ void Message::pars_str(std::string str)
         if (this->nick(this->temp[1]))
         {
             Utils::print_line("nickname is available!");
-            this->curr_user.nickname = this->temp[1];
+            //this->curr_user.nickname = this->temp[1];
         }
         else
             Utils::print_error(ERR_NICKNAME, "Wrong nickname!");
     }
-    this->temp.clear();
+    this->temp.clear();*/
 }
 
-struct User Message::get_user()
+void * Message::cmd_nick()
+{
+	User *new_user = new User(this->temp[1], std::stoi(this->temp[2]));
+
+	return ((void *)new_user);
+}
+
+void * Message::cmd_pass()
+{
+	if (this->temp[1] == DEF_PASS)
+		return ((void *)true);
+	return ((void *)false);
+}
+
+typedef void *(Message::*doCommand)(void);
+
+void * Message::do_cmd()
+{
+	std::string cmd_name[2] = {"NICK",
+							   "PASS"};
+	doCommand cmd_func[2] 	= {&Message::cmd_nick,
+							   &Message::cmd_pass};
+	for (int i = 0; i < 2; i++)
+	{
+		if (cmd_name[i] == this->temp[0])
+			return ((this->*(cmd_func[i]))());
+	}
+	return (NULL);
+}
+
+/*struct User Message::get_user()
 {
     return (this->curr_user);
-}
+}*/

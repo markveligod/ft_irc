@@ -20,7 +20,7 @@ class IRC	// иземенить на Irc
         std::string         _localhost_pass;
 		std::map<int, int>	_array_fd_select;
 		// std::map<std::string, User>	users;
-		// std::map<std::string, IRC>	servers;
+		// std::map<std::string, Server> servers;
         fd_set              _fd_set_sockets;
         int                 _select_res;
 

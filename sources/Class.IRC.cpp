@@ -110,11 +110,15 @@ void IRC::check_fd_select()
 			{
 				//Перед тем как добавлять user проверяем пароль и заполняем структуру
 				Message mess;
+				User	*user;
 
-				mess.pars_str("PASS 123");
+				//mess.pars_str("PASS 123");
+				//mess.do_cmd();
 				mess.pars_str("NICK mark");
-				struct User user = mess.get_user();
-				Utils::print_line("User.nickname -> " + user.nickname);
+				user = (User *)mess.do_cmd();
+				std::cout << user->getNickname() << std::endl;
+				//struct User user = mess.get_user();
+				//Utils::print_line("User.nickname -> " + user.nickname);
 
 				// _accept() возвращает fd клиента, который мы добавляем в map
 				// в качестве ключа, в качестве значения добавляем FD_CLIENT
