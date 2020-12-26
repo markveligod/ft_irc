@@ -72,21 +72,27 @@ void IRC::do_select()
 		Utils::print_error(ERR_SELECT, "SELECT");
 }
 
-typedef void (Message::*doCommand)(void *);
+typedef void (Message::*doCommand)(void *, void *);
 
 void IRC::do_command(Message * message)
 {
-	std::string cmd_name[2] = {"NICK",
-							   "PASS"};
-	doCommand 	cmd_func[2]	= {&Message::cmd_nick,
-							   &Message::cmd_pass};
-	void *		cmd_var[2]	= {(void *)&this->_clients,
-						       (void *)&this->_clients};
+	std::string cmd_name[3] = {"NICK",
+							   "PASS",
+							   "USER"};
+	doCommand 	cmd_func[3]	= {&Message::cmd_nick,
+							   &Message::cmd_pass,
+							   &Message::cmd_user};
+	void *		cmd_var[3]	= {(void *)&this->_clients,
+						       (void *)&this->_clients,
+							   (void *)&this->_clients};
+	void *		cmd_var2[3]	= {NULL,
+						       NULL,
+							   (void *)&this->_users};
 
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < 3; i++)
 		if (cmd_name[i] == message->getCommand())
 		{
-			(message->*(cmd_func[i]))(cmd_var[i]);
+			(message->*(cmd_func[i]))(cmd_var[i], cmd_var2[i]);
 			return ;
 		}
 	Utils::print_error(123, "Command not found");
@@ -135,25 +141,16 @@ void IRC::check_fd_select()
 			//Раздел для приемки сообщений из селекта
 			if (it->second == FD_SERVER)
 			{
-				//Перед тем как добавлять user проверяем пароль и заполняем структуру
-				//Message mess;
-				//User	*user;
-
-				//mess.pars_str("PASS 123");
-				//this->do_command(&mess);
-				//mess.pars_str("NICK mark");
-				//this->do_command(&mess);
-				//std::cout << this->_users[0]->getNickname() << std::endl;
-
 				// _accept() возвращает fd клиента, который мы добавляем в map
 				// в качестве ключа, в качестве значения добавляем FD_CLIENT
-				int client = _localhost._accept();
-				_array_fd_select[client] = FD_CLIENT;
+				int client_socket = _localhost._accept();
+				_array_fd_select[client_socket] = FD_CLIENT;
 				char response[] = "Accepted\n";
-				std::cout << "New client#" << client << " joined server\n";
-				Client *newclient = new Client(client);
+				std::cout << "New client#" << client_socket << " joined server\n";
+				send(client_socket, reinterpret_cast<void *>(response), 10, 0);
+
+				Client *newclient = new Client(client_socket);
 				this->_clients.push_back(newclient);
-				send(client, reinterpret_cast<void *>(response), 10, 0);
 			}
 			_select_res--;
 		}

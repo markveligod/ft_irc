@@ -11,34 +11,26 @@
 #include "main.hpp"
 #include "Class.User.hpp"
 
-//temp
-//struct User {
-  //  std::string nickname;
-//};
-
 class Message
 {
     private:
-        //struct User curr_user;
-		//User						curr_user;
 		std::vector<std::string>	temp;
-		//std::vector<User *>			all_users;
 
 		Message(const Message &other);
         Message &operator=(const Message &other);
 
         bool pass(std::string password);
-        bool nick(std::string nickname);
+        bool nick(std::string nickname, std::vector<Client *> users);
+		bool user(Client *curr_client);
     public:
         Message();
-		//Message(std::vector<User *> all_users);
 		~Message();
 
-		void 	cmd_nick(void * var);
-		void 	cmd_pass(void * var);
-		//void *	do_cmd();
+		void 	cmd_nick(void * var_1, void * var_2);
+		void 	cmd_pass(void * var_1, void * var_2);
+		void	cmd_user(void * var_1, void * var_2);
+		
 		void	pars_str(std::string str);
-		//struct User get_user();
 
 		std::string const &getCommand() const;
 };
