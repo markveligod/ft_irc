@@ -39,27 +39,5 @@ int main(int ac, char **av)
 		server.check_fd_select();
 	}
 
-  /*  if (ac == 4)
-    {
-		server.create_socket_network();
-		server.create_socket_local();
-		while (true)
-        {
-			server.init_fd_select();
-			server.do_select();
-			server.check_fd_select();
-		}
-    }
-    else if (ac == 3)
-    {
-        server.create_socket_local();
-        while (true)
-        {
-            server.init_fd_select();
-			server.do_select();
-			server.check_fd_select();
-        }
-    }*/
-
 	return (0);
 }
