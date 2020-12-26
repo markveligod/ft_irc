@@ -74,7 +74,7 @@ void IRC::do_select()
 
 typedef void (Message::*doCommand)(void *, void *);
 
-void IRC::do_command(Message * message)
+void IRC::do_command(Message * message, int socket_fd)
 {
 	std::string cmd_name[3] = {"NICK",
 							   "PASS",
@@ -85,8 +85,8 @@ void IRC::do_command(Message * message)
 	void *		cmd_var[3]	= {(void *)&this->_clients,
 						       (void *)&this->_clients,
 							   (void *)&this->_clients};
-	void *		cmd_var2[3]	= {NULL,
-						       NULL,
+	void *		cmd_var2[3]	= {(void *)&socket_fd,
+						       (void *)&socket_fd,
 							   (void *)&this->_users};
 
 	for (int i = 0; i < 3; i++)
@@ -132,9 +132,7 @@ void IRC::check_fd_select()
 					buffer[n] = '\0';
 					std::cout << buffer << std::endl;
 					mess.pars_str(buffer);
-					this->do_command(&mess);
-					if (mess.getCommand() == "NICK")
-						std::cout << this->_clients[0]->getNickname() << std::endl;
+					this->do_command(&mess, it->first);
 					_network._send(buffer);
 				}
 			}

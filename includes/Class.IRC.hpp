@@ -46,5 +46,5 @@ class IRC	// иземенить на Irc
         void init_fd_select();
         void do_select();
         void check_fd_select();
-		void do_command(Message * message);
+		void do_command(Message * message, int socket_fd);
 };

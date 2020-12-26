@@ -96,14 +96,23 @@ void Message::pars_str(std::string str)
 
 void  Message::cmd_nick(void * var_1, void * var_2)
 {
-	(void)var_2;
+	int *fd = (int *)var_2;
+
 	std::vector<Client *> *vect = (std::vector<Client *> *)var_1;
-	if ((*vect)[0]->getPassword() == false)
+	std::vector<Client *>::iterator v_begin = (*vect).begin();
+	std::vector<Client *>::iterator v_end = (*vect).end();
+	while (v_begin != v_end)
+	{
+		if ((*v_begin)->getSocketFd() == *fd)
+			break;
+		v_begin++;
+	}
+	if ((*v_begin)->getPassword() == false)
 		Utils::print_error(123, "Enter PASS before NICK!");
 	else if (this->nick(this->temp[1], *vect))
 	{
 		Utils::print_line("NickName is avalible!");
-		(*vect)[0]->setNickname(this->temp[1]);
+		(*v_begin)->setNickname(this->temp[1]);
 	}
 	else
 		Utils::print_error(ERR_NICKNAME, "NickName is not avalible!");
@@ -118,11 +127,23 @@ void  Message::cmd_nick(void * var_1, void * var_2)
 
 void	Message::cmd_pass(void * var_1, void * var_2)
 {
-	(void)var_2;
+	int *fd = (int *)var_2;
+
 	if (this->pass(this->temp[1]))
 	{
 		std::vector<Client *> *vect = (std::vector<Client *> *)var_1;
-		(*vect)[0]->setPassword();
+		
+		std::vector<Client *>::iterator v_begin = (*vect).begin();
+		std::vector<Client *>::iterator v_end = (*vect).end();
+
+		while (v_begin != v_end)
+		{
+			if ((*v_begin)->getSocketFd() == *fd)
+				break;
+			v_begin++;
+		}
+
+		(*v_begin)->setPassword();
 		std::cout << "Correct password\n";
 	}
 	else
