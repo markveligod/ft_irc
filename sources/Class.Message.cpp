@@ -68,8 +68,8 @@ void Message::pars_str(std::string str)
 void  Message::cmd_nick(void * var)
 {
 	//User *new_user = new User(this->temp[1]);
-	std::vector<User *> *vect = (std::vector<User *> *)var;
-	(*vect)[0]->client_from_pass(this->temp[1]);
+	std::vector<Client *> *vect = (std::vector<Client *> *)var;
+	(*vect)[0]->setNickname(this->temp[1]);
 	this->temp.clear();
 	//vect->push_back(new_user);
 }
@@ -78,9 +78,8 @@ void	Message::cmd_pass(void * var)
 {
 	if (this->temp[1] == DEF_PASS)
 	{
-		User *new_user = new User();
-		std::vector<User *> *vect = (std::vector<User *> *)var;
-		vect->push_back(new_user);
+		std::vector<Client *> *vect = (std::vector<Client *> *)var;
+		(*vect)[0]->setPassword();
 		std::cout << "Correct password\n";
 	}
 	else

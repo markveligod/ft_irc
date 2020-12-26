@@ -20,6 +20,7 @@ SRCS	= main.cpp \
 		  Class.Utils.cpp \
 		  Class.IRC.cpp \
 		  Class.Socket.cpp \
+		  Class.Client.cpp \
 		  Class.Message.cpp \
 		  Class.User.cpp
 SRC		= $(addprefix $(SRC_DIR), $(SRCS))

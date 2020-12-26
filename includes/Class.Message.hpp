@@ -8,7 +8,8 @@
 */
 
 #pragma once
-#include "./main.hpp"
+#include "main.hpp"
+#include "Class.User.hpp"
 
 //temp
 //struct User {

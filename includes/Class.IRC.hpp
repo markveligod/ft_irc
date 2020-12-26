@@ -4,26 +4,31 @@
 **==========================
 */
 
-#include "./main.hpp"
+#include "main.hpp"
 #include "Class.Socket.hpp"
+
+//#include "Class.Client.hpp"
+#include "Class.Message.hpp"
+#include "Class.User.hpp"
 //#include "Class.Getting.hpp"
 //#include "Class.Sending.hpp"
 
 class IRC	// иземенить на Irc
 {
     private:
-        Socket              _network;
-        std::string         _network_ip;
-        int                 _network_port;
-        std::string         _network_pass;
-        Socket              _localhost;
-        std::string         _localhost_pass;
-		std::map<int, int>	_array_fd_select;
-		std::vector<User *> _users;
+        Socket              	_network;
+        std::string         	_network_ip;
+        int                 	_network_port;
+        std::string        		_network_pass;
+        Socket              	_localhost;
+        std::string         	_localhost_pass;
+		std::map<int, int>		_array_fd_select;
+		std::vector<User *> 	_users;
+		std::vector<Client *>	_clients;
 		// std::map<std::string, User>	users;
 		// std::map<std::string, Server> servers;
-		fd_set              _fd_set_sockets;
-        int                 _select_res;
+		fd_set              	_fd_set_sockets;
+        int                 	_select_res;
 
     public:
         IRC();

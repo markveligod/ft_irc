@@ -1,10 +1,19 @@
 #include "Class.User.hpp"
+#include "Class.Client.hpp"
 
 // -------------
 // Constructors
 // -------------
 
-User::User() {}
+User::User(Client const &src) : Client(src)
+{
+	this->nickname = src.getNickname();
+	this->password = src.getPassword();
+	this->hopcount = src.getHopcount();
+	this->socket_fd = src.getSocketFd();
+}
+
+/*User::User() {}
 
 User::User(User const & src)
 		  : nickname(src.nickname), username(src.username),
@@ -40,16 +49,16 @@ User::User(std::string nickname, std::string username,
 {
 	this->status = USER;
 }
-
+*/
 // ----------------------------------------------
 // Creating user from client (with USER command)
 // ----------------------------------------------
 
-void User::client_from_pass(std::string nickname, int hopcount)
+/*void User::client_from_pass(std::string nickname, int hopcount)
 {
 	this->nickname = nickname;
 	this->hopcount = hopcount;
-}
+}*/
 
 void User::user_from_client(std::string username, std::string hostname,
 					  std::string servername, std::string realname)
@@ -73,10 +82,10 @@ void User::user_from_client(std::string username, std::string hostname,
 	this->realname = realname;
 	this->mode = mode;
 }
-
+/*
 int User::getHopcount() const {return (this->hopcount);}
 std::string const & User::getNickname() const {return (this->nickname);}
-
+*/
 /*std::ostream &operator<<(std::ostream &o, User const &src)
 {
 	o << src.getName() << ", bureaucrat grade " << src.getGrade();

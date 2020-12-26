@@ -80,8 +80,8 @@ void IRC::do_command(Message * message)
 							   "PASS"};
 	doCommand 	cmd_func[2]	= {&Message::cmd_nick,
 							   &Message::cmd_pass};
-	void *		cmd_var[2]	= {(void *)&this->_users,
-						       (void *)&this->_users};
+	void *		cmd_var[2]	= {(void *)&this->_clients,
+						       (void *)&this->_clients};
 
 	for (int i = 0; i < 2; i++)
 		if (cmd_name[i] == message->getCommand())
@@ -128,7 +128,7 @@ void IRC::check_fd_select()
 					mess.pars_str(buffer);
 					this->do_command(&mess);
 					if (mess.getCommand() == "NICK")
-						std::cout << this->_users[0]->getNickname() << std::endl;
+						std::cout << this->_clients[0]->getNickname() << std::endl;
 					_network._send(buffer);
 				}
 			}
@@ -151,6 +151,8 @@ void IRC::check_fd_select()
 				_array_fd_select[client] = FD_CLIENT;
 				char response[] = "Accepted\n";
 				std::cout << "New client#" << client << " joined server\n";
+				Client *newclient = new Client(client);
+				this->_clients.push_back(newclient);
 				send(client, reinterpret_cast<void *>(response), 10, 0);
 			}
 			_select_res--;
