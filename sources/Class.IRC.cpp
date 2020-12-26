@@ -78,10 +78,10 @@ void IRC::do_command(Message * message)
 {
 	std::string cmd_name[2] = {"NICK",
 							   "PASS"};
-	doCommand cmd_func[2] = {&Message::cmd_nick,
-							 &Message::cmd_pass};
-	void *cmd_var[2] = {(void *)&this->_users,
-						(void *)&this->_users};
+	doCommand 	cmd_func[2]	= {&Message::cmd_nick,
+							   &Message::cmd_pass};
+	void *		cmd_var[2]	= {(void *)&this->_users,
+						       (void *)&this->_users};
 
 	for (int i = 0; i < 2; i++)
 		if (cmd_name[i] == message->getCommand())
@@ -119,9 +119,16 @@ void IRC::check_fd_select()
 					std::cout << "connection closed\n";
 					_array_fd_select.erase(it->first);
 				}
-				else {
+				else
+				{
+					Message mess;
+
 					buffer[n] = '\0';
 					std::cout << buffer << std::endl;
+					mess.pars_str(buffer);
+					this->do_command(&mess);
+					if (mess.getCommand() == "NICK")
+						std::cout << this->_users[0]->getNickname() << std::endl;
 					_network._send(buffer);
 				}
 			}
@@ -129,17 +136,14 @@ void IRC::check_fd_select()
 			if (it->second == FD_SERVER)
 			{
 				//Перед тем как добавлять user проверяем пароль и заполняем структуру
-				Message mess;
+				//Message mess;
 				//User	*user;
 
-				mess.pars_str("PASS 123");
-				this->do_command(&mess);
-				//mess.do_cmd();
-				mess.pars_str("NICK mark");
-				this->do_command(&mess);
-				std::cout << this->_users[0]->getNickname() << std::endl;
-				//struct User user = mess.get_user();
-				//Utils::print_line("User.nickname -> " + user.nickname);
+				//mess.pars_str("PASS 123");
+				//this->do_command(&mess);
+				//mess.pars_str("NICK mark");
+				//this->do_command(&mess);
+				//std::cout << this->_users[0]->getNickname() << std::endl;
 
 				// _accept() возвращает fd клиента, который мы добавляем в map
 				// в качестве ключа, в качестве значения добавляем FD_CLIENT

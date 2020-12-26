@@ -81,8 +81,12 @@ void	Message::cmd_pass(void * var)
 		User *new_user = new User();
 		std::vector<User *> *vect = (std::vector<User *> *)var;
 		vect->push_back(new_user);
+		std::cout << "Correct password\n";
 	}
+	else
+		std::cout << "Incorrect password\n";
 	this->temp.clear();
+	
 	/*if (this->temp[1] == DEF_PASS)
 		return ((void *)true);
 	return ((void *)false);*/

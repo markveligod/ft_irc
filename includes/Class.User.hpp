@@ -27,8 +27,8 @@ private:
 	struct ModeUser	mode;
 
 public:
-	User(User const &src);
 	User();
+	User(User const &src);
 	User(std::string nickname, int hopcount = 0);
 	User(std::string nickname, std::string username,
 		 std::string hostname, std::string servername,
