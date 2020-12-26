@@ -52,6 +52,7 @@
 #define ERR_SELECT 19
 #define ERR_PASSWORD 20
 #define ERR_NICKNAME 21
+#define ERR_DATACLIENT 22
 
 /*
 **==========================
