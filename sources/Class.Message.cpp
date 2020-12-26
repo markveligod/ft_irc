@@ -87,12 +87,6 @@ void Message::pars_str(std::string str)
 }
 
 /*
-**==========================
-** cmd_nick - при удачном вызове добавляет никнэйм в класс Client
-**==========================
-*/
-
-/*
 ** ================================================================
 ** cmd_nick		-	при удачном вызове добавляет никнэйм в класс Client
 **					
@@ -109,17 +103,18 @@ void Message::pars_str(std::string str)
 
 void  Message::cmd_nick(void * var_1, void * var_2)
 {
-	int *fd = (int *)var_2;
-
-	std::vector<Client *> *vect = (std::vector<Client *> *)var_1;
+	int *fd 								= (int *)var_2;
+	std::vector<Client *> *vect				= (std::vector<Client *> *)var_1;
 	std::vector<Client *>::iterator v_begin = (*vect).begin();
-	std::vector<Client *>::iterator v_end = (*vect).end();
+	std::vector<Client *>::iterator v_end	= (*vect).end();
+
 	while (v_begin != v_end)
 	{
 		if ((*v_begin)->getSocketFd() == *fd)
 			break;
 		v_begin++;
 	}
+
 	if ((*v_begin)->getPassword() == false)
 		Utils::print_error(123, "Enter PASS before NICK!");
 	else if (this->nick(this->temp[1], *vect))
@@ -129,6 +124,7 @@ void  Message::cmd_nick(void * var_1, void * var_2)
 	}
 	else
 		Utils::print_error(ERR_NICKNAME, "NickName is not avalible!");
+	
 	this->temp.clear();
 }
 
@@ -149,14 +145,12 @@ void  Message::cmd_nick(void * var_1, void * var_2)
 
 void	Message::cmd_pass(void * var_1, void * var_2)
 {
-	int *fd = (int *)var_2;
-
 	if (this->pass(this->temp[1]))
 	{
-		std::vector<Client *> *vect = (std::vector<Client *> *)var_1;
-		
+		int *fd 								= (int *)var_2;
+		std::vector<Client *> *vect 			= (std::vector<Client *> *)var_1;
 		std::vector<Client *>::iterator v_begin = (*vect).begin();
-		std::vector<Client *>::iterator v_end = (*vect).end();
+		std::vector<Client *>::iterator v_end 	= (*vect).end();
 
 		while (v_begin != v_end)
 		{
