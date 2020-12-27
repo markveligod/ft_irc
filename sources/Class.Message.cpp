@@ -17,9 +17,9 @@ Message::~Message() {}
 **==========================
 */
 
-bool Message::pass(std::string password)
+bool Message::pass(std::string password, std::string local_pass)
 {
-    if (password == DEF_PASS)
+    if (password == local_pass)
         return true;
     return false;
 }
@@ -50,17 +50,14 @@ bool Message::nick(std::string nickname, std::vector<Client *> users)
 **==========================
 */
 
-bool Message::user(std::vector<Client *>::iterator it)
+bool Message::user(User *curr_user)
 {
 	std::string temp_str;
 	if (this->temp.size() < 4)
 		return false;
-    (*it)->setUsername(this->temp[1]);
-	(*it)->setHostname(this->temp[2]);
-	(*it)->setServername(this->temp[3]);
 	for (size_t i = 4; i < this->temp.size(); i++)
 		temp_str += this->temp[i];
-	(*it)->setRealname(temp_str);
+	curr_user->user_from_client(this->temp[1], this->temp[2], this->temp[3], temp_str);
 	return true;
 }
 
@@ -118,12 +115,13 @@ std::vector<Client *>::iterator Message::find_fd(std::vector<Client *> *vect, in
 ** =================================================================
 */
 
-void  Message::cmd_nick(void * var_1, void * var_2)
+void  Message::cmd_nick(void * var_1, void * var_2, void * var_3)
 {
 	int *fd 								= (int *)var_2;
 	std::vector<Client *> *vect				= (std::vector<Client *> *)var_1;
 	std::vector<Client *>::iterator temp;
 
+	(void)var_3;
 	if ((temp = this->find_fd(vect, *fd)) == (*vect).end())
 	{
 		Utils::print_error(ERR_FINDFD, "FD don't find in vector!");
@@ -157,9 +155,10 @@ void  Message::cmd_nick(void * var_1, void * var_2)
 ** =================================================================
 */
 
-void	Message::cmd_pass(void * var_1, void * var_2)
+void	Message::cmd_pass(void * var_1, void * var_2, void * var_3)
 {
-	if (this->pass(this->temp[1]))
+	std::string *local_pass = (std::string *)var_3;
+	if (this->pass(this->temp[1], *local_pass))
 	{
 		int *fd 								= (int *)var_2;
 		std::vector<Client *> *vect 			= (std::vector<Client *> *)var_1;
@@ -190,7 +189,7 @@ void Message::cmd_user(void *var_1, void *var_2, void *var_3)
 	std::vector<Client *> *vect = (std::vector<Client *> *)var_1;
 
 	int *fd = (int *)var_2;
-	User *curr_user = (User *)var_3;
+	std::vector<User *> *vec_user = (std::vector<User *> *)var_3;
 	std::vector<Client *>::iterator temp;
 
 	if ((temp = this->find_fd(vect, *fd)) == (*vect).end())
@@ -199,14 +198,29 @@ void Message::cmd_user(void *var_1, void *var_2, void *var_3)
 		return ;
 	}
 
-	if ((*temp)->getPassword() && (*temp)->getNickname() == curr_user->getNickname())
+	if (!(*temp)->getPassword())
 	{
-		if (this->user(curr_user))
-		{
-			Utils::print_line("Client is done!");
-		}
-		else
-			Utils::print_error(ERR_DATACLIENT, "Incorrect client data!");
+		Utils::print_error(ERR_PASSWORD, "Enter PASS <password>");
+		return ;
+	}
+
+	if ((*temp)->getNickname().size() == 0)
+	{
+		Utils::print_error(ERR_NICKNAME, "ENTER NICK <nickname>");
+		return ;
+	}
+
+	User *curr_user = new User(**temp);
+
+	if (this->user(curr_user))
+	{
+		(*vec_user).push_back(curr_user);
+		Utils::print_line("Client is done!");
+	}
+	else
+	{
+		delete curr_user;
+		Utils::print_error(ERR_DATACLIENT, "Incorrect client data!");
 	}
 }
 

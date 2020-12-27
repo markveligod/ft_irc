@@ -19,16 +19,16 @@ class Message
 		Message(const Message &other);
 		Message &operator=(const Message &other);
 
-		bool pass(std::string password);
+		bool pass(std::string password, std::string local_pass);
 		bool nick(std::string nickname, std::vector<Client *> users);
-		bool user(std::vector<Client *>::iterator it);
+		bool user(User *curr_user);
 		std::vector<Client *>::iterator find_fd(std::vector<Client *> *vect, int fd);
 	public:
 		Message();
 		~Message();
 
-		void	cmd_nick(void * var_1, void * var_2);
-		void	cmd_pass(void * var_1, void * var_2);
+		void	cmd_nick(void * var_1, void * var_2, void *var_3);
+		void	cmd_pass(void * var_1, void * var_2, void *var_3);
 		void	cmd_user(void *var_1, void *var_2, void *var_3);
 		
 		void	pars_str(std::string str);
