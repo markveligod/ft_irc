@@ -50,22 +50,18 @@ bool Message::nick(std::string nickname, std::vector<Client *> users)
 **==========================
 */
 
-bool Message::user(Client *curr_client)
+bool Message::user(std::vector<Client *>::iterator it)
 {
-	//test
-	(void)curr_client;
-	return true;
-	//
-
-
-	/*if (this->temp.size() < 4)
+	std::string temp_str;
+	if (this->temp.size() < 4)
 		return false;
-    curr_client->username = this->temp[1];
-	curr_client->hostname = this->temp[2];
-	curr_client->servername = this->temp[3];
+    (*it)->setUsername(this->temp[1]);
+	(*it)->setHostname(this->temp[2]);
+	(*it)->setServername(this->temp[3]);
 	for (size_t i = 4; i < this->temp.size(); i++)
-		curr_client->realname += this->temp[i];
-	return true;*/
+		temp_str += this->temp[i];
+	(*it)->setRealname(temp_str);
+	return true;
 }
 
 /*
@@ -87,6 +83,27 @@ void Message::pars_str(std::string str)
 }
 
 /*
+**==========================
+** find_fd - находит в векторе итераторную позицию которая соответствует переданный fd
+**==========================
+*/
+
+std::vector<Client *>::iterator Message::find_fd(std::vector<Client *> *vect, int fd)
+{
+	std::vector<Client *>::iterator v_begin = (*vect).begin();
+	std::vector<Client *>::iterator v_end	= (*vect).end();
+
+	while (v_begin != v_end)
+	{
+		if ((*v_begin)->getSocketFd() == fd)
+			return (v_begin);
+		v_begin++;
+	}
+	return (v_end);
+}
+
+
+/*
 ** ================================================================
 ** cmd_nick		-	при удачном вызове добавляет никнэйм в класс Client
 **					
@@ -105,22 +122,19 @@ void  Message::cmd_nick(void * var_1, void * var_2)
 {
 	int *fd 								= (int *)var_2;
 	std::vector<Client *> *vect				= (std::vector<Client *> *)var_1;
-	std::vector<Client *>::iterator v_begin = (*vect).begin();
-	std::vector<Client *>::iterator v_end	= (*vect).end();
+	std::vector<Client *>::iterator temp;
 
-	while (v_begin != v_end)
+	if ((temp = this->find_fd(vect, *fd)) == (*vect).end())
 	{
-		if ((*v_begin)->getSocketFd() == *fd)
-			break;
-		v_begin++;
+		Utils::print_error(ERR_FINDFD, "FD don't find in vector!");
+		return ;
 	}
-
-	if ((*v_begin)->getPassword() == false)
+	if ((*temp)->getPassword() == false)
 		Utils::print_error(123, "Enter PASS before NICK!");
 	else if (this->nick(this->temp[1], *vect))
 	{
 		Utils::print_line("NickName is avalible!");
-		(*v_begin)->setNickname(this->temp[1]);
+		(*temp)->setNickname(this->temp[1]);
 	}
 	else
 		Utils::print_error(ERR_NICKNAME, "NickName is not avalible!");
@@ -149,17 +163,15 @@ void	Message::cmd_pass(void * var_1, void * var_2)
 	{
 		int *fd 								= (int *)var_2;
 		std::vector<Client *> *vect 			= (std::vector<Client *> *)var_1;
-		std::vector<Client *>::iterator v_begin = (*vect).begin();
-		std::vector<Client *>::iterator v_end 	= (*vect).end();
-
-		while (v_begin != v_end)
+		std::vector<Client *>::iterator temp;
+		
+		if ((temp = this->find_fd(vect, *fd)) == (*vect).end())
 		{
-			if ((*v_begin)->getSocketFd() == *fd)
-				break;
-			v_begin++;
+			Utils::print_error(ERR_FINDFD, "FD don't find in vector!");
+			return ;
 		}
 
-		(*v_begin)->setPassword();
+		(*temp)->setPassword();
 		std::cout << "Correct password\n";
 	}
 	else
@@ -175,15 +187,23 @@ void	Message::cmd_pass(void * var_1, void * var_2)
 
 void Message::cmd_user(void *var_1, void *var_2)
 {
-	(void)var_2;
-	(void)var_1;
-	/*
-	Client *curr_client = (Client *)var_1;
-	if (this->user(curr_client))
+	std::vector<Client *> *vect = (std::vector<Client *> *)var_1;
+	int *fd = (int *)var_2;
+	std::vector<Client *>::iterator temp;
+
+	if ((temp = this->find_fd(vect, *fd)) == (*vect).end())
+	{
+		Utils::print_error(ERR_FINDFD, "FD don't find in vector!");
+		return ;
+	}
+
+	if (this->user(temp))
+	{
+		(*temp)->setStatusReady(true);
 		Utils::print_line("Client is done!");
+	}
 	else
 		Utils::print_error(ERR_DATACLIENT, "Incorrect client data!");
-	*/
 }
 
 /*

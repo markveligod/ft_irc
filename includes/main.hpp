@@ -53,6 +53,7 @@
 #define ERR_PASSWORD 20
 #define ERR_NICKNAME 21
 #define ERR_DATACLIENT 22
+#define ERR_FINDFD 23
 
 /*
 **==========================

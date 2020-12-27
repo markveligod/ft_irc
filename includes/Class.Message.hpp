@@ -21,7 +21,8 @@ class Message
 
 		bool pass(std::string password);
 		bool nick(std::string nickname, std::vector<Client *> users);
-		bool user(Client *curr_client);
+		bool user(std::vector<Client *>::iterator it);
+		std::vector<Client *>::iterator find_fd(std::vector<Client *> *vect, int fd);
 	public:
 		Message();
 		~Message();
