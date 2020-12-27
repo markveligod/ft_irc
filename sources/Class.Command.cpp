@@ -1,14 +1,14 @@
-#include "../includes/Class.Message.hpp"
+#include "../includes/Class.Command.hpp"
 
 /*
 **==========================
-** конструктор и деструктор Message()
+** конструктор и деструктор Command()
 **==========================
 */
 
-Message::Message() {}
+Command::Command() {}
 
-Message::~Message() {}
+Command::~Command() {}
 
 /*
 **==========================
@@ -17,7 +17,7 @@ Message::~Message() {}
 **==========================
 */
 
-bool Message::pass(std::string password, std::string local_pass)
+bool Command::pass(std::string password, std::string local_pass)
 {
     if (password == local_pass)
         return true;
@@ -31,7 +31,7 @@ bool Message::pass(std::string password, std::string local_pass)
 **==========================
 */
 
-bool Message::nick(std::string nickname, std::vector<Client *> users)
+bool Command::nick(std::string nickname, std::vector<Client *> users)
 {
     if (nickname.size() > 9 || nickname.size() == 0)
         return false;
@@ -50,7 +50,7 @@ bool Message::nick(std::string nickname, std::vector<Client *> users)
 **==========================
 */
 
-bool Message::user(User *curr_user)
+bool Command::user(User *curr_user)
 {
 	std::string temp_str;
 	if (this->temp.size() < 4)
@@ -67,7 +67,7 @@ bool Message::user(User *curr_user)
 **==========================
 */
 
-void Message::pars_str(std::string str)
+void Command::pars_str(std::string str)
 {
     std::istringstream ss(str);
     std::string ff;
@@ -85,7 +85,7 @@ void Message::pars_str(std::string str)
 **==========================
 */
 
-std::vector<Client *>::iterator Message::find_fd(std::vector<Client *> *vect, int fd)
+std::vector<Client *>::iterator Command::find_fd(std::vector<Client *> *vect, int fd)
 {
 	std::vector<Client *>::iterator v_begin = (*vect).begin();
 	std::vector<Client *>::iterator v_end	= (*vect).end();
@@ -115,7 +115,7 @@ std::vector<Client *>::iterator Message::find_fd(std::vector<Client *> *vect, in
 ** =================================================================
 */
 
-void  Message::cmd_nick(void * var_1, void * var_2, void * var_3)
+void  Command::cmd_nick(void * var_1, void * var_2, void * var_3)
 {
 	int *fd 								= (int *)var_2;
 	std::vector<Client *> *vect				= (std::vector<Client *> *)var_1;
@@ -155,7 +155,7 @@ void  Message::cmd_nick(void * var_1, void * var_2, void * var_3)
 ** =================================================================
 */
 
-void	Message::cmd_pass(void * var_1, void * var_2, void * var_3)
+void	Command::cmd_pass(void * var_1, void * var_2, void * var_3)
 {
 	std::string *local_pass = (std::string *)var_3;
 	if (this->pass(this->temp[1], *local_pass))
@@ -184,7 +184,7 @@ void	Message::cmd_pass(void * var_1, void * var_2, void * var_3)
 **==========================
 */
 
-void Message::cmd_user(void *var_1, void *var_2, void *var_3)
+void Command::cmd_user(void *var_1, void *var_2, void *var_3)
 {
 	std::vector<Client *> *vect = (std::vector<Client *> *)var_1;
 
@@ -230,7 +230,7 @@ void Message::cmd_user(void *var_1, void *var_2, void *var_3)
 **==========================
 */
 
-std::string const & Message::getCommand() const
+std::string const & Command::getCommand() const
 {
 	return (this->temp[0]);
 }

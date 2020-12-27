@@ -84,16 +84,16 @@ void IRC::create_socket_network()
 ** ---------------------------------------------------------------------------------------------
 */
 
-typedef void (Message::*doCommand)(void *, void *, void *);
+typedef void (Command::*doCommand)(void *, void *, void *);
 
-void IRC::do_command(Message *message, int socket_fd)
+void IRC::do_command(Command *command, int socket_fd)
 {
 	std::string cmd_name[3] =	{"NICK",
 							   	 "PASS",
 							  	 "USER"};
-	doCommand	cmd_func[3] = 	{&Message::cmd_nick,
-							   	 &Message::cmd_pass,
-							   	 &Message::cmd_user};
+	doCommand	cmd_func[3] = 	{&Command::cmd_nick,
+							   	 &Command::cmd_pass,
+							   	 &Command::cmd_user};
 	void 		*cmd_var1[3] = 	{(void *)&this->_clients,
 							   	 (void *)&this->_clients,
 							   	 (void *)&this->_clients};
@@ -105,9 +105,9 @@ void IRC::do_command(Message *message, int socket_fd)
 							 	(void *)&this->_users};
 
 	for (int i = 0; i < 3; i++)
-		if (cmd_name[i] == message->getCommand())
+		if (cmd_name[i] == command->getCommand())
 		{
-			(message->*(cmd_func[i]))(cmd_var1[i], cmd_var2[i], cmd_var3[i]);
+			(command->*(cmd_func[i]))(cmd_var1[i], cmd_var2[i], cmd_var3[i]);
 			return;
 		}
 	Utils::print_error(123, "Command not found");
@@ -170,7 +170,7 @@ void IRC::check_fd_select()
 				}
 				else
 				{
-					Message mess;
+					Command mess;
 
 					buffer[n] = '\0';
 					std::cout << buffer << std::endl;
@@ -193,7 +193,7 @@ void IRC::check_fd_select()
 				}
 				else
 				{
-					Message mess;
+					Command mess;
 
 					buffer[n] = '\0';
 					std::cout << buffer << std::endl;

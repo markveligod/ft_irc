@@ -1,7 +1,6 @@
 #include "main.hpp"
 #include <set>
 #include "Class.User.hpp"
-#include "Class.User.hpp"
 
 struct ModeChannel
 {

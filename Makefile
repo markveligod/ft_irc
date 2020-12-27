@@ -12,6 +12,10 @@ FLAGS	= -Wall -Wextra -Werror -MMD -std=c++98
 SSL		= -lssl -lcrypto
 INCLUDES= -I ./includes
 
+ifeq ($(UNAME), Darwin)
+INCLUDES+= -I/usr/local/opt/openssl/include
+endif
+
 NAME	= ircserv
 
 SRC_DIR = ./sources/
@@ -22,7 +26,7 @@ SRCS	= main.cpp \
 		  Class.IRC.cpp \
 		  Class.Socket.cpp \
 		  Class.Client.cpp \
-		  Class.Message.cpp \
+		  Class.Command.cpp \
 		  Class.User.cpp
 SRC		= $(addprefix $(SRC_DIR), $(SRCS))
 OBJS	= $(SRC:.cpp=.o) $(CLASS:.cpp=.o)

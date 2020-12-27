@@ -11,7 +11,7 @@
 #include "Class.Socket.hpp"
 
 //#include "Class.Client.hpp"
-#include "Class.Message.hpp"
+#include "Class.Command.hpp"
 #include "Class.User.hpp"
 //#include "Class.Getting.hpp"
 //#include "Class.Sending.hpp"
@@ -52,7 +52,7 @@ class IRC	// иземенить на Irc
 		void init_fd_select();
 		void do_select();
 		void check_fd_select();
-		void do_command(Message * message, int socket_fd);
+		void do_command(Command * command, int socket_fd);
 		void init_ssl();
 		void init_ctx();
 		SSL *ssl_connection(int fd);
