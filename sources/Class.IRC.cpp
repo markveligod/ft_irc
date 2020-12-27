@@ -84,7 +84,7 @@ void IRC::create_socket_network()
 ** ---------------------------------------------------------------------------------------------
 */
 
-typedef void (Message::*doCommand)(void *, void *);
+typedef void (Message::*doCommand)(void *, void *, void *);
 
 void IRC::do_command(Message *message, int socket_fd)
 {
@@ -94,17 +94,20 @@ void IRC::do_command(Message *message, int socket_fd)
 	doCommand	cmd_func[3] = 	{&Message::cmd_nick,
 							   	 &Message::cmd_pass,
 							   	 &Message::cmd_user};
-	void 		*cmd_var[3] = 	{(void *)&this->_clients,
+	void 		*cmd_var1[3] = 	{(void *)&this->_clients,
 							   	 (void *)&this->_clients,
 							   	 (void *)&this->_clients};
 	void 		*cmd_var2[3] =	{(void *)&socket_fd,
 								 (void *)&socket_fd,
 							 	 (void *)&this->_users};
+	void 		*cmd_var3[3] =	{NULL,
+								 NULL,
+							 	 NULL};
 
 	for (int i = 0; i < 3; i++)
 		if (cmd_name[i] == message->getCommand())
 		{
-			(message->*(cmd_func[i]))(cmd_var[i], cmd_var2[i]);
+			(message->*(cmd_func[i]))(cmd_var1[i], cmd_var2[i], cmd_var3[i]);
 			return;
 		}
 	Utils::print_error(123, "Command not found");

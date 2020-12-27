@@ -118,12 +118,13 @@ std::vector<Client *>::iterator Message::find_fd(std::vector<Client *> *vect, in
 ** =================================================================
 */
 
-void  Message::cmd_nick(void * var_1, void * var_2)
+void  Message::cmd_nick(void * var_1, void * var_2, void * var_3)
 {
 	int *fd 								= (int *)var_2;
 	std::vector<Client *> *vect				= (std::vector<Client *> *)var_1;
 	std::vector<Client *>::iterator temp;
 
+	(void)var_3;
 	if ((temp = this->find_fd(vect, *fd)) == (*vect).end())
 	{
 		Utils::print_error(ERR_FINDFD, "FD don't find in vector!");
@@ -157,8 +158,9 @@ void  Message::cmd_nick(void * var_1, void * var_2)
 ** =================================================================
 */
 
-void	Message::cmd_pass(void * var_1, void * var_2)
+void	Message::cmd_pass(void * var_1, void * var_2, void * var_3)
 {
+	(void)var_3;
 	if (this->pass(this->temp[1]))
 	{
 		int *fd 								= (int *)var_2;
@@ -185,11 +187,12 @@ void	Message::cmd_pass(void * var_1, void * var_2)
 **==========================
 */
 
-void Message::cmd_user(void *var_1, void *var_2)
+void Message::cmd_user(void *var_1, void *var_2, void * var_3)
 {
 	std::vector<Client *> *vect = (std::vector<Client *> *)var_1;
 	int *fd = (int *)var_2;
 	std::vector<Client *>::iterator temp;
+	(void)var_3;
 
 	if ((temp = this->find_fd(vect, *fd)) == (*vect).end())
 	{
