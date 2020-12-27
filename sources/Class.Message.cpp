@@ -185,10 +185,12 @@ void	Message::cmd_pass(void * var_1, void * var_2)
 **==========================
 */
 
-void Message::cmd_user(void *var_1, void *var_2)
+void Message::cmd_user(void *var_1, void *var_2, void *var_3)
 {
 	std::vector<Client *> *vect = (std::vector<Client *> *)var_1;
+
 	int *fd = (int *)var_2;
+	User *curr_user = (User *)var_3;
 	std::vector<Client *>::iterator temp;
 
 	if ((temp = this->find_fd(vect, *fd)) == (*vect).end())
@@ -197,13 +199,15 @@ void Message::cmd_user(void *var_1, void *var_2)
 		return ;
 	}
 
-	if (this->user(temp))
+	if ((*temp)->getPassword() && (*temp)->getNickname() == curr_user->getNickname())
 	{
-		(*temp)->setStatusReady(true);
-		Utils::print_line("Client is done!");
+		if (this->user(curr_user))
+		{
+			Utils::print_line("Client is done!");
+		}
+		else
+			Utils::print_error(ERR_DATACLIENT, "Incorrect client data!");
 	}
-	else
-		Utils::print_error(ERR_DATACLIENT, "Incorrect client data!");
 }
 
 /*

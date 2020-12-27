@@ -29,7 +29,7 @@ class Message
 
 		void	cmd_nick(void * var_1, void * var_2);
 		void	cmd_pass(void * var_1, void * var_2);
-		void	cmd_user(void * var_1, void * var_2);
+		void	cmd_user(void *var_1, void *var_2, void *var_3);
 		
 		void	pars_str(std::string str);
 
