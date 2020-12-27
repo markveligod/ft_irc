@@ -99,10 +99,10 @@ void IRC::do_command(Message *message, int socket_fd)
 							   	 (void *)&this->_clients};
 	void 		*cmd_var2[3] =	{(void *)&socket_fd,
 								 (void *)&socket_fd,
-							 	 (void *)&this->_users};
+							 	 (void *)&socket_fd};
 	void 		*cmd_var3[3] =	{NULL,
-								 NULL,
-							 	 NULL};
+								(void *)&this->_localhost_pass,
+							 	(void *)&this->_users};
 
 	for (int i = 0; i < 3; i++)
 		if (cmd_name[i] == message->getCommand())
