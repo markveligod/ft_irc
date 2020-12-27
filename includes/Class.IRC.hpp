@@ -24,6 +24,7 @@ class IRC	// иземенить на Irc
 		int						_network_port;
 		std::string				_network_pass;
 		Socket					_localhost;
+		Socket					_localhost_ssl;
 		std::string				_localhost_pass;
 		std::map<int, int>		_array_fd_select;
 		std::vector<User *>		_users;
@@ -32,7 +33,7 @@ class IRC	// иземенить на Irc
 		// std::map<std::string, Server> servers;
 		fd_set					_fd_set_sockets;
 		int						_select_res;
-		bool					_ssl;
+		SSL*					_ssl;
 		SSL_CTX*				_ctx;
 
 	public:
@@ -41,8 +42,7 @@ class IRC	// иземенить на Irc
 			   std::string network_port,
 			   std::string network_pass,
 			   std::string current_port,
-			   std::string _current_pass,
-			   bool ssl = false);
+			   std::string _current_pass);
 
 		IRC &operator=(const IRC &other);
 
@@ -55,5 +55,5 @@ class IRC	// иземенить на Irc
 		void do_command(Message * message, int socket_fd);
 		void init_ssl();
 		void init_ctx();
-		void ssl_connection(int fd);
+		SSL *ssl_connection(int fd);
 };
