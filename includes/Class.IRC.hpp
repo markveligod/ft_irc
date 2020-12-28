@@ -53,7 +53,11 @@ class IRC	// иземенить на Irc
 		void do_select();
 		void check_fd_select();
 		void do_command(Command * command, int socket_fd);
+
 		void init_ssl();
 		void init_ctx();
 		SSL *ssl_connection(int fd);
+
+		int _send(int, int, const char *, size_t, int);
+		int _recv(int, int, char *, size_t, int);
 };

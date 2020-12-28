@@ -68,7 +68,6 @@ fclean: clean
 re: fclean all
 
 test: all
-	./$(NAME) 1280 wap
-	# ./$(NAME) 4444 grjgi
+	./$(NAME) 1280 123
 
 .PHONY: all clean fclean re
