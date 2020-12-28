@@ -1,4 +1,4 @@
-#include "Class.Client.hpp"
+#include "../includes/Class.Client.hpp"
 
 /*
 ** ----------------------------------------------------------
@@ -80,7 +80,7 @@ void Client::setBuffer(const std::string &buff)
 
 bool Client::find_line_break()
 {
-	if (this->buffer.find("\r") != std::string::npos || this->buffer.find("\n") != std::string::npos)
+	if (this->buffer.find("\r\n") != std::string::npos)
 		return (true);
 	return (false);
 }
@@ -91,17 +91,14 @@ std::string Client::get_line_break()
 	std::string temp_2;
 	size_t pos;
 
-	if ((pos = this->buffer.find("\r")) == std::string::npos)
+	if ((pos = this->buffer.find("\r\n")) == std::string::npos)
 	{
-		if ((pos = this->buffer.find("\n")) == std::string::npos)
-		{
 			temp_1 = this->buffer;
 			this->buffer.clear();
 			return (temp_1);
-		}
 	}
 	temp_1 = std::string(this->buffer.begin(), (this->buffer.begin() + pos));
-	temp_2 = std::string(this->buffer.begin() + (pos + 1), this->buffer.end());
+	temp_2 = std::string(this->buffer.begin() + (pos + 2), this->buffer.end());
 	this->buffer = temp_2;
 	return (temp_1);
 }
