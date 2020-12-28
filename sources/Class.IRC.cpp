@@ -192,11 +192,8 @@ void IRC::check_fd_select()
 					ssl_connection(client_socket);
 											
 				std::cout << "New client#" << client_socket << " joined server\n";
-				
 				_send(it->second, client_socket, response, 10, 0);
-
-				Client *newclient = new Client(client_socket);
-				this->_clients.push_back(newclient);
+				this->_clients.push_back(new Client(client_socket));
 			}
 			_select_res--;
 		}
@@ -243,9 +240,11 @@ int IRC::_recv(int connection_type, int fd, char *response, size_t size, int fla
 }
 
 /*
-**==========================
+** ========================SSL PART==========================
+**
+** ----------------------------------------------------------
 ** init_ctx - инициализация конфигурации для SSL
-**==========================
+** ----------------------------------------------------------
 */
 
 void IRC::init_ssl()
@@ -288,11 +287,16 @@ SSL *IRC::ssl_connection(int fd)
 	return _ssl;
 }
 
+
 /*
-**==========================
-** find_fd - находит в векторе итераторную позицию которая соответствует переданный fd
-**==========================
+** ========================UTILS PART==========================
+**
+** ----------------------------------------------------------
+** find_fd - находит в векторе итераторную позицию которая 
+**           соответствует переданный fd
+** ----------------------------------------------------------
 */
+
 int IRC::find_fd(std::vector<Client *> *vect, int fd)
 {
 	std::vector<Client *>::iterator v_begin = (*vect).begin();
