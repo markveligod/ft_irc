@@ -62,4 +62,8 @@ class IRC
 		
 		void		delete_user(int fd);
 		void		delete_client(int fd);
+
+		std::vector<std::string> check_buffer(int fd, const char *buffer);
+		//static int	find_fd(std::vector<Client *> *vect, int fd);
+		//static int	find_fd(std::vector<User *> *vect, int fd);
 };
