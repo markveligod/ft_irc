@@ -47,6 +47,7 @@ Command::~Command() {}
 bool Command::pass(std::string password, std::string local_pass)
 {
     if (password == local_pass)
+    // if (password == local_pass + "\r\n")
         return true;
     return false;
 }
@@ -60,6 +61,8 @@ bool Command::pass(std::string password, std::string local_pass)
 
 bool Command::nick(std::string nickname, std::vector<Client *> users)
 {
+	std::cout << "WHY YOU DONT LIKE MY NICK??? " << nickname << std::endl;
+	std::cout << "SIZE " << nickname.size() << std::endl;
     if (nickname.size() > 9 || nickname.size() == 0)
         return false;
     for (size_t i = 0; i < users.size(); i++)
@@ -131,7 +134,7 @@ void  Command::cmd_nick(void * var_1, void * var_2, void * var_3)
 	(void)var_3;
 	if ((temp = this->find_fd(vect, *fd)) == (*vect).end())
 	{
-		Utils::print_error(ERR_FINDFD, "FD don't find in vector!");
+		Utils::print_error(ERR_FINDFD, "FD didn't find in vector!");
 		return ;
 	}
 	if ((*temp)->getPassword() == false)

@@ -6,13 +6,13 @@
 ** ----------------------------------------------------------
 */
 
-Client::Client(int socket_fd) : socket_fd(socket_fd),
-								password(false) {}
+Client::Client(int socket_fd) 		: socket_fd(socket_fd),
+									  password(false) {}
 
-Client::Client(Client const &src) : nickname(src.nickname),
-									socket_fd(src.socket_fd),
-									hopcount(src.hopcount),
-									password(src.password) {}
+Client::Client(Client const &src)	: nickname(src.nickname),
+									  socket_fd(src.socket_fd),
+									  hopcount(src.hopcount),
+									  password(src.password) {}
 
 /*
 ** ----------------------------------------------------------
