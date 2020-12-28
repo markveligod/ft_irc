@@ -227,7 +227,7 @@ int IRC::_recv(int connection_type, int fd, char *response, size_t size, int fla
 	if (n == 0)
 	{
 		int i;
-		if ((i = this->find_fd(&this->_clients, fd)) > -1)
+		if ((i = IRC::find_fd(&this->_clients, fd)) > -1)
 			this->_users.erase(this->_users.begin() + i);
 
 		std::cout << "connection closed\n";
@@ -297,6 +297,24 @@ SSL *IRC::ssl_connection(int fd)
 ** ----------------------------------------------------------
 */
 
+template <typename T>
+int IRC::find_fd(std::vector<T> *vect, int fd)
+{
+	typename std::vector<T>::iterator v_begin = (*vect).begin();
+	typename std::vector<T>::iterator v_end = (*vect).end();
+	int i = 0;
+
+	while (v_begin != v_end)
+	{
+		if ((*v_begin)->getSocketFd() == fd)
+			return (i);
+		v_begin++;
+		i++;
+	}
+	return (-1);
+}
+
+/*
 int IRC::find_fd(std::vector<Client *> *vect, int fd)
 {
 	std::vector<Client *>::iterator v_begin = (*vect).begin();
@@ -312,3 +330,19 @@ int IRC::find_fd(std::vector<Client *> *vect, int fd)
 	}
 	return (-1);
 }
+
+int IRC::find_fd(std::vector<User *> *vect, int fd)
+{
+	std::vector<User *>::iterator v_begin = (*vect).begin();
+	std::vector<User *>::iterator v_end = (*vect).end();
+	int i = 0;
+
+	while (v_begin != v_end)
+	{
+		if ((*v_begin)->getSocketFd() == fd)
+			return (i);
+		v_begin++;
+		i++;
+	}
+	return (-1);
+}*/

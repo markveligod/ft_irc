@@ -55,6 +55,8 @@ class IRC
 		int 		_send(int, int, const char *, size_t, int);
 		int 		_recv(int, int, char *, size_t, int);
 
-		static int	find_fd(std::vector<Client *> *vect, int fd);
-		static int	find_fd(std::vector<User *> *vect, int fd);
+		template <typename T>
+		static int find_fd(std::vector<T> *vect, int fd);
+		//static int	find_fd(std::vector<Client *> *vect, int fd);
+		//static int	find_fd(std::vector<User *> *vect, int fd);
 };
