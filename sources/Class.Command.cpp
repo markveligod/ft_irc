@@ -1,9 +1,10 @@
 #include "../includes/Class.Command.hpp"
+#include "Class.IRC.hpp"
 
 /*
-**==========================
+** ==========================================
 ** конструктор и деструктор Command()
-**==========================
+** ==========================================
 */
 
 Command::Command(std::string const & str)
@@ -38,6 +39,8 @@ Command::Command(std::string const & str)
 Command::~Command() {}
 
 /*
+** ================================================================
+** Команда: PASS
 ** ================================================================
 ** cmd_pass		-	при удачном вызове меняет статус 
 **					класса Client на корректный ввод пароля
@@ -84,8 +87,9 @@ void	Command::cmd_pass(void * var_1, void * var_2, void * var_3)
 }
 
 /*
-** ================================================================
+** ====================================================================
 ** Команда: NICK 
+** ====================================================================
 ** Параметры: <nickname> [ <hopcount> ]
 ** cmd_nick		-	при удачном вызове добавляет никнэйм в класс Client
 **					
@@ -97,54 +101,106 @@ void	Command::cmd_pass(void * var_1, void * var_2, void * var_3)
 **					(при помощи fd сокета),
 **					проверяем, вошел ли этот клиент по паролю,
 **					если да, то выставляем ему nickname
-** =================================================================
+** =====================================================================
 */
 
-bool Command::nick(std::string nickname, std::vector<Client *> users)
+bool Command::nick_length()
 {
-	std::cout << "WHY YOU DONT LIKE MY NICK??? " << nickname << std::endl;
-	std::cout << "SIZE " << nickname.size() << std::endl;
-    if (nickname.size() > 9 || nickname.size() == 0)
-        return false;
-    for (size_t i = 0; i < users.size(); i++)
+	if (this->arguments[0].size() > 9 || this->arguments[0].size() == 0)
 	{
-		if (users[i]->getNickname() == nickname)
-			return false;
+		Utils::print_error(ERR_NICKNAME, "Nickname length must be between 1 and 9 symbols");
+		return false;
 	}
-    return true;
+	return true;
+}
+
+bool Command::nick_password(Client * cur_client)
+{
+	if (cur_client->getPassword() == false)
+	{
+		Utils::print_error(123, "Log in with correct PASS at first");
+		return false;
+	}
+	return true;
+}
+
+template <typename T>
+bool Command::nick_available(std::vector<T> vect)
+{
+	for (size_t i = 0; i < vect.size(); i++)
+	{
+		if (vect[i]->getNickname() == this->arguments[0])
+		{
+			Utils::print_error(ERR_NICKNAME, "Nickname is already in use");
+			return false;
+		}
+	}
+	return true;
 }
 
 void  Command::cmd_nick(void * var_1, void * var_2, void * var_3)
 {
-	int *fd 								= (int *)var_2;
-	std::vector<Client *> *vect				= (std::vector<Client *> *)var_1;
-	std::vector<Client *>::iterator temp;
+	std::vector<Client *> *	clients			= (std::vector<Client *> *)var_1;
+	std::vector<User *> *	users			= (std::vector<User *> *)var_3;
+	int *					fd 				= (int *)var_2;
+	int						i;
 
-	(void)var_3;
-	if ((temp = this->find_fd(vect, *fd)) == (*vect).end())
+/*
+** если клиент подключен к локальному серверу
+*/
+	// если есть клиент с таким fd
+	if ((i = IRC::find_fd(clients, *fd)) >= 0 && this->nick_length())
+	{
+		Client *cur_client = (*((*clients).begin() + i));
+		// если клиент ввел корректный пароль и если ник соответствует требованиям и такого еще нет в списке клиентов
+		if (this->nick_password(cur_client) && this->nick_available(*clients))  //this->nick(this->arguments[0], *clients))
+		{
+			// если никнейм у клиента еще не установлен / уже установлен
+			if (cur_client->getNickname().empty())
+				Utils::print_line("New nickname for client " + this->arguments[0] + " set");
+			else
+				Utils::print_line("Nickname for client changed from " + cur_client->getNickname() + " to " + this->arguments[0]);
+			cur_client->setNickname(this->arguments[0]);
+
+			// если есть юзер с таким fd и если ник соответствует требованиям и такого еще нет в списке юзеров
+			if ((i = IRC::find_fd(users, *fd)) >= 0 && this->nick_available(*users))
+			{
+				User * cur_user = (*((*users).begin() + i));
+				if (cur_user->getNickname().empty())
+					Utils::print_line("New nickname for user" + this->arguments[0] + " set");
+				else
+					Utils::print_line("Nickname for user changed from " + cur_user->getNickname() + " to " + this->arguments[0]);
+				cur_user->setNickname(this->arguments[0]);
+			}
+		}
+	}
+
+
+	/*if ((i = IRC::find_fd(vect, *fd)) < 0)
 	{
 		Utils::print_error(ERR_FINDFD, "FD didn't find in vector!");
 		return ;
 	}
-	if ((*temp)->getPassword() == false)
+	if ((*((*vect).begin()))->getPassword() == false)
 		Utils::print_error(123, "Enter PASS before NICK!");
 	else if (this->nick(this->arguments[0], *vect))
 	{
 		Utils::print_line("NickName is avalible!");
-		(*temp)->setNickname(this->arguments[0]);
+		(*((*vect).begin()))->setNickname(this->arguments[0]);
 	}
 	else
-		Utils::print_error(ERR_NICKNAME, "NickName is not avalible!");
+		Utils::print_error(ERR_NICKNAME, "NickName is not avalible!");*/
 	
 	this->arguments.clear();
 }
 
 /*
-**==========================
+** =============================================================
 ** Команда: USER 
+** =============================================================
 ** Параметры: <username> <hostname> <servername> <realname> 
 ** cmd_user - при удачном вызове дозополняет класс Client
-**==========================
+** =============================================================
 */
 
 bool Command::user(User *curr_user)
@@ -182,7 +238,7 @@ void Command::cmd_user(void *var_1, void *var_2, void *var_3)
 		return ;
 	}
 
-	User *curr_user = new User(**temp);
+	User *curr_user = new User(*temp);
 
 	if (this->user(curr_user))
 	{
@@ -197,9 +253,10 @@ void Command::cmd_user(void *var_1, void *var_2, void *var_3)
 }
 
 /*
-**==========================
-** find_fd - находит в векторе итераторную позицию которая соответствует переданный fd
-**==========================
+** =====================================================================
+** find_fd - находит в векторе итераторную позицию которая соответствует 
+**           переданный fd
+** =====================================================================
 */
 
 std::vector<Client *>::iterator Command::find_fd(std::vector<Client *> *vect, int fd)
@@ -217,9 +274,9 @@ std::vector<Client *>::iterator Command::find_fd(std::vector<Client *> *vect, in
 }
 
 /*
-**==========================
+** ==================================================
 ** getCommand - возвращает текущую команду из буфера
-**==========================
+** ==================================================
 */
 
 std::string const & Command::getCommand() const

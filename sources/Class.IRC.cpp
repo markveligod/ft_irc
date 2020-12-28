@@ -18,10 +18,10 @@
 IRC::IRC() {}
 
 IRC::IRC(std::string network_ip,
-				std::string network_port,
-				std::string network_pass,
-				std::string localhost_port,
-				std::string localhost_pass)
+		 std::string network_port,
+		 std::string network_pass,
+		 std::string localhost_port,
+		 std::string localhost_pass)
 {
 	_network_ip = network_ip;
 	_network_port = std::atoi(network_port.c_str());
@@ -79,7 +79,7 @@ void IRC::create_socket_network()
 /*
 ** ---------------------------------------------------------------------------------------------
 ** do_command 	- выполняет команду, которая пришла в сообщении от клиента
-** 				  (принимает на вход сообшение и дескриптор сокета, от которого оно пришло)
+** 				  (принимает на вход команду и дескриптор сокета, от которого она пришла)
 ** суть работы -  создает массив имен команд, ссылок на соответствующие функции,
 **				  и два массива аргументов для этих функций;
 **				  Проходится в цикле по всем именам команд и запускает соответствующую функцию
@@ -103,7 +103,7 @@ void IRC::do_command(Command *command, int socket_fd)
 	void 		*cmd_var2[3] =	{(void *)&socket_fd,
 								 (void *)&socket_fd,
 							 	 (void *)&socket_fd};
-	void 		*cmd_var3[3] =	{ NULL,
+	void 		*cmd_var3[3] =	{(void *)&this->_users,
 								 (void *)&this->_localhost_pass,
 							 	 (void *)&this->_users};
 
@@ -300,14 +300,18 @@ SSL *IRC::ssl_connection(int fd)
 	return _ssl;
 }
 
-
 /*
-** ========================UTILS PART==========================
+** ===========================UTILS PART=============================
 **
-** ----------------------------------------------------------
-** find_fd - находит в векторе итераторную позицию которая 
-**           соответствует переданный fd
-** ----------------------------------------------------------
+** ------------------------------------------------------------------
+** find_fd			- находит в векторе итераторную позицию которая 
+**           		  соответствует переданный fd
+**					- вместо T можно подавать Client * или User *
+** ------------------------------------------------------------------
+** find_nickname	- находит в векторе итераторную позицию которая 
+**           		  соответствует переданному никнейму
+**					- вместо T можно подавать Client * или User *
+** ------------------------------------------------------------------
 */
 
 template <typename T>
@@ -326,6 +330,30 @@ int IRC::find_fd(std::vector<T> *vect, int fd)
 	}
 	return (-1);
 }
+
+template <typename T>
+int IRC::find_nickname(std::vector<T> *vect, std::string const & nickname)
+{
+	typename std::vector<T>::iterator v_begin = (*vect).begin();
+	typename std::vector<T>::iterator v_end = (*vect).end();
+	int i = 0;
+
+	while (v_begin != v_end)
+	{
+		if ((*v_begin)->getNickname() == nickname)
+			return (i);
+		v_begin++;
+		i++;
+	}
+	return (-1);
+}
+
+/*
+** ------------------------------------------------------------------
+** delete_user		- находит и удаляет клиента или юзера с 
+** delete_client      соответствующим fd
+** ------------------------------------------------------------------
+*/
 
 /*
 ** ВАЖНО

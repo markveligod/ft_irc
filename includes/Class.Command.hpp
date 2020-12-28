@@ -18,8 +18,12 @@ private:
 	std::string						command;
 	std::vector<std::string> 		arguments;
 
+
+	bool							nick_length();
+	bool							nick_password(Client * cur_client);
+	template <typename T> bool		nick_available(std::vector<T> vect);
+
 	bool							pass(std::string password, std::string local_pass);
-	bool							nick(std::string nickname, std::vector<Client *> users);
 	bool							user(User *curr_user);
 	std::vector<Client *>::iterator find_fd(std::vector<Client *> *vect, int fd);
 	
