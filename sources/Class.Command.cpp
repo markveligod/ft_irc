@@ -148,21 +148,17 @@ void  Command::cmd_nick(void * var_1, void * var_2, void * var_3)
 /*
 ** если клиент подключен к локальному серверу
 */
-	// если есть клиент с таким fd
 	if ((i = IRC::find_fd(clients, *fd)) >= 0 && this->nick_length())
 	{
 		Client *cur_client = (*((*clients).begin() + i));
-		// если клиент ввел корректный пароль и если ник соответствует требованиям и такого еще нет в списке клиентов
-		if (this->nick_password(cur_client) && this->nick_available(*clients))  //this->nick(this->arguments[0], *clients))
+		if (this->nick_password(cur_client) && this->nick_available(*clients))
 		{
-			// если никнейм у клиента еще не установлен / уже установлен
 			if (cur_client->getNickname().empty())
 				Utils::print_line("New nickname for client " + this->arguments[0] + " set");
 			else
 				Utils::print_line("Nickname for client changed from " + cur_client->getNickname() + " to " + this->arguments[0]);
 			cur_client->setNickname(this->arguments[0]);
 
-			// если есть юзер с таким fd и если ник соответствует требованиям и такого еще нет в списке юзеров
 			if ((i = IRC::find_fd(users, *fd)) >= 0 && this->nick_available(*users))
 			{
 				User * cur_user = (*((*users).begin() + i));
@@ -174,24 +170,16 @@ void  Command::cmd_nick(void * var_1, void * var_2, void * var_3)
 			}
 		}
 	}
+/*
+** если клиент подключен через другой сервер
+*/
+	// добавить - если дексриптор есть среди дексрипторов серверов
+
+// получается, если нам пришел запрос на изменение ника пользователя с другого сервера, 
+// мы должны не только у сея изменить эти данные, но и отправить эту же команду
+// другим серверам ? (а что, если им тот сервер, что нам отправил запрос, уже отправил его и им, и мы отправил повторно???)
 
 
-	/*if ((i = IRC::find_fd(vect, *fd)) < 0)
-	{
-		Utils::print_error(ERR_FINDFD, "FD didn't find in vector!");
-		return ;
-	}
-	if ((*((*vect).begin()))->getPassword() == false)
-		Utils::print_error(123, "Enter PASS before NICK!");
-	else if (this->nick(this->arguments[0], *vect))
-	{
-		Utils::print_line("NickName is avalible!");
-		(*((*vect).begin()))->setNickname(this->arguments[0]);
-	}
-	else
-		Utils::print_error(ERR_NICKNAME, "NickName is not avalible!");*/
-	
-	this->arguments.clear();
 }
 
 /*
