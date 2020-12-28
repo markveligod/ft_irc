@@ -67,10 +67,13 @@ void IRC::create_socket_network()
 {
 	_network = Socket(_network_ip.c_str(), _network_port);
 	Utils::print_line("Socket network done!");
-	_network._socket();
+	int fd = _network._socket();
 	Utils::print_line("Socket network FD done!");
 	_network._connect();
 	Utils::print_line("Socket network connection!");
+
+	std::string pass = "PASS " + _network_pass + "\n\r";
+	send(fd, pass.c_str(), pass.size(), 0);
 }
 
 /*
