@@ -68,7 +68,10 @@ fclean: clean
 
 re: fclean all
 
-test: all
-	./$(NAME) 1280 123
+server: all
+	./$(NAME) 1080 111
 
-.PHONY: all clean fclean re
+client: all
+	./$(NAME) localhost:1080:111 1280 123
+
+.PHONY: all clean fclean re server client

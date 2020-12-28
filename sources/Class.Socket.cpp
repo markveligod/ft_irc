@@ -11,7 +11,10 @@ Socket::Socket(const char *host_ip, int port, int fd, int sin_family, int type, 
 	bzero(&_addr, _addr_size);
 	_addr.sin_family = _sin_family;
 	if (host_ip)
-		inet_pton(_sin_family, host_ip, &_addr.sin_addr);
+	{
+		hostent *host = gethostbyname(host_ip);
+		inet_pton(_sin_family, host->h_name, &_addr.sin_addr);
+	}
 	else
 		_addr.sin_addr.s_addr = htons(INADDR_ANY);
 	_addr.sin_port = htons(_port);
