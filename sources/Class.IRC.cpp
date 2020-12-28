@@ -100,9 +100,9 @@ void IRC::do_command(Command *command, int socket_fd)
 	void 		*cmd_var2[3] =	{(void *)&socket_fd,
 								 (void *)&socket_fd,
 							 	 (void *)&socket_fd};
-	void 		*cmd_var3[3] =	{NULL,
-								(void *)&this->_localhost_pass,
-							 	(void *)&this->_users};
+	void 		*cmd_var3[3] =	{ NULL,
+								 (void *)&this->_localhost_pass,
+							 	 (void *)&this->_users};
 
 	for (int i = 0; i < 3; i++)
 		if (cmd_name[i] == command->getCommand())
@@ -229,6 +229,10 @@ int IRC::_recv(int connection_type, int fd, char *response, size_t size, int fla
 	
 	if (n == 0)
 	{
+		int i;
+		if ((i = this->find_fd(&this->_clients, fd)) > -1)
+			this->_users.erase(this->_users.begin() + i);
+
 		std::cout << "connection closed\n";
 		_array_fd_select.erase(fd);
 	}
@@ -282,4 +286,25 @@ SSL *IRC::ssl_connection(int fd)
 		Utils::print_error(1, "SSL: SSL_accept failed\n");
 
 	return _ssl;
+}
+
+/*
+**==========================
+** find_fd - находит в векторе итераторную позицию которая соответствует переданный fd
+**==========================
+*/
+int IRC::find_fd(std::vector<Client *> *vect, int fd)
+{
+	std::vector<Client *>::iterator v_begin = (*vect).begin();
+	std::vector<Client *>::iterator v_end = (*vect).end();
+	int i = 0;
+
+	while (v_begin != v_end)
+	{
+		if ((*v_begin)->getSocketFd() == fd)
+			return (i);
+		v_begin++;
+		i++;
+	}
+	return (-1);
 }

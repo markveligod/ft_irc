@@ -20,5 +20,4 @@ class Utils
 		static void print_error(int num_error, std::string fail_msg);
 		static void print_line(std::string msg);
 		static std::string convert_int_to_str(int num);
-		
 };
