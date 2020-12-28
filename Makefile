@@ -13,7 +13,8 @@ SSL		= -lssl -lcrypto
 INCLUDES= -I ./includes
 
 ifeq ($(UNAME), Darwin)
-INCLUDES+= -I/usr/local/opt/openssl/include
+	INCLUDES += -I/usr/local/opt/openssl/include
+	SSL += -L/usr/local/opt/openssl/lib
 endif
 
 NAME	= ircserv
@@ -68,7 +69,6 @@ fclean: clean
 re: fclean all
 
 test: all
-	./$(NAME) 1280 wap
-	# ./$(NAME) 4444 grjgi
+	./$(NAME) 1280 123
 
 .PHONY: all clean fclean re

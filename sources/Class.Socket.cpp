@@ -75,12 +75,6 @@ int Socket::_accept() {
 	return client;
 }
 
-size_t	Socket::_send(char const * buffer) {
-	return (send(_fd, buffer, 512, 0));
-}
-
-	// size_t	Socket::_recv() { }
-
 Socket::~Socket() {
 	if (_fd)
 		close(_fd);

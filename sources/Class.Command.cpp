@@ -6,7 +6,34 @@
 **==========================
 */
 
-Command::Command() {}
+Command::Command(std::string const & str)
+{
+	std::istringstream	ss(str);
+	std::string			word;
+	std::string			last_arg;
+
+	getline(ss, word, ' ');
+	if (word[0] == ':')
+		this->prefix = word.substr(1, word.length());
+	else
+		this->command = word;
+
+	if (this->command.empty())
+		getline(ss, this->command, ' ');
+
+	while (getline(ss, word, ' '))
+	{
+		if (word[0] == ':')
+		{
+			last_arg = word.substr(1, word.length());
+			break;
+		}
+		this->arguments.push_back(word);
+	}
+	while (getline(ss, word, ' '))
+		last_arg = last_arg + ' ' + word;
+	this->arguments.push_back(last_arg);
+}
 
 Command::~Command() {}
 
@@ -20,6 +47,7 @@ Command::~Command() {}
 bool Command::pass(std::string password, std::string local_pass)
 {
     if (password == local_pass)
+    // if (password == local_pass + "\r\n")
         return true;
     return false;
 }
@@ -33,6 +61,8 @@ bool Command::pass(std::string password, std::string local_pass)
 
 bool Command::nick(std::string nickname, std::vector<Client *> users)
 {
+	std::cout << "WHY YOU DONT LIKE MY NICK??? " << nickname << std::endl;
+	std::cout << "SIZE " << nickname.size() << std::endl;
     if (nickname.size() > 9 || nickname.size() == 0)
         return false;
     for (size_t i = 0; i < users.size(); i++)
@@ -53,30 +83,10 @@ bool Command::nick(std::string nickname, std::vector<Client *> users)
 bool Command::user(User *curr_user)
 {
 	std::string temp_str;
-	if (this->temp.size() < 4)
+	if (this->arguments.size() != 4)
 		return false;
-	for (size_t i = 4; i < this->temp.size(); i++)
-		temp_str += this->temp[i];
-	curr_user->user_from_client(this->temp[1], this->temp[2], this->temp[3], temp_str);
+	curr_user->user_from_client(this->arguments[0], this->arguments[1], this->arguments[2], this->arguments[4]);
 	return true;
-}
-
-/*
-**==========================
-** pars_str - парсинг строки из буфера 
-**==========================
-*/
-
-void Command::pars_str(std::string str)
-{
-    std::istringstream ss(str);
-    std::string ff;
-
-    while (getline(ss, ff, ' '))
-    {
-        //std::cout << ff << std::endl;
-        this->temp.push_back(ff);
-    }
 }
 
 /*
@@ -124,20 +134,20 @@ void  Command::cmd_nick(void * var_1, void * var_2, void * var_3)
 	(void)var_3;
 	if ((temp = this->find_fd(vect, *fd)) == (*vect).end())
 	{
-		Utils::print_error(ERR_FINDFD, "FD don't find in vector!");
+		Utils::print_error(ERR_FINDFD, "FD didn't find in vector!");
 		return ;
 	}
 	if ((*temp)->getPassword() == false)
 		Utils::print_error(123, "Enter PASS before NICK!");
-	else if (this->nick(this->temp[1], *vect))
+	else if (this->nick(this->arguments[0], *vect))
 	{
 		Utils::print_line("NickName is avalible!");
-		(*temp)->setNickname(this->temp[1]);
+		(*temp)->setNickname(this->arguments[0]);
 	}
 	else
 		Utils::print_error(ERR_NICKNAME, "NickName is not avalible!");
 	
-	this->temp.clear();
+	this->arguments.clear();
 }
 
 /*
@@ -158,7 +168,7 @@ void  Command::cmd_nick(void * var_1, void * var_2, void * var_3)
 void	Command::cmd_pass(void * var_1, void * var_2, void * var_3)
 {
 	std::string *local_pass = (std::string *)var_3;
-	if (this->pass(this->temp[1], *local_pass))
+	if (this->pass(this->arguments[0], *local_pass))
 	{
 		int *fd 								= (int *)var_2;
 		std::vector<Client *> *vect 			= (std::vector<Client *> *)var_1;
@@ -175,7 +185,7 @@ void	Command::cmd_pass(void * var_1, void * var_2, void * var_3)
 	}
 	else
 		Utils::print_error(ERR_PASSWORD, "Incorrect password");
-	this->temp.clear();
+	this->arguments.clear();
 }
 
 /*
@@ -232,5 +242,5 @@ void Command::cmd_user(void *var_1, void *var_2, void *var_3)
 
 std::string const & Command::getCommand() const
 {
-	return (this->temp[0]);
+	return (this->command);
 }

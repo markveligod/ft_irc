@@ -158,78 +158,42 @@ void IRC::check_fd_select()
 	{
 		if (FD_ISSET(it->first, &_fd_set_sockets))
 		{
-			if (it->second == FD_CLIENT)
+			if (it->second == FD_CLIENT || it->second == FD_CLIENT_SSL)
 			{
-				char buffer[512 + 1];
-				int n = 0;
 				std::cout << "Client#" << it->first << ": ";
-				if (((n = recv(it->first, buffer, 512, 0))) == 0)
-				{
-					std::cout << "connection closed\n";
-					_array_fd_select.erase(it->first);
-				}
-				else
-				{
-					Command mess;
-
-					buffer[n] = '\0';
-					std::cout << buffer << std::endl;
-					mess.pars_str(buffer);
-
-					// передаем в исполнение команды сообщение и сокет, из которого пришло сообщение
-					this->do_command(&mess, it->first);
-					_network._send(buffer);
-				}
-			}
-			if (it->second == FD_CLIENT_SSL)
-			{
+				
 				char buffer[512 + 1];
-				int n = 0;
-				std::cout << "Client ssl#" << it->first << ": ";
-				if (((n = SSL_read(_ssl, buffer, 512))) <= 0)
-				{
-					std::cout << "ssl connection closed\n";
-					_array_fd_select.erase(it->first);
-				}
-				else
-				{
-					Command mess;
+				int n = _recv(it->second, it->first, buffer, 512, 0);
+				
+				Command mess((std::string(buffer)));
 
-					buffer[n] = '\0';
-					std::cout << buffer << std::endl;
-					mess.pars_str(buffer);
+				buffer[n] = '\0';
+				std::cout << buffer << std::endl;
 
-					// передаем в исполнение команды сообщение и сокет, из которого пришло сообщение
-					this->do_command(&mess, it->first);
-					_network._send(buffer);
-				}
+				// передаем в исполнение команды сообщение и сокет, из которого пришло сообщение
+				this->do_command(&mess, it->first);
+				_send(it->second, it->first, buffer, strlen(buffer), 0);
 			}
 			//Раздел для приемки сообщений из селекта
-			if (it->second == FD_SERVER)
+			if (it->second == FD_SERVER || it->second == FD_SERVER_SSL)
 			{
 				// _accept() возвращает fd клиента, который мы добавляем в map
-				// в качестве ключа, в качестве значения добавляем FD_CLIENT
+				// в качестве ключа, в качестве значения добавляем FD_CLIENT(_SSL)
 				char response[] = "Accepted\n";
 
-				int client_socket = _localhost._accept();
-				_array_fd_select[client_socket] = FD_CLIENT;
+				int client_socket = (it->second == FD_SERVER)
+									? _localhost._accept()
+									: _localhost_ssl._accept();
+
+				_array_fd_select[client_socket] = (it->second == FD_SERVER)
+																? FD_CLIENT
+																: FD_CLIENT_SSL;
+				if (it->second == FD_SERVER_SSL)
+					ssl_connection(client_socket);
+											
 				std::cout << "New client#" << client_socket << " joined server\n";
 				
-				send(client_socket, reinterpret_cast<void *>(response), 10, 0);
-
-				Client *newclient = new Client(client_socket);
-				this->_clients.push_back(newclient);
-			}
-			if (it->second == FD_SERVER_SSL)
-			{
-				char response[] = "Accepted\n";
-
-				int client_socket = _localhost_ssl._accept();
-				_array_fd_select[client_socket] = FD_CLIENT_SSL;
-				std::cout << "New ssl client#" << client_socket << " joined server\n";
-				
-				_ssl = ssl_connection(client_socket);
-				SSL_write(_ssl, reinterpret_cast<void *>(response), 10);
+				_send(it->second, client_socket, response, 10, 0);
 
 				Client *newclient = new Client(client_socket);
 				this->_clients.push_back(newclient);
@@ -237,6 +201,41 @@ void IRC::check_fd_select()
 			_select_res--;
 		}
 	}
+}
+
+int IRC::_send(int connection_type, int fd, const char *response, size_t size, int flags)
+{
+	int n;
+
+	if (connection_type == FD_CLIENT || connection_type == FD_SERVER)
+		n = send(fd, reinterpret_cast<const void *>(response), size, flags);
+	else
+		n = SSL_write(_ssl, reinterpret_cast<const void *>(response), size);
+	
+	if (n < 0)
+		std::cout << "message sending failed\n";
+	
+	return n;
+}
+
+int IRC::_recv(int connection_type, int fd, char *response, size_t size, int flags)
+{
+	int n;
+
+	if (connection_type == FD_CLIENT || connection_type == FD_SERVER)
+		n = recv(fd, reinterpret_cast<void *>(response), size, flags);
+	else
+		n = SSL_read(_ssl, reinterpret_cast<void *>(response), size);
+	
+	if (n == 0)
+	{
+		std::cout << "connection closed\n";
+		_array_fd_select.erase(fd);
+	}
+	if (n < 0)
+		std::cout << "message receiving failed\n";
+
+	return n;
 }
 
 /*
@@ -274,13 +273,13 @@ void IRC::init_ctx()
 
 SSL *IRC::ssl_connection(int fd)
 {
-	SSL *ssl = SSL_new(_ctx);
+	_ssl = SSL_new(_ctx);
 
-	if (SSL_set_fd(ssl, fd) <= 0)
+	if (SSL_set_fd(_ssl, fd) <= 0)
 		Utils::print_error(1, "SSL: SSL_set_fd failed\n");
 
-	if (SSL_accept(ssl) < 0)		/* do SSL-protocol accept */
+	if (SSL_accept(_ssl) < 0)		/* do SSL-protocol accept */
 		Utils::print_error(1, "SSL: SSL_accept failed\n");
 
-	return ssl;
+	return _ssl;
 }
