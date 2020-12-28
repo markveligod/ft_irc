@@ -233,9 +233,8 @@ int IRC::_recv(int connection_type, int fd, char *response, size_t size, int fla
 	
 	if (n == 0 || n < 0)
 	{
-		int i;
-		if ((i = IRC::find_fd(&this->_clients, fd)) > -1)
-			this->_clients.erase(this->_clients.begin() + i);
+		this->delete_client(fd);
+		this->delete_user(fd);
 
 		std::cout << (n == 0 ? "connection closed\n" : "message receiving failed\n");
 		_array_fd_select.erase(fd);
@@ -319,34 +318,35 @@ int IRC::find_fd(std::vector<T> *vect, int fd)
 }
 
 /*
-int IRC::find_fd(std::vector<Client *> *vect, int fd)
-{
-	std::vector<Client *>::iterator v_begin = (*vect).begin();
-	std::vector<Client *>::iterator v_end = (*vect).end();
-	int i = 0;
+** ВАЖНО
+** когда к нам добавятся юзеры из других серверов, так удалять будет нельзя!
+** нужно будет смотреть на префиксы, а не только на fd
+*/
 
-	while (v_begin != v_end)
+void	IRC::delete_user(int fd)
+{
+	int i;
+	if ((i = IRC::find_fd(&this->_users, fd)) > -1)
 	{
-		if ((*v_begin)->getSocketFd() == fd)
-			return (i);
-		v_begin++;
-		i++;
+		User *out_user = (*(this->_users.begin() + i));
+		this->_users.erase(this->_users.begin() + i);
+		delete out_user;
 	}
-	return (-1);
 }
 
-int IRC::find_fd(std::vector<User *> *vect, int fd)
-{
-	std::vector<User *>::iterator v_begin = (*vect).begin();
-	std::vector<User *>::iterator v_end = (*vect).end();
-	int i = 0;
+/*
+** ВАЖНО
+** когда к нам добавятся юзеры из других серверов, так удалять будет нельзя!
+** нужно будет смотреть на префиксы, а не только на fd
+*/
 
-	while (v_begin != v_end)
+void	IRC::delete_client(int fd)
+{
+	int i;
+	if ((i = IRC::find_fd(&this->_clients, fd)) > -1)
 	{
-		if ((*v_begin)->getSocketFd() == fd)
-			return (i);
-		v_begin++;
-		i++;
+		Client *out_client = (*(this->_clients.begin() + i));
+		this->_clients.erase(this->_clients.begin() + i);
+		delete out_client;
 	}
-	return (-1);
-}*/
+}

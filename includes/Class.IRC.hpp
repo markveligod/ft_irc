@@ -56,7 +56,9 @@ class IRC
 		int 		_recv(int, int, char *, size_t, int);
 
 		template <typename T>
-		static int find_fd(std::vector<T> *vect, int fd);
+		static int	find_fd(std::vector<T> *vect, int fd);
+		void		delete_user(int fd);
+		void		delete_client(int fd);
 		//static int	find_fd(std::vector<Client *> *vect, int fd);
 		//static int	find_fd(std::vector<User *> *vect, int fd);
 };
