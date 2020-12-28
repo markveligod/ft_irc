@@ -8,8 +8,8 @@ RESET=\033[0m
 CC		= clang++
 RM		= rm -rf
 DEBUG	= -g
-FLAGS	= -Wall -Wextra -Werror -MMD -std=c++98
-SSL		= -lssl -lcrypto
+FLAGS	= -Wall -Wextra -Werror -MMD -std=c++98 -I/usr/local/opt/openssl/include
+SSL		= -lssl -lcrypto -L/usr/local/opt/openssl/lib
 INCLUDES= -I ./includes
 
 ifeq ($(UNAME), Darwin)
