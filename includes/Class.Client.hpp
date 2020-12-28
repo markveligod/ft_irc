@@ -10,6 +10,7 @@ protected:
 	int					socket_fd;
 	int					hopcount;
 	bool				password;
+	std::string			buffer;
 
 public:
 	Client(int socket_fd);
@@ -23,6 +24,11 @@ public:
 	std::string const &	getNickname() const;
 	bool				getPassword() const;
 	int					getSocketFd() const;
+
+	void				setBuffer(const std::string &buff);
+	bool				find_line_break();
+	std::string			get_line_break();
+	bool				isempty_buffer();
 };
 
 #endif
