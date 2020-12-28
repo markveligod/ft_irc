@@ -42,6 +42,5 @@ int main(int ac, char **av)
 		server.do_select();
 		server.check_fd_select();
 	}
-
 	return (0);
 }

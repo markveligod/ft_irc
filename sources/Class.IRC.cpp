@@ -165,6 +165,9 @@ void IRC::check_fd_select()
 				char buffer[512 + 1];
 				int n = _recv(it->second, it->first, buffer, 512, 0);
 				
+				if (n < 1)
+					continue;
+
 				Command mess((std::string(buffer)));
 
 				buffer[n] = '\0';
@@ -173,6 +176,7 @@ void IRC::check_fd_select()
 				// передаем в исполнение команды сообщение и сокет, из которого пришло сообщение
 				this->do_command(&mess, it->first);
 				_send(it->second, it->first, buffer, strlen(buffer), 0);
+				buffer[0] = '\0';
 			}
 			//Раздел для приемки сообщений из селекта
 			if (it->second == FD_SERVER || it->second == FD_SERVER_SSL)
@@ -224,18 +228,15 @@ int IRC::_recv(int connection_type, int fd, char *response, size_t size, int fla
 	else
 		n = SSL_read(_ssl, reinterpret_cast<void *>(response), size);
 	
-	if (n == 0)
+	if (n == 0 || n < 0)
 	{
 		int i;
 		if ((i = IRC::find_fd(&this->_clients, fd)) > -1)
-			this->_users.erase(this->_users.begin() + i);
+			this->_clients.erase(this->_clients.begin() + i);
 
-		std::cout << "connection closed\n";
+		std::cout << (n == 0 ? "connection closed\n" : "message receiving failed\n");
 		_array_fd_select.erase(fd);
 	}
-	if (n < 0)
-		std::cout << "message receiving failed\n";
-
 	return n;
 }
 
