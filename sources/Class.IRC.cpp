@@ -173,7 +173,7 @@ void IRC::check_fd_select()
 					it = _array_fd_select.begin();
 					continue;
 				}
-
+				buffer[n] = '\0';
 				//получаем распарсенный вектор команд если нашли \r\n
 				std::vector<std::string> buffer_cmd = this->check_buffer(it->first, buffer);
 
@@ -182,14 +182,13 @@ void IRC::check_fd_select()
 
 					Command mess(buffer_cmd[i]);
 
-					//buffer[n] = '\0';
 					std::cout << buffer_cmd[i] << std::endl;
 
 					// передаем в исполнение команды сообщение и сокет, из которого пришло сообщение
 					this->do_command(&mess, it->first);
 					_send(it->second, it->first, buffer_cmd[i].c_str(), strlen(buffer_cmd[i].c_str()), 0);
-					//buffer[0] = '\0';
 				}
+				bzero(buffer, 512);
 			}
 			//Раздел для приемки сообщений из селекта
 			if (it->second == FD_SERVER || it->second == FD_SERVER_SSL)
