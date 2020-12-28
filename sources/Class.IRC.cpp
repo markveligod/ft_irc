@@ -166,7 +166,10 @@ void IRC::check_fd_select()
 				int n = _recv(it->second, it->first, buffer, 512, 0);
 				
 				if (n < 1)
+				{
+					it = _array_fd_select.begin();
 					continue;
+				}
 
 				Command mess((std::string(buffer)));
 
