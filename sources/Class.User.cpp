@@ -7,16 +7,26 @@
 ** ----------------------------------------------------------
 */
 
-User::User(Client const &src) : Client(src)
+User::User(Client * src) : Client(*src)
+{
+	this->nickname	= src->getNickname();
+	this->password	= src->getPassword();
+	this->hopcount	= src->getHopcount();
+	this->socket_fd = src->getSocketFd();
+	this->client 	= src;
+}
+
+/*User::User(Client const &src) : Client(src)
 {
 	this->nickname	= src.getNickname();
 	this->password	= src.getPassword();
 	this->hopcount	= src.getHopcount();
 	this->socket_fd = src.getSocketFd();
-}
+	//this->client 	= src;
+}*/
 
 /*
-** ----------------------------------------------------------
+** ---------------------------------------------------------------
 ** creating user from client
 **
 ** когда клиент уже ввел пароль и задал nick, и командой USER
@@ -26,7 +36,7 @@ User::User(Client const &src) : Client(src)
 **					 (например, когда создается новый юзер)
 **				   - второй вариант с заданием модов
 **					 (например, когда юзеры приходят от сервера)
-** ----------------------------------------------------------
+** ---------------------------------------------------------------
 */
 
 void User::user_from_client(std::string username, std::string hostname,

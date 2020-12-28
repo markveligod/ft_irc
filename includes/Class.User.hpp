@@ -19,10 +19,12 @@ private:
 	std::string 	hostname;
 	std::string 	servername;
 	std::string 	realname;
+	Client *		client;
 	struct ModeUser	mode;
 
 public:
-	User(Client const &src);
+	//User(Client const &src);
+	User(Client * src);
 
 	void			user_from_client(std::string username, std::string hostname, 
 									 std::string servername, std::string realname);

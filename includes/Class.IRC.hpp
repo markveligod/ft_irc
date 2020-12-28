@@ -57,8 +57,9 @@ class IRC
 
 		template <typename T>
 		static int	find_fd(std::vector<T> *vect, int fd);
+		template <typename T>
+		static int	find_nickname(std::vector<T> * vect, std::string const & nickname);
+		
 		void		delete_user(int fd);
 		void		delete_client(int fd);
-		//static int	find_fd(std::vector<Client *> *vect, int fd);
-		//static int	find_fd(std::vector<User *> *vect, int fd);
 };
