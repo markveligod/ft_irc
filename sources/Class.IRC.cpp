@@ -170,11 +170,11 @@ void IRC::check_fd_select()
 				}
 				else
 				{
-					Command mess;
+					Command mess((std::string(buffer)));
 
 					buffer[n] = '\0';
 					std::cout << buffer << std::endl;
-					mess.pars_str(buffer);
+					//mess.pars_str(buffer);
 
 					// передаем в исполнение команды сообщение и сокет, из которого пришло сообщение
 					this->do_command(&mess, it->first);
@@ -193,11 +193,11 @@ void IRC::check_fd_select()
 				}
 				else
 				{
-					Command mess;
+					Command mess((std::string(buffer)));
 
 					buffer[n] = '\0';
 					std::cout << buffer << std::endl;
-					mess.pars_str(buffer);
+					//mess.pars_str(buffer);
 
 					// передаем в исполнение команды сообщение и сокет, из которого пришло сообщение
 					this->do_command(&mess, it->first);
