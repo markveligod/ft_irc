@@ -66,7 +66,11 @@ void	Client::chat()
 	{
 		std::cout << "Client: ";
 		std::cin.getline(this->buffer, BUFFER_SIZE - 1);
-		send(this->client, this->buffer, BUFFER_SIZE, 0);
+		size_t i = strlen(this->buffer);
+		this->buffer[i] = '\r';
+		this->buffer[i + 1] = '\n';
+		this->buffer[i + 2] = '\0';
+		send(this->client, this->buffer, i + 2, 0);
 		if (Client::end_connection(this->buffer))
 			break;
 

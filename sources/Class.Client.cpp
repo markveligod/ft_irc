@@ -63,6 +63,11 @@ std::string const &	Client::getNickname() const
 	return (this->nickname);
 }
 
+std::string	Client::getBuffer() const
+{
+	return (this->buffer);
+}
+
 /*
 ** ----------------------------------------------------------
 ** Набор функций для парсинга незавершенных команд:

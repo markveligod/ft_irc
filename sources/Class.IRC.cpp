@@ -174,15 +174,22 @@ void IRC::check_fd_select()
 					continue;
 				}
 
-				Command mess((std::string(buffer)));
+				//получаем распарсенный вектор команд если нашли \r\n
+				std::vector<std::string> buffer_cmd = this->check_buffer(it->first, buffer);
 
-				buffer[n] = '\0';
-				std::cout << buffer << std::endl;
+				for (size_t i = 0; i < buffer_cmd.size(); i++)
+				{
 
-				// передаем в исполнение команды сообщение и сокет, из которого пришло сообщение
-				this->do_command(&mess, it->first);
-				_send(it->second, it->first, buffer, strlen(buffer), 0);
-				buffer[0] = '\0';
+					Command mess(buffer_cmd[i]);
+
+					//buffer[n] = '\0';
+					std::cout << buffer_cmd[i] << std::endl;
+
+					// передаем в исполнение команды сообщение и сокет, из которого пришло сообщение
+					this->do_command(&mess, it->first);
+					_send(it->second, it->first, buffer_cmd[i].c_str(), strlen(buffer_cmd[i].c_str()), 0);
+					//buffer[0] = '\0';
+				}
 			}
 			//Раздел для приемки сообщений из селекта
 			if (it->second == FD_SERVER || it->second == FD_SERVER_SSL)
@@ -352,4 +359,26 @@ void	IRC::delete_client(int fd)
 		this->_clients.erase(this->_clients.begin() + i);
 		delete out_client;
 	}
+}
+
+/*
+** ----------------------------------------------------------
+** check_buffer - возвращает расспарсенный вектор буфера с соединенными командами
+** ----------------------------------------------------------
+*/
+
+std::vector<std::string> IRC::check_buffer(int fd, const char *buffer)
+{
+	Client *temp_ptr_client = this->_clients[IRC::find_fd(&this->_clients, fd)];
+	std::vector<std::string> temp_vec;
+
+	std::string temp = temp_ptr_client->getBuffer();
+	temp_ptr_client->setBuffer(temp + static_cast<std::string>(buffer));
+	
+	while (temp_ptr_client->find_line_break())
+	{
+		temp_vec.push_back(temp_ptr_client->get_line_break());
+		std::cout << "TEMP_VEC: " << temp_vec.back() << std::endl;
+	}
+	return (temp_vec);
 }

@@ -19,13 +19,14 @@ public:
 	void				setNickname(std::string const & nickname);
 	void				setHopcount(int hopcount);
 	void				setPassword();
+	void				setBuffer(const std::string &buff);
 
 	int					getHopcount() const;
 	std::string const &	getNickname() const;
 	bool				getPassword() const;
 	int					getSocketFd() const;
+	std::string			getBuffer() const;
 
-	void				setBuffer(const std::string &buff);
 	bool				find_line_break();
 	std::string			get_line_break();
 	bool				isempty_buffer();
