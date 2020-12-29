@@ -151,7 +151,7 @@ void  Command::cmd_nick(IRC& irc, int fd)
 		return;
 	if ((i = IRC::find_fd(&clients, fd)) >= 0)
 	{
-		Client *cur_client = (*(clients.begin() + i));
+		Client *cur_client = clients[i];
 		if (this->nick_password(cur_client))
 		{
 			if (cur_client->getNickname().empty())
@@ -163,7 +163,7 @@ void  Command::cmd_nick(IRC& irc, int fd)
 			if ((i = IRC::find_fd(&users, fd)) >= 0 &&
 				this->nick_available(users, this->arguments[0]))
 			{
-				User *cur_user = (*((users).begin() + i));
+				User *cur_user = users[i];
 				if (cur_user->getNickname().empty())
 					Utils::print_line("New nickname for user" + this->arguments[0] + " set");
 				else
@@ -185,7 +185,7 @@ void  Command::cmd_nick(IRC& irc, int fd)
 		else if (!(this->nick_available(clients, this->prefix)) &&
 				 (i = IRC::find_nickname(&clients, this->arguments[0])) >= 0)
 		{
-			Client *cur_client = (*((clients).begin() + i));
+			Client *cur_client = clients[i];
 			if (this->nick_password(cur_client))
 			{
 				cur_client->setNickname(this->arguments[0]);
@@ -193,7 +193,7 @@ void  Command::cmd_nick(IRC& irc, int fd)
 			}
 			if (!(this->nick_available(users, this->prefix)) && (i = IRC::find_nickname(&users, this->prefix)) >= 0)
 			{
-				User *cur_user = (*((users).begin() + i));
+				User *cur_user = users[i];
 				cur_user->setNickname(this->arguments[0]);
 				Utils::print_line("Nickname for user changed from " + cur_user->getNickname() + " to " + this->arguments[0]);
 			}
