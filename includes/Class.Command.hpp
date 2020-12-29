@@ -23,7 +23,7 @@ private:
 
 	bool							nick_length();
 	bool							nick_password(Client * cur_client);
-	template <typename T> bool		nick_available(std::vector<T> vect);
+	template <typename T> bool		nick_available(std::vector<T> vect, std::string const &nick);
 
 	bool							pass(std::string password, std::string local_pass);
 	bool							user(User *curr_user);

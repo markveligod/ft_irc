@@ -13,7 +13,8 @@ protected:
 	std::string			buffer;
 
 public:
-	Client(int socket_fd);
+	Client(int socket_fd, int hopcount = 0);
+	Client(int socket_fd, std::string const &nickname, int hopcount = 0);
 	Client(Client const &src);
 
 	void				setNickname(std::string const & nickname);

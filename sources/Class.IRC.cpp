@@ -295,6 +295,13 @@ SSL *IRC::ssl_connection(int fd)
 ** ===========================UTILS PART=============================
 */
 
+User* IRC::get_user(string nickname)
+{
+	int index = find_nickname(&_users, nickname);
+
+	return (index >= 0) ? _users[index] : NULL;
+}
+
 /*
 ** ------------------------------------------------------------------
 ** delete_user		- находит и удаляет клиента или юзера с 

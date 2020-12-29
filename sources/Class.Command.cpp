@@ -65,13 +65,13 @@ bool Command::pass(std::string password, std::string local_pass)
 
 void	Command::cmd_pass(IRC& irc, int fd)
 {
-	std::string *local_pass = irc.get_localhost_pass();
-	if (this->pass(this->arguments[0], *local_pass))
+	const std::string local_pass = irc.get_localhost_pass();
+	if (this->pass(this->arguments[0], local_pass))
 	{
-		std::vector<Client *> *vect = irc.get_clients();
+		std::vector<Client *> vect = irc.get_clients();
 		std::vector<Client *>::iterator temp;
 		
-		if ((temp = this->find_fd(vect, fd)) == (*vect).end())
+		if ((temp = this->find_fd(&vect, fd)) == vect.end())
 		{
 			Utils::print_error(ERR_FINDFD, "FD don't find in vector!");
 			return ;
@@ -124,11 +124,11 @@ bool Command::nick_password(Client * cur_client)
 }
 
 template <typename T>
-bool Command::nick_available(std::vector<T> vect)
+bool Command::nick_available(std::vector<T> vect, std::string const &nick)
 {
 	for (size_t i = 0; i < vect.size(); i++)
 	{
-		if (vect[i]->getNickname() == this->arguments[0])
+		if (vect[i]->getNickname() == nick)
 		{
 			Utils::print_error(ERR_NICKNAME, "Nickname is already in use");
 			return false;
@@ -139,20 +139,19 @@ bool Command::nick_available(std::vector<T> vect)
 
 void  Command::cmd_nick(IRC& irc, int fd)
 {
-	std::vector<Client *> *clients = (std::vector<Client *> *)var_1;
-	std::vector<User *> *users = (std::vector<User *> *)var_3;
-	int *fd = (int *)var_2;
+	std::vector<Client *> clients = irc.get_clients();
+	std::vector<User *> users = irc.get_users();
 	int i = 0;
 
 	//
 	// если клиент подключен к локальному серверу
 	//
 	if (!(this->nick_length()) ||
-		!(this->nick_available(*clients, this->arguments[0])))
+		!(this->nick_available(clients, this->arguments[0])))
 		return;
-	if ((i = IRC::find_fd(clients, *fd)) >= 0)
+	if ((i = IRC::find_fd(&clients, fd)) >= 0)
 	{
-		Client *cur_client = (*((*clients).begin() + i));
+		Client *cur_client = (*(clients.begin() + i));
 		if (this->nick_password(cur_client))
 		{
 			if (cur_client->getNickname().empty())
@@ -161,10 +160,10 @@ void  Command::cmd_nick(IRC& irc, int fd)
 				Utils::print_line("Nickname for client changed from " + cur_client->getNickname() + " to " + this->arguments[0]);
 			cur_client->setNickname(this->arguments[0]);
 
-			if ((i = IRC::find_fd(users, *fd)) >= 0 &&
-				this->nick_available(*users, this->arguments[0]))
+			if ((i = IRC::find_fd(&users, fd)) >= 0 &&
+				this->nick_available(users, this->arguments[0]))
 			{
-				User *cur_user = (*((*users).begin() + i));
+				User *cur_user = (*((users).begin() + i));
 				if (cur_user->getNickname().empty())
 					Utils::print_line("New nickname for user" + this->arguments[0] + " set");
 				else
@@ -180,21 +179,21 @@ void  Command::cmd_nick(IRC& irc, int fd)
 	{
 		if (this->prefix.empty())
 		{
-			Client *new_client = new Client(*fd, this->arguments[0], std::stoi(this->arguments[1]));
-			clients->push_back(new_client);
+			Client *new_client = new Client(fd, this->arguments[0], std::stoi(this->arguments[1]));
+			clients.push_back(new_client);
 		}
-		else if (!(this->nick_available(*clients, this->prefix)) &&
-				 (i = IRC::find_nickname(clients, this->arguments[0])) >= 0)
+		else if (!(this->nick_available(clients, this->prefix)) &&
+				 (i = IRC::find_nickname(&clients, this->arguments[0])) >= 0)
 		{
-			Client *cur_client = (*((*clients).begin() + i));
+			Client *cur_client = (*((clients).begin() + i));
 			if (this->nick_password(cur_client))
 			{
 				cur_client->setNickname(this->arguments[0]);
 				Utils::print_line("Nickname for client changed from " + cur_client->getNickname() + " to " + this->arguments[0]);
 			}
-			if (!(this->nick_available(*users, this->prefix)) && (i = IRC::find_nickname(users, this->prefix)) >= 0)
+			if (!(this->nick_available(users, this->prefix)) && (i = IRC::find_nickname(&users, this->prefix)) >= 0)
 			{
-				User *cur_user = (*((*users).begin() + i));
+				User *cur_user = (*((users).begin() + i));
 				cur_user->setNickname(this->arguments[0]);
 				Utils::print_line("Nickname for user changed from " + cur_user->getNickname() + " to " + this->arguments[0]);
 			}
@@ -225,12 +224,12 @@ bool Command::user(User *curr_user)
 
 void Command::cmd_user(IRC& irc, int fd)
 {
-	std::vector<Client *> *vect = irc.get_clients();
+	std::vector<Client *> vect = irc.get_clients();
 
-	std::vector<User *> *vec_user =irc.get_users();
+	std::vector<User *> vec_user =irc.get_users();
 	std::vector<Client *>::iterator temp;
 
-	if ((temp = this->find_fd(vect, fd)) == (*vect).end())
+	if ((temp = this->find_fd(&vect, fd)) == vect.end())
 	{
 		Utils::print_error(ERR_FINDFD, "FD don't find in vector!");
 		return ;
@@ -252,7 +251,7 @@ void Command::cmd_user(IRC& irc, int fd)
 
 	if (this->user(curr_user))
 	{
-		(*vec_user).push_back(curr_user);
+		vec_user.push_back(curr_user);
 		Utils::print_line("Client is done!");
 	}
 	else

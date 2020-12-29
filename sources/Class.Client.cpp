@@ -6,8 +6,16 @@
 ** ----------------------------------------------------------
 */
 
-Client::Client(int socket_fd) 		: socket_fd(socket_fd),
+Client::Client(int socket_fd, int hopcount) 		
+									: socket_fd(socket_fd),
+									  hopcount(hopcount),
 									  password(false) {}
+
+Client::Client(int socket_fd, std::string const & nickname, int hopcount)
+									: nickname(nickname),
+									  socket_fd(socket_fd),
+									  hopcount(hopcount),
+									  password(true) {}
 
 Client::Client(Client const &src)	: nickname(src.nickname),
 									  socket_fd(src.socket_fd),
