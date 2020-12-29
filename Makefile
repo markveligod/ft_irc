@@ -28,7 +28,9 @@ SRCS	= main.cpp \
 		  Class.Socket.cpp \
 		  Class.Client.cpp \
 		  Class.Command.cpp \
-		  Class.User.cpp
+		  Class.User.cpp \
+		  Class.Channel.cpp \
+
 SRC		= $(addprefix $(SRC_DIR), $(SRCS))
 OBJS	= $(SRC:.cpp=.o) $(CLASS:.cpp=.o)
 OBJ		= $(patsubst %.cpp,$(OBJ_DIR)%.o,$(SRCS))

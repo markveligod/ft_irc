@@ -1,3 +1,5 @@
+#pragma once 
+
 /*
 **==========================
 ** Class IRC - 
@@ -11,34 +13,44 @@
 #include "Class.Socket.hpp"
 #include "Class.Command.hpp"
 #include "Class.User.hpp"
+#include "Class.Channel.hpp"
+
+using std::string;
+
+class Channel;
 
 class IRC
 {
 	private:
-		Socket					_network;
-		std::string				_network_ip;
-		int						_network_port;
-		std::string				_network_pass;
-		Socket					_localhost;
-		Socket					_localhost_ssl;
-		std::string				_localhost_pass;
-		std::map<int, int>		_array_fd_select;
-		std::vector<User *>		_users;
-		std::vector<Client *>	_clients;
-		fd_set					_fd_set_sockets;
-		int						_select_res;
-		SSL*					_ssl;
-		SSL_CTX*				_ctx;
+		Socket						_network;
+		string						_network_ip;
+		int							_network_port;
+		string						_network_pass;
+
+		Socket						_localhost;
+		Socket						_localhost_ssl;
+		string						_localhost_pass;
+
+		std::map<int, int>			_array_fd_select;
+		fd_set						_fd_set_sockets;
+
+		std::vector<User *>			_users;
+		std::vector<Client *>		_clients;
+		std::map<string, Channel>	_channels;
+
+		int							_select_res;
+		SSL*						_ssl;
+		SSL_CTX*					_ctx;
 
 	public:
 		IRC();
-		IRC(std::string network_ip,
-			   std::string network_port,
-			   std::string network_pass,
-			   std::string current_port,
-			   std::string _current_pass);
+		IRC(string network_ip,
+			string network_port,
+			string network_pass,
+			string current_port,
+			string _current_pass);
 
-		IRC &		operator=(const IRC &other);
+		IRC&		operator=(const IRC &other);
 
 		void		create_socket_network();
 		void		create_socket_local();
@@ -50,7 +62,7 @@ class IRC
 
 		void		init_ssl();
 		void		init_ctx();
-		SSL *		ssl_connection(int fd);
+		SSL*		ssl_connection(int fd);
 
 		int 		_send(int, int, const char *, size_t, int);
 		int 		_recv(int, int, char *, size_t, int);
@@ -58,12 +70,14 @@ class IRC
 		template <typename T>
 		static int	find_fd(std::vector<T> *vect, int fd);
 		template <typename T>
-		static int	find_nickname(std::vector<T> * vect, std::string const & nickname);
+		static int	find_nickname(std::vector<T> *vect, string const & nickname);
+		User*		get_user(string nickname);
 		
 		void		delete_user(int fd);
 		void		delete_client(int fd);
 
-		std::vector<std::string> check_buffer(int fd, const char *buffer);
+		std::vector<string> check_buffer(int fd, const char *buffer);
 		//static int	find_fd(std::vector<Client *> *vect, int fd);
 		//static int	find_fd(std::vector<User *> *vect, int fd);
+		void		join_channel(string, string);
 };

@@ -72,6 +72,7 @@ void IRC::create_socket_network()
 	_network._connect();
 	Utils::print_line("Socket network connection!");
 
+	_array_fd_select[fd] = FD_CLIENT;
 	std::string pass = "PASS " + _network_pass + "\n\r";
 	send(fd, pass.c_str(), pass.size(), 0);
 }
@@ -179,7 +180,6 @@ void IRC::check_fd_select()
 
 				for (size_t i = 0; i < buffer_cmd.size(); i++)
 				{
-
 					Command mess(buffer_cmd[i]);
 
 					std::cout << buffer_cmd[i] << std::endl;
@@ -347,6 +347,13 @@ int IRC::find_nickname(std::vector<T> *vect, std::string const & nickname)
 	return (-1);
 }
 
+User* IRC::get_user(string nickname)
+{
+	int index = find_nickname(&_users, nickname);
+
+	return (index >= 0) ? _users[index] : NULL;
+}
+
 /*
 ** ------------------------------------------------------------------
 ** delete_user		- находит и удаляет клиента или юзера с 
@@ -408,4 +415,32 @@ std::vector<std::string> IRC::check_buffer(int fd, const char *buffer)
 		std::cout << "TEMP_VEC: " << temp_vec.back() << std::endl;
 	}
 	return (temp_vec);
+}
+
+/*
+** ----------------------------------------------------------
+** Channel
+** ----------------------------------------------------------
+*/
+
+void IRC::join_channel(string channel_name, string nickname)
+{
+	if (!_channels.count(channel_name))
+	{
+		_channels.insert(make_pair(channel_name, Channel(channel_name, nickname, *this)));
+		// отправить всем серверам, что создан канал
+	}
+	else
+	{
+		// if (_channels[channel_name].is_banned(nickname)) TODO
+		// 	// отправить пользователю, что он забанен и не может подключиться
+
+		int index = find_nickname(&_users, nickname);
+		if (index >= 0)
+		{
+			std::map<string, Channel>::iterator it = _channels.find(channel_name);
+			it->second.add_user(_users[index]);
+		}
+	}
+	
 }
