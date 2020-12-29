@@ -71,10 +71,11 @@ void	Command::cmd_pass(IRC& irc, int fd)
 {
 	int i;
 	int j;
+	bool res;
 	std::vector<Client *> clients	= irc.get_clients();
 	std::vector<User *> users 		= irc.get_users();
 
-	if (!(args_number(1)))
+	if (!(check_args_number(1)))
 		return;
 	if (this->prefix.empty())
 	{
@@ -94,18 +95,10 @@ void	Command::cmd_pass(IRC& irc, int fd)
 		}
 		j = IRC::find_nickname(&users, this->prefix);
 	}
-	if (this->pass(this->arguments[0], irc.get_localhost_pass()))
-	{
-		clients[i]->setPassword(true);
-		if (j >= 0)
-			users[j]->setPassword(true);
-	}
-	else
-	{
-		clients[i]->setPassword(false);
-		if (j >= 0)
-			users[j]->setPassword(false);
-	}
+	res = this->pass(this->arguments[0], irc.get_localhost_pass());
+	clients[i]->setPassword(res);
+	if (j >= 0)
+		users[j]->setPassword(res);
 }
 
 /*
@@ -131,16 +124,6 @@ bool Command::nick_length()
 	if (this->arguments[0].size() > 9 || this->arguments[0].size() == 0)
 	{
 		Utils::print_error(ERR_NICKNAME, "Nickname length must be between 1 and 9 symbols");
-		return false;
-	}
-	return true;
-}
-
-bool Command::nick_password(Client * cur_client)
-{
-	if (cur_client->getPassword() == false)
-	{
-		Utils::print_error(123, "Log in with correct PASS at first");
 		return false;
 	}
 	return true;
@@ -172,40 +155,31 @@ void  Command::cmd_nick(IRC& irc, int fd)
 		!(this->nick_available(clients, this->arguments[0])))
 		return;
 
-	if (this->prefix.empty()											// если префикс пуст
-		&& (i = IRC::find_fd(&clients, fd)) >= 0)						// если есть клиент с таким fd
+	if (this->prefix.empty() && (i = IRC::find_fd(&clients, fd)) >= 0) // если префикс пуст и если есть клиент с таким fd
 	{
-		if (!(this->nick_password(clients[i])))							// если он уже установил верный пароль
+		if (!(this->check_password(*clients[i])))							// если он уже установил верный пароль
 			return;
 		Utils::print_line("Nickname for client " + this->arguments[0] + " set");
-		if ((j = IRC::find_fd(&users, fd)) >= 0 &&
-			this->nick_available(users, this->arguments[0]))
+		if ((j = IRC::find_fd(&users, fd)) >= 0)
 			Utils::print_line("New nickname for user" + this->arguments[0] + " set");
 	}
-	else if (this->prefix.empty()										// если префикс пуст
-			&& IRC::find_fd(&clients, fd) < 0)							// если нет клиента с таким fd
-			//&& (IRC::find_fd(&servers, fd)) >= 0)						// но есть сервер с таким fd
+
+	else if (this->prefix.empty() && IRC::find_fd(&clients, fd) < 0) // если префикс пуст и если нет клиента с таким fd //!!!!!&& (IRC::find_fd(&servers, fd)) >= 0)!!!!!
+		clients.push_back(new Client(fd, this->arguments[0], std::atoi(this->arguments[1].c_str())));
+
+	else if (!(this->prefix.empty()) && (i = IRC::find_nickname(&clients, this->prefix)) >= 0) // если есть префикс и если есть клиент с ником, который пришел в префикс
 	{
-		Client *new_client = new Client(fd, this->arguments[0], std::atoi(this->arguments[1].c_str()));
-		clients.push_back(new_client);
-	}
-	else if (!(this->prefix.empty())									// если есть префикс
-			&& (i = IRC::find_nickname(&clients, this->prefix)) >= 0)	// если есть клиент с ником, который пришел в префикс
-	{
-		if (!(this->nick_password(clients[i])))							// если он уже установил верный пароль
+		if (!(this->check_password(*clients[i])))												// если он уже установил верный пароль
 			return;
 		Utils::print_line("Nickname for client changed from " + clients[i]->getNickname() + " to " + this->arguments[0]);
 		if ((j = IRC::find_nickname(&users, this->prefix)) >= 0)
 			Utils::print_line("Nickname for user changed from " + users[j]->getNickname() + " to " + this->arguments[0]);
 	}
+
 	if (i >= 0)
 		clients[i]->setNickname(this->arguments[0]);
 	if (j >= 0)
 		users[j]->setNickname(this->arguments[0]);
-
-	// получается, если нам пришел запрос на изменение ника пользователя с другого сервера,
-	// мы должны не только у сея изменить эти данные, но и отправить эту же команду
-	// другим серверам ? (а что, если им тот сервер, что нам отправил запрос, уже отправил его и им, и мы отправил повторно???)
 }
 
 /*
@@ -230,25 +204,25 @@ void Command::cmd_user(IRC& irc, int fd)
 {
 	std::vector<Client *> vect = irc.get_clients();
 
-	std::vector<User *> vec_user =irc.get_users();
+	std::vector<User *> vec_user = irc.get_users();
 	std::vector<Client *>::iterator temp;
 
 	if ((temp = this->find_fd(&vect, fd)) == vect.end())
 	{
 		Utils::print_error(ERR_FINDFD, "FD don't find in vector!");
-		return ;
+		return;
 	}
 
 	if (!(*temp)->getPassword())
 	{
 		Utils::print_error(ERR_PASSWORD, "Enter PASS <password>");
-		return ;
+		return;
 	}
 
 	if ((*temp)->getNickname().size() == 0)
 	{
 		Utils::print_error(ERR_NICKNAME, "ENTER NICK <nickname>");
-		return ;
+		return;
 	}
 
 	User *curr_user = new User(*temp);
@@ -263,6 +237,34 @@ void Command::cmd_user(IRC& irc, int fd)
 		delete curr_user;
 		Utils::print_error(ERR_DATACLIENT, "Incorrect client data!");
 	}
+
+	/*int i;
+	std::vector<Client *> clients 	= irc.get_clients();
+	std::vector<User *> users 		= irc.get_users();
+
+	if ()
+	if ((i = IRC::find_fd(&clients, fd)) >= 0)
+	{
+		Utils::print_error(ERR_FINDFD, "FD don't find in vector!");
+		return ;
+	}
+
+	if (!(check_password(*clients[i])) ||
+		!(check_nickname(*clients[i])))
+		return ;
+
+	User *curr_user = new User(*temp);
+
+	if (this->user(curr_user))
+	{
+		vec_user.push_back(curr_user);
+		Utils::print_line("Client is done!");
+	}
+	else
+	{
+		delete curr_user;
+		Utils::print_error(ERR_DATACLIENT, "Incorrect client data!");
+	}*/
 }
 
 /*
@@ -297,11 +299,31 @@ std::string const & Command::getCommand() const
 	return (this->command);
 }
 
-bool Command::args_number(int n) const
+bool Command::check_args_number(int n) const
 {
 	if ((int)this->arguments.size() != n)
 	{
 		Utils::print_error(ERR_ARG_NUMBER, "Invalid number of arguments");
+		return false;
+	}
+	return true;
+}
+
+bool Command::check_password(Client const &client) const
+{
+	if (client.getPassword() == false)
+	{
+		Utils::print_error(123, "ENTER PASS <password>");
+		return false;
+	}
+	return true;
+}
+
+bool Command::check_nickname(Client const & client) const
+{
+	if (client.getNickname().empty())
+	{
+		Utils::print_error(ERR_NICKNAME, "ENTER NICK <nickname>");
 		return false;
 	}
 	return true;

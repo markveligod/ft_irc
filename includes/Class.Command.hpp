@@ -22,7 +22,6 @@ private:
 
 
 	bool							nick_length();
-	bool							nick_password(Client * cur_client);
 	template <typename T> bool		nick_available(std::vector<T> vect, std::string const &nick);
 
 	bool							pass(std::string password, std::string local_pass);
@@ -38,5 +37,7 @@ public:
 	void				cmd_user(IRC& irc, int fd);
 
 	std::string const &	getCommand() const;
-	bool				args_number(int n) const;
+	bool				check_args_number(int n) const;
+	bool				check_password(Client const & client) const;
+	bool				check_nickname(Client const & client) const;
 };
