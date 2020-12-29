@@ -404,7 +404,10 @@ std::vector<std::string> IRC::check_buffer(int fd, const char *buffer)
 	
 	while (temp_ptr_client->find_line_break())
 	{
-		temp_vec.push_back(temp_ptr_client->get_line_break());
+		std::string temp_str = temp_ptr_client->get_line_break();
+		if (temp_str == "CAP LS")
+			continue ;
+		temp_vec.push_back(temp_str);
 		std::cout << "TEMP_VEC: " << temp_vec.back() << std::endl;
 	}
 	return (temp_vec);
