@@ -196,7 +196,7 @@ bool Command::user(User *curr_user)
 	std::string temp_str;
 	if (this->arguments.size() != 4)
 		return false;
-	curr_user->user_from_client(this->arguments[0], this->arguments[1], this->arguments[2], this->arguments[4]);
+	curr_user->user_from_client(this->arguments[0], this->arguments[1], this->arguments[2], this->arguments[3]);
 	return true;
 }
 
