@@ -80,3 +80,4 @@
 //#include "Class.Client.hpp"
 //#include "Class.Message.hpp"
 //#include "Class.User.hpp"
+#include "codes.hpp"
