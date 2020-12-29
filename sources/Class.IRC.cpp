@@ -73,7 +73,7 @@ void IRC::create_socket_network()
 	Utils::print_line("Socket network connection!");
 
 	_array_fd_select[fd] = FD_CLIENT;
-	std::string pass = "PASS " + _network_pass + "\n\r";
+	std::string pass = "PASS " + _network_pass + "\r\n";
 	send(fd, pass.c_str(), pass.size(), 0);
 	// отправить список пользователей и каналов
 }
@@ -293,16 +293,6 @@ SSL *IRC::ssl_connection(int fd)
 
 /*
 ** ===========================UTILS PART=============================
-*/
-
-User* IRC::get_user(string nickname)
-{
-	int index = find_nickname(&_users, nickname);
-
-	return (index >= 0) ? _users[index] : NULL;
-}
-
-/*
 ** ------------------------------------------------------------------
 ** delete_user		- находит и удаляет клиента или юзера с 
 ** delete_client      соответствующим fd
@@ -389,15 +379,21 @@ void IRC::join_channel(string channel_name, string nickname)
 		int index = find_nickname(&_users, nickname);
 		if (index >= 0)
 		{
-			std::map<string, Channel>::iterator it = _channels.find(channel_name);
+			map<string, Channel>::iterator it = _channels.find(channel_name);
 			it->second.add_user(_users[index]);
 		}
 	}
 	
 }
 
-std::vector<User *> &		IRC::get_users() {return (this->_users);}
-std::vector<Client *> &		IRC::get_clients() {return (this->_clients);}
-std::vector<Server *> &		IRC::get_servers() {return (this->_servers);}
-std::map<string, Channel> &	IRC::get_channels() {return (this->_channels);}
-std::string const &			IRC::get_localhost_pass() const {return (this->_localhost_pass);}
+User *					IRC::get_user(string nickname)
+{
+	int index = find_nickname(&_users, nickname);
+
+	return (index >= 0) ? _users[index] : NULL;
+}
+vector<User *> &		IRC::get_users() {return (this->_users);}
+vector<Client *> &		IRC::get_clients() {return (this->_clients);}
+vector<Server *> &		IRC::get_servers() {return (this->_servers);}
+map<string, Channel> &	IRC::get_channels() {return (this->_channels);}
+string const &			IRC::get_localhost_pass() const {return (this->_localhost_pass);}

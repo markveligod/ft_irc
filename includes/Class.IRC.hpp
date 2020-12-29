@@ -86,9 +86,9 @@ class IRC
 		string const &				get_localhost_pass() const;
 
 		template <typename T>
-		static int					find_fd(std::vector<T> *vect, int fd);
+		static int					find_fd(vector<T> *vect, int fd);
 		template <typename T>
-		static int					find_nickname(std::vector<T> *vect, string const & nickname);
+		static int					find_nickname(vector<T> *vect, string const & nickname);
 };
 
 #include "../Class.IRC.templates.cpp"
