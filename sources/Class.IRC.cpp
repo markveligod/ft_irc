@@ -415,7 +415,7 @@ std::vector<std::string> IRC::check_buffer(int fd, const char *buffer)
 		if (temp_str == "CAP LS")
 			continue ;
 		temp_vec.push_back(temp_str);
-		std::cout << "TEMP_VEC: " << temp_vec.back() << std::endl;
+		//std::cout << "TEMP_VEC: " << temp_vec.back() << std::endl;
 	}
 	return (temp_vec);
 }

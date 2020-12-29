@@ -14,6 +14,7 @@
 #include "Class.Command.hpp"
 #include "Class.User.hpp"
 #include "Class.Channel.hpp"
+#include "Class.Server.hpp"
 
 using std::string;
 
@@ -36,6 +37,7 @@ class IRC
 
 		std::vector<User *>			_users;
 		std::vector<Client *>		_clients;
+		std::vector<Server *>		_servers;
 		std::map<string, Channel>	_channels;
 
 		int							_select_res;
