@@ -56,6 +56,7 @@
 #define ERR_NICKNAME 21
 #define ERR_DATACLIENT 22
 #define ERR_FINDFD 23
+#define ERR_ARG_NUMBER 24
 
 /*
 **==========================

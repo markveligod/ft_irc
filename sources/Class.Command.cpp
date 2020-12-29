@@ -33,6 +33,7 @@ Command::Command(std::string const & str)
 	}
 	while (getline(ss, word, ' '))
 		last_arg = last_arg + ' ' + word;
+	if (!(last_arg.empty()))
 	this->arguments.push_back(last_arg);
 }
 
@@ -58,30 +59,27 @@ Command::~Command() {}
 bool Command::pass(std::string password, std::string local_pass)
 {
     if (password == local_pass)
-    // if (password == local_pass + "\r\n")
         return true;
-    return false;
+	Utils::print_error(ERR_PASSWORD, "Incorrect password");
+	return false;
 }
 
 void	Command::cmd_pass(IRC& irc, int fd)
 {
-	const std::string local_pass = irc.get_localhost_pass();
-	if (this->pass(this->arguments[0], local_pass))
+	if (args_number(1) &&
+		this->pass(this->arguments[0], irc.get_localhost_pass()))
 	{
+		int i;
 		std::vector<Client *> vect = irc.get_clients();
-		std::vector<Client *>::iterator temp;
 		
-		if ((temp = this->find_fd(&vect, fd)) == vect.end())
+		if ((i = IRC::find_fd(&vect, fd)) < 0)
 		{
 			Utils::print_error(ERR_FINDFD, "FD don't find in vector!");
 			return ;
 		}
-
-		(*temp)->setPassword();
+		vect[i]->setPassword();
 		std::cout << "Correct password\n";
 	}
-	else
-		Utils::print_error(ERR_PASSWORD, "Incorrect password");
 	this->arguments.clear();
 }
 
@@ -291,4 +289,14 @@ std::vector<Client *>::iterator Command::find_fd(std::vector<Client *> *vect, in
 std::string const & Command::getCommand() const
 {
 	return (this->command);
+}
+
+bool Command::args_number(int n) const
+{
+	if ((int)this->arguments.size() != n)
+	{
+		Utils::print_error(ERR_ARG_NUMBER, "Invalid number of arguments");
+		return false;
+	}
+	return true;
 }

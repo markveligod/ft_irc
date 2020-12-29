@@ -38,4 +38,5 @@ public:
 	void				cmd_user(IRC& irc, int fd);
 
 	std::string const &	getCommand() const;
+	bool				args_number(int n) const;
 };
