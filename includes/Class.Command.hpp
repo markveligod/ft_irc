@@ -9,7 +9,9 @@
 
 #pragma once
 #include "main.hpp"
+class IRC;
 #include "Class.User.hpp"
+#include "Class.IRC.hpp"
 
 class Command
 {
@@ -31,9 +33,9 @@ public:
 	Command(std::string const & str);
 	~Command();
 
-	void				cmd_nick(void * var_1, void * var_2, void * var_3);
-	void				cmd_pass(void * var_1, void * var_2, void * var_3);
-	void				cmd_user(void * var_1, void * var_2, void * var_3);
+	void				cmd_nick(IRC& irc, int fd);
+	void				cmd_pass(IRC& irc, int fd);
+	void				cmd_user(IRC& irc, int fd);
 
 	std::string const &	getCommand() const;
 };
