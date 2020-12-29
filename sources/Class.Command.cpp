@@ -1,4 +1,4 @@
-#include "../includes/Class.Command.hpp"
+#include "Class.Command.hpp"
 #include "Class.IRC.hpp"
 
 /*
@@ -179,7 +179,7 @@ void  Command::cmd_nick(IRC& irc, int fd)
 	{
 		if (this->prefix.empty())
 		{
-			Client *new_client = new Client(fd, this->arguments[0], std::stoi(this->arguments[1]));
+			Client *new_client = new Client(fd, this->arguments[0], std::atoi(this->arguments[1].c_str()));
 			clients.push_back(new_client);
 		}
 		else if (!(this->nick_available(clients, this->prefix)) &&
