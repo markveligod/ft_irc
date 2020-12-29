@@ -21,6 +21,7 @@ using std::string;
 using std::vector;
 
 class Channel;
+class Command;
 
 class IRC
 {
