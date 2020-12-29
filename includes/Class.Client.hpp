@@ -19,7 +19,7 @@ public:
 
 	void				setNickname(std::string const & nickname);
 	void				setHopcount(int hopcount);
-	void				setPassword();
+	void				setPassword(bool password = true);
 	void				setBuffer(const std::string &buff);
 
 	int					getHopcount() const;

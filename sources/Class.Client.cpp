@@ -40,9 +40,9 @@ void 	Client::setHopcount(int hopcount)
 		this->hopcount = hopcount;
 }
 
-void 	Client::setPassword()
+void 	Client::setPassword(bool password)
 {
-	this->password = true;
+	this->password = password;
 }
 
 /*

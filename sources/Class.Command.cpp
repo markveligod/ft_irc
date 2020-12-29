@@ -59,28 +59,53 @@ Command::~Command() {}
 bool Command::pass(std::string password, std::string local_pass)
 {
     if (password == local_pass)
-        return true;
-	Utils::print_error(ERR_PASSWORD, "Incorrect password");
+	{
+		Utils::print_line("Correct password");
+		return true;
+	}
+	Utils::print_error(ERR_PASSWORD, "Incorrect password set");
 	return false;
 }
 
 void	Command::cmd_pass(IRC& irc, int fd)
 {
-	if (args_number(1) &&
-		this->pass(this->arguments[0], irc.get_localhost_pass()))
+	int i;
+	int j;
+	std::vector<Client *> clients	= irc.get_clients();
+	std::vector<User *> users 		= irc.get_users();
+
+	if (!(args_number(1)))
+		return;
+	if (this->prefix.empty())
 	{
-		int i;
-		std::vector<Client *> vect = irc.get_clients();
-		
-		if ((i = IRC::find_fd(&vect, fd)) < 0)
+		if ((i = IRC::find_fd(&clients, fd)) < 0)
 		{
-			Utils::print_error(ERR_FINDFD, "FD don't find in vector!");
-			return ;
+			Utils::print_error(ERR_FINDFD, "There is no client with such fd");
+			return;
 		}
-		vect[i]->setPassword();
-		std::cout << "Correct password\n";
+		j = IRC::find_fd(&users, fd);
 	}
-	this->arguments.clear();
+	else
+	{
+		if ((i = IRC::find_nickname(&clients, this->prefix)) < 0)
+		{
+			Utils::print_error(ERR_FINDFD, "There is no client with such nickname");
+			return;
+		}
+		j = IRC::find_nickname(&users, this->prefix);
+	}
+	if (this->pass(this->arguments[0], irc.get_localhost_pass()))
+	{
+		clients[i]->setPassword(true);
+		if (j >= 0)
+			users[j]->setPassword(true);
+	}
+	else
+	{
+		clients[i]->setPassword(false);
+		if (j >= 0)
+			users[j]->setPassword(false);
+	}
 }
 
 /*
