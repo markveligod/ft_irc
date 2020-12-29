@@ -1,4 +1,4 @@
-#include "Class.Command.hpp"
+#include "../includes/Class.Command.hpp"
 #include "Class.IRC.hpp"
 
 /*
@@ -15,12 +15,12 @@ Command::Command(std::string const & str)
 
 	getline(ss, word, ' ');
 	if (word[0] == ':')
+	{
 		this->prefix = word.substr(1, word.length());
+		getline(ss, this->command, ' ');
+	}
 	else
 		this->command = word;
-
-	if (this->command.empty())
-		getline(ss, this->command, ' ');
 
 	while (getline(ss, word, ' '))
 	{
@@ -179,7 +179,7 @@ void  Command::cmd_nick(IRC& irc, int fd)
 	{
 		if (this->prefix.empty())
 		{
-			Client *new_client = new Client(fd, this->arguments[0], std::atoi(this->arguments[1].c_str()));
+			Client *new_client = new Client(fd, this->arguments[0], std::stoi(this->arguments[1]));
 			clients.push_back(new_client);
 		}
 		else if (!(this->nick_available(clients, this->prefix)) &&
