@@ -89,3 +89,5 @@ class IRC
 		template <typename T>
 		static int					find_nickname(std::vector<T> *vect, string const & nickname);
 };
+
+#include "../Class.IRC.templates.cpp"

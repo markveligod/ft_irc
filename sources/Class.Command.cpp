@@ -139,17 +139,21 @@ bool Command::nick_available(std::vector<T> vect)
 
 void  Command::cmd_nick(IRC& irc, int fd)
 {
-	std::vector<Client *> 	clients	= irc.get_clients();
-	std::vector<User *>		users	= irc.get_users();
-	int						i;
+	std::vector<Client *> *clients = (std::vector<Client *> *)var_1;
+	std::vector<User *> *users = (std::vector<User *> *)var_3;
+	int *fd = (int *)var_2;
+	int i = 0;
 
-/*
-** если клиент подключен к локальному серверу
-*/
-	if ((i = IRC::find_fd(clients, fd)) >= 0 && this->nick_length())
+	//
+	// если клиент подключен к локальному серверу
+	//
+	if (!(this->nick_length()) ||
+		!(this->nick_available(*clients, this->arguments[0])))
+		return;
+	if ((i = IRC::find_fd(clients, *fd)) >= 0)
 	{
 		Client *cur_client = (*((*clients).begin() + i));
-		if (this->nick_password(cur_client) && this->nick_available(*clients))
+		if (this->nick_password(cur_client))
 		{
 			if (cur_client->getNickname().empty())
 				Utils::print_line("New nickname for client " + this->arguments[0] + " set");
@@ -157,9 +161,10 @@ void  Command::cmd_nick(IRC& irc, int fd)
 				Utils::print_line("Nickname for client changed from " + cur_client->getNickname() + " to " + this->arguments[0]);
 			cur_client->setNickname(this->arguments[0]);
 
-			if ((i = IRC::find_fd(users, fd)) >= 0 && this->nick_available(*users)) 
+			if ((i = IRC::find_fd(users, *fd)) >= 0 &&
+				this->nick_available(*users, this->arguments[0]))
 			{
-				User * cur_user = (*((*users).begin() + i));
+				User *cur_user = (*((*users).begin() + i));
 				if (cur_user->getNickname().empty())
 					Utils::print_line("New nickname for user" + this->arguments[0] + " set");
 				else
@@ -168,16 +173,36 @@ void  Command::cmd_nick(IRC& irc, int fd)
 			}
 		}
 	}
-/*
-** если клиент подключен через другой сервер
-*/
+	//
+	// если клиент подключен через другой сервер
+	else
 	// добавить - если дексриптор есть среди дексрипторов серверов
-
-// получается, если нам пришел запрос на изменение ника пользователя с другого сервера, 
-// мы должны не только у сея изменить эти данные, но и отправить эту же команду
-// другим серверам ? (а что, если им тот сервер, что нам отправил запрос, уже отправил его и им, и мы отправил повторно???)
-
-
+	{
+		if (this->prefix.empty())
+		{
+			Client *new_client = new Client(*fd, this->arguments[0], std::stoi(this->arguments[1]));
+			clients->push_back(new_client);
+		}
+		else if (!(this->nick_available(*clients, this->prefix)) &&
+				 (i = IRC::find_nickname(clients, this->arguments[0])) >= 0)
+		{
+			Client *cur_client = (*((*clients).begin() + i));
+			if (this->nick_password(cur_client))
+			{
+				cur_client->setNickname(this->arguments[0]);
+				Utils::print_line("Nickname for client changed from " + cur_client->getNickname() + " to " + this->arguments[0]);
+			}
+			if (!(this->nick_available(*users, this->prefix)) && (i = IRC::find_nickname(users, this->prefix)) >= 0)
+			{
+				User *cur_user = (*((*users).begin() + i));
+				cur_user->setNickname(this->arguments[0]);
+				Utils::print_line("Nickname for user changed from " + cur_user->getNickname() + " to " + this->arguments[0]);
+			}
+		}
+	}
+	// получается, если нам пришел запрос на изменение ника пользователя с другого сервера,
+	// мы должны не только у сея изменить эти данные, но и отправить эту же команду
+	// другим серверам ? (а что, если им тот сервер, что нам отправил запрос, уже отправил его и им, и мы отправил повторно???)
 }
 
 /*
