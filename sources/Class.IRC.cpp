@@ -448,3 +448,9 @@ void IRC::join_channel(string channel_name, string nickname)
 	}
 	
 }
+
+std::vector<User *> &		IRC::get_users() {return (this->_users);}
+std::vector<Client *> &		IRC::get_clients() {return (this->_clients);}
+std::vector<Server *> &		IRC::get_servers() {return (this->_servers);}
+std::map<string, Channel> &	IRC::get_channels() {return (this->_channels);}
+std::string const &			IRC::get_localhost_pass() const {return (this->_localhost_pass);}
