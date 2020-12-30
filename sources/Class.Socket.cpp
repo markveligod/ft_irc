@@ -13,6 +13,8 @@ Socket::Socket(const char *host_ip, int port, int fd, int sin_family, int type, 
 	if (host_ip)
 	{
 		hostent *host = gethostbyname(host_ip);
+		if (!host)
+			Utils::exit_error(1, "Unknown address");
 		inet_pton(_sin_family, host->h_name, &_addr.sin_addr);
 	}
 	else

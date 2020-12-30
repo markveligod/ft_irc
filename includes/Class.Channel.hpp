@@ -27,12 +27,9 @@ class Channel
 private:
 	string			_name;
 	string			_creator;
-	set<User *>		_users;
-	set<User *>		_operators;
-	set<User*>		_banned;
-	// vector<User *>	_users;
-	// vector<User *>	_operators;
-	// vector<User*>	_banned;
+	vector<User *>	_users;
+	vector<User *>	_operators;
+	vector<User*>	_banned;
 	string			_topic;
 	ModeChannel		_mode;
 	// int				_limit_users;

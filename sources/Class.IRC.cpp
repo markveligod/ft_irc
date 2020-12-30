@@ -73,7 +73,9 @@ void IRC::create_socket_network()
 	Utils::print_line("Socket network connection!");
 
 	_array_fd_select[fd] = FD_CLIENT;
-	std::string pass = "PASS " + _network_pass + "\r\n";
+	// std::string pass = "PASS " + _network_pass + "\r\n";
+	// std::string pass = "PASS \r\nSERVER banda 1 HALLO\r\n";
+	std::string pass = "SERVER 91.211.105.88:6666 1 \r\n";
 	_clients.push_back(new Client(fd));
 	send(fd, pass.c_str(), pass.size(), 0);
 	// отправить список пользователей и каналов
