@@ -13,6 +13,7 @@ class IRC;
 class Server;
 #include "Class.User.hpp"
 #include "Class.IRC.hpp"
+#include "codes.hpp"
 
 class Command
 {
@@ -34,10 +35,10 @@ public:
 	Command(std::string const & str);
 	~Command();
 
-	void				cmd_nick(IRC& irc, int fd);
-	void				cmd_pass(IRC& irc, int fd);
-	void				cmd_user(IRC& irc, int fd);
-	void				cmd_server(IRC& irc, int fd);
+	int				cmd_nick(IRC& irc, int fd);
+	int				cmd_pass(IRC& irc, int fd);
+	int				cmd_user(IRC& irc, int fd);
+	int				cmd_server(IRC& irc, int fd);
 
 	std::string const &	getCommand() const;
 	bool				check_args_number(int n) const;

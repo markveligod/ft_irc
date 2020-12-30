@@ -67,38 +67,29 @@ bool Command::pass(std::string password, std::string local_pass)
 	return false;
 }
 
-void	Command::cmd_pass(IRC& irc, int fd)
+int	Command::cmd_pass(IRC& irc, int fd)
 {
 	int i;
-	int j;
 	bool res;
 	std::vector<Client *> &clients	= irc.get_clients();
-	std::vector<User *> &users 		= irc.get_users();
+	std::vector<Server *> &servers 	= irc.get_servers();
 
 	if (!(check_args_number(1)))
-		return;
-	if (this->prefix.empty())
+		return (ERR_NEEDMOREPARAMS);
+
+	if ((i = IRC::find_fd(&clients, fd)) < 0 &&
+		(IRC::find_fd(&servers, fd)) < 0)
+		return (0);								// по идее, такой ситуации быть не может
+
+	if (clients[i]->getPassword() || IRC::find_fd(&servers, fd) >= 0)
 	{
-		if ((i = IRC::find_fd(&clients, fd)) < 0)
-		{
-			Utils::print_error(ERR_FINDFD, "There is no client with such fd");
-			return;
-		}
-		j = IRC::find_fd(&users, fd);
+		Utils::print_error(ERR_ALREADYREGISTRED, "Already registered");
+		return (ERR_ALREADYREGISTRED);
 	}
-	else
-	{
-		if ((i = IRC::find_nickname(&clients, this->prefix)) < 0)
-		{
-			Utils::print_error(ERR_FINDFD, "There is no client with such nickname");
-			return;
-		}
-		j = IRC::find_nickname(&users, this->prefix);
-	}
+
 	res = this->pass(this->arguments[0], irc.get_localhost_pass());
 	clients[i]->setPassword(res);
-	if (j >= 0)
-		users[j]->setPassword(res);
+	return (res == false ? ERR_PASSWDMISMATCH : 0);	// в документации нет такой ошибки
 }
 
 /*
@@ -143,7 +134,7 @@ bool Command::nick_available(std::vector<T> vect, std::string const &nick)
 	return true;
 }
 
-void  Command::cmd_nick(IRC& irc, int fd)
+int  Command::cmd_nick(IRC& irc, int fd)
 {
 	std::vector<Client *> &clients 	= irc.get_clients();
 	std::vector<User *> &users 		= irc.get_users();
@@ -151,22 +142,27 @@ void  Command::cmd_nick(IRC& irc, int fd)
 	int i = -1;
 	int j = -1;
 
-	if (!(this->nick_length()) ||
-		!(this->nick_available(clients, this->arguments[0])))
-		return;
+	if (!(this->check_args_number(1)))
+		return (ERR_NONICKNAMEGIVEN);
 
-	if (this->prefix.empty() && (i = IRC::find_fd(&clients, fd)) >= 0) // если префикс пуст и если есть клиент с таким fd
+	if (!(this->nick_length()))									// add check valid!!!
+		return (ERR_ERRONEUSNICKNAME);
+
+	if (!(this->nick_available(clients, this->arguments[0])))	// add check for server??? ERR_NICKCOLLISION
+		return (ERR_NICKNAMEINUSE);
+
+	if (this->prefix.empty() && (i = IRC::find_fd(&clients, fd)) >= 0) 		// если префикс пуст и если есть клиент с таким fd
 	{
 		if (!(this->check_password(*clients[i])))							// если он уже установил верный пароль
-			return;
+			return 0;
 		Utils::print_line("Nickname for client " + this->arguments[0] + " set");
 		if ((j = IRC::find_fd(&users, fd)) >= 0)
 			Utils::print_line("New nickname for user" + this->arguments[0] + " set");
 	}
 
-	else if (this->prefix.empty() &&					// если префикс пуст
-			IRC::find_fd(&clients, fd) < 0 &&			// и нет клиента с таким fd
-			(i = IRC::find_fd(&servers, fd)) >= 0)		// и есть сервер с таким fd
+	else if (this->prefix.empty() &&										// если префикс пуст
+			IRC::find_fd(&clients, fd) < 0 &&								// и нет клиента с таким fd
+			(i = IRC::find_fd(&servers, fd)) >= 0)							// и есть сервер с таким fd
 	{
 		Client *new_client = new Client(fd, this->arguments[0], std::atoi(this->arguments[1].c_str()));
 		clients.push_back(new_client);
@@ -178,7 +174,7 @@ void  Command::cmd_nick(IRC& irc, int fd)
 	else if (!(this->prefix.empty()) && (i = IRC::find_nickname(&clients, this->prefix)) >= 0) // если есть префикс и если есть клиент с ником, который пришел в префикс
 	{
 		if (!(this->check_password(*clients[i])))												// если он уже установил верный пароль
-			return;
+			return 0;
 		Utils::print_line("Nickname for client changed from " + clients[i]->getNickname() + " to " + this->arguments[0]);
 		if ((j = IRC::find_nickname(&users, this->prefix)) >= 0)
 			Utils::print_line("Nickname for user changed from " + users[j]->getNickname() + " to " + this->arguments[0]);
@@ -188,6 +184,7 @@ void  Command::cmd_nick(IRC& irc, int fd)
 		clients[i]->setNickname(this->arguments[0]);
 	if (j >= 0)
 		users[j]->setNickname(this->arguments[0]);
+	return 0;
 }
 
 /*
@@ -220,25 +217,24 @@ void Command::user_create(Client * curr_client, std::vector<User *> &users, Serv
 	}
 }
 
-void Command::cmd_user(IRC& irc, int fd)
+int Command::cmd_user(IRC& irc, int fd)
 {
 	int i = -1;
-	int j = -1;
 	int server_fd = -1;
-	std::vector<Client *> &clients = irc.get_clients();
+	std::vector<Client *> &clients	= irc.get_clients();
 	std::vector<User *> &users 		= irc.get_users();
 	std::vector<Server *> &servers 	= irc.get_servers();
 
 	if (!(this->check_args_number(4)))
-		return;
+		return (ERR_NEEDMOREPARAMS);
 	if (this->prefix.empty() &&										// если префикс пуст
 	   (i = IRC::find_fd(&clients, fd)) >= 0)						// и сообщение от клиента
 	{
 		if (!(check_password(*clients[i])) ||						// проверяем, ввел ли клиент пароль
 			!(check_nickname(*clients[i])))							// и ввел ли клиент ник
-			return;
-		if ((j = IRC::find_fd(&users, fd)) >= 0)
-			this->user_change(users[j]);
+			return 0;
+		if (IRC::find_fd(&users, fd) >= 0)
+			return (ERR_ALREADYREGISTRED);
 		else
 			this->user_create(clients[i], users, NULL);
 	}
@@ -248,12 +244,13 @@ void Command::cmd_user(IRC& irc, int fd)
 	{
 		if (!(check_password(*clients[i])) ||						// проверяем, ввел ли клиент пароль
 			!(check_nickname(*clients[i])))							// и ввел ли клиент ник
-			return;
-		if ((j = IRC::find_nickname(&users, this->prefix)))			// если уже есть юзер с таким именем
-			this->user_change(users[j]);
+			return 0;
+		if (IRC::find_nickname(&users, this->prefix))				// если уже есть юзер с таким именем
+			return (ERR_ALREADYREGISTRED);
 		else
 			this->user_create(clients[i], users, servers[server_fd]);
 	}
+	return 0;
 }
 
 /*
@@ -290,9 +287,9 @@ std::string const & Command::getCommand() const
 
 bool Command::check_args_number(int n) const
 {
-	if ((int)this->arguments.size() != n)
+	if ((int)this->arguments.size() < n)
 	{
-		Utils::print_error(ERR_ARG_NUMBER, "Invalid number of arguments");
+		Utils::print_error(ERR_ARG_NUMBER, "Not enought parameters");
 		return false;
 	}
 	return true;
@@ -326,7 +323,7 @@ bool Command::check_nickname(Client const & client) const
 ** ==================================================
 */
 
-void Command::cmd_server(IRC& irc, int fd)
+int Command::cmd_server(IRC& irc, int fd)
 {
 	std::vector<Client *> vect = irc.get_clients();
 
@@ -336,16 +333,17 @@ void Command::cmd_server(IRC& irc, int fd)
 	if (temp == vect.end())
 	{
 		Utils::print_error(ERR_FINDFD, "FD don't find in vector!");
-		return ;
+		return 0;
 	}
 
 	if (!this->check_args_number(3))
-		return ;
+		return (ERR_NEEDMOREPARAMS);
 
 	if (!this->check_password(**temp))
-		return ;
+		return 0;
 
 	Server *new_server = new Server((*temp)->getSocketFd(), this->arguments[0], atoi(this->arguments[1].c_str()), this->arguments[2]);
 	vec_server.push_back(new_server);
 	irc.delete_client(fd);
+	return 0;
 }

@@ -62,7 +62,7 @@ class IRC
 		void						init_fd_select();
 		void						do_select();
 		void						check_fd_select();
-		void						do_command(Command * command, int socket_fd);
+		int							do_command(Command * command, int socket_fd);
 
 		void						init_ssl();
 		void						init_ctx();
