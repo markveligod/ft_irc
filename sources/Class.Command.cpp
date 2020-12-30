@@ -110,12 +110,29 @@ int	Command::cmd_pass(IRC& irc, int fd)
 ** =====================================================================
 */
 
-bool Command::nick_length()
+bool Command::nick_valid()
 {
+	int i = 1;
 	if (this->arguments[0].size() > 9 || this->arguments[0].size() == 0)
 	{
 		Utils::print_error(ERR_NICKNAME, "Nickname length must be between 1 and 9 symbols");
 		return false;
+	}
+	if (!(std::isalpha(this->arguments[0][0])))
+	{
+		Utils::print_error(ERR_NICKNAME, "First symbol must be a letter");
+		return false;
+	}
+	while (i != (int)this->arguments[0].size())
+	{
+		if (std::isalnum(this->arguments[0][i]) ||
+			std::strchr("-[]\\`^{}", this->arguments[0][i]) != NULL)
+			i++;
+		else
+		{
+			Utils::print_error(ERR_NICKNAME, "Not valid symbols");
+			return false;
+		}
 	}
 	return true;
 }
@@ -145,10 +162,15 @@ int  Command::cmd_nick(IRC& irc, int fd)
 	if (!(this->check_args_number(1)))
 		return (ERR_NONICKNAMEGIVEN);
 
-	if (!(this->nick_length()))									// add check valid!!!
+	if (!(this->nick_valid()))
 		return (ERR_ERRONEUSNICKNAME);
 
-	if (!(this->nick_available(clients, this->arguments[0])))	// add check for server??? ERR_NICKCOLLISION
+	if (IRC::find_fd(servers, fd) >= 0 &&
+		this->prefix.empty() &&									
+		!(this->nick_available(clients, this->arguments[0])))				// ????????
+		return (ERR_NICKCOLLISION);
+
+	if (!(this->nick_available(clients, this->arguments[0])))
 		return (ERR_NICKNAMEINUSE);
 
 	if (this->prefix.empty() && (i = IRC::find_fd(clients, fd)) >= 0) 		// если префикс пуст и если есть клиент с таким fd
@@ -234,7 +256,10 @@ int Command::cmd_user(IRC& irc, int fd)
 			!(check_nickname(*clients[i])))							// и ввел ли клиент ник
 			return 0;
 		if (IRC::find_fd(users, fd) >= 0)
+		{
+			Utils::print_error(ERR_ALREADYREGISTRED, "Already registered");
 			return (ERR_ALREADYREGISTRED);
+		}
 		else
 			this->user_create(clients[i], users, NULL);
 	}
@@ -246,7 +271,10 @@ int Command::cmd_user(IRC& irc, int fd)
 			!(check_nickname(*clients[i])))							// и ввел ли клиент ник
 			return 0;
 		if (IRC::find_nickname(users, this->prefix))				// если уже есть юзер с таким именем
+		{
+			Utils::print_error(ERR_ALREADYREGISTRED, "Already registered");
 			return (ERR_ALREADYREGISTRED);
+		}
 		else
 			this->user_create(clients[i], users, servers[server_fd]);
 	}
@@ -325,19 +353,21 @@ bool Command::check_nickname(Client const & client) const
 
 int Command::cmd_server(IRC& irc, int fd)
 {
-	std::vector<Client *> vect = irc.get_clients();
+	std::vector<Client *> & vec_client 		= irc.get_clients();
+	std::vector<Server *> & vec_server 		= irc.get_servers();
+	std::vector<Client *>::iterator temp 	= this->find_fd(&vec_client, fd);
 
-	std::vector<Server *> vec_server = irc.get_servers();
-	std::vector<Client *>::iterator temp = this->find_fd(&vect, fd);
+	if (!this->check_args_number(3))
+		return (0);
 
-	if (temp == vect.end())
+	if (IRC::find_fd(vec_server, fd) >= 0)
+		return (ERR_ALREADYREGISTRED);
+
+	if (temp == vec_client.end())
 	{
 		Utils::print_error(ERR_FINDFD, "FD don't find in vector!");
 		return 0;
 	}
-
-	if (!this->check_args_number(3))
-		return (ERR_NEEDMOREPARAMS);
 
 	if (!this->check_password(**temp))
 		return 0;

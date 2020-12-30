@@ -23,7 +23,7 @@ private:
 	std::vector<std::string> 		arguments;
 
 
-	bool							nick_length();
+	bool							nick_valid();
 	template <typename T> bool		nick_available(std::vector<T> vect, std::string const &nick);
 
 	bool							pass(std::string password, std::string local_pass);
@@ -35,10 +35,10 @@ public:
 	Command(std::string const & str);
 	~Command();
 
-	int				cmd_nick(IRC& irc, int fd);
-	int				cmd_pass(IRC& irc, int fd);
-	int				cmd_user(IRC& irc, int fd);
-	int				cmd_server(IRC& irc, int fd);
+	int					cmd_nick(IRC& irc, int fd);
+	int					cmd_pass(IRC& irc, int fd);
+	int					cmd_user(IRC& irc, int fd);
+	int					cmd_server(IRC& irc, int fd);
 
 	std::string const &	getCommand() const;
 	bool				check_args_number(int n) const;
