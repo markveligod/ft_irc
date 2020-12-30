@@ -30,6 +30,7 @@ SRCS	= main.cpp \
 		  Class.Command.cpp \
 		  Class.User.cpp \
 		  Class.Channel.cpp \
+		  Class.Server.cpp
 
 SRC		= $(addprefix $(SRC_DIR), $(SRCS))
 OBJS	= $(SRC:.cpp=.o) $(CLASS:.cpp=.o)

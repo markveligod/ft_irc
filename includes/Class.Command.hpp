@@ -35,6 +35,7 @@ public:
 	void				cmd_nick(IRC& irc, int fd);
 	void				cmd_pass(IRC& irc, int fd);
 	void				cmd_user(IRC& irc, int fd);
+	void				cmd_server(IRC& irc, int fd);
 
 	std::string const &	getCommand() const;
 	bool				check_args_number(int n) const;

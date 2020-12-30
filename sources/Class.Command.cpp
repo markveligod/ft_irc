@@ -328,3 +328,39 @@ bool Command::check_nickname(Client const & client) const
 	}
 	return true;
 }
+
+/*
+** ==================================================
+**	cmd_server - добавляет в вектор серверов => текущий сервер
+**	Команда: SERVER
+**	Параметры: <servername> <hopcount> <info>
+** ==================================================
+*/
+
+void Command::cmd_server(IRC& irc, int fd)
+{
+	std::vector<Client *> vect = irc.get_clients();
+
+	std::vector<Server *> vec_server = irc.get_servers();
+	std::vector<Client *>::iterator temp = this->find_fd(&vect, fd);
+
+	if (temp == vect.end())
+	{
+		Utils::print_error(ERR_FINDFD, "FD don't find in vector!");
+		return ;
+	}
+
+	if (this->arguments.size() > 3)
+	{
+		Utils::print_error(ERR_ARG_NUMBER, "Invalid number of arguments!");
+		return ;
+	}
+
+	if ((*temp)->getPassword())
+	{
+		Server *new_server = new Server((*temp)->getSocketFd(), this->arguments[0], atoi(this->arguments[1].c_str()), this->arguments[2]);
+		vec_server.push_back(new_server);
+	}
+	else
+		Utils::print_error(ERR_PASSWORD, "Enter PASS <password>!");
+}

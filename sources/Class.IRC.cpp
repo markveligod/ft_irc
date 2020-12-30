@@ -93,14 +93,16 @@ typedef void (Command::*doCommand)(IRC& irc, int fd);
 
 void IRC::do_command(Command *command, int socket_fd)
 {
-	std::string cmd_name[3] =	{"NICK",
+	std::string cmd_name[4] =	{"NICK",
 							   	 "PASS",
-							  	 "USER"};
-	doCommand	cmd_func[3] = 	{&Command::cmd_nick,
+							  	 "USER",
+								 "SERVER"};
+	doCommand	cmd_func[4] = 	{&Command::cmd_nick,
 							   	 &Command::cmd_pass,
-							   	 &Command::cmd_user};
+							   	 &Command::cmd_user,
+								 &Command::cmd_server};
 
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 4; i++)
 		if (cmd_name[i] == command->getCommand())
 		{
 			(command->*(cmd_func[i]))(*this, socket_fd);
@@ -353,7 +355,6 @@ std::vector<std::string> IRC::check_buffer(int fd, const char *buffer)
 		if (temp_str == "CAP LS")
 			continue ;
 		temp_vec.push_back(temp_str);
-		std::cout << "TEMP_VEC: " << temp_vec.back() << std::endl;
 	}
 	return (temp_vec);
 }
