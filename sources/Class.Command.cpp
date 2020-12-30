@@ -325,19 +325,21 @@ bool Command::check_nickname(Client const & client) const
 
 int Command::cmd_server(IRC& irc, int fd)
 {
-	std::vector<Client *> vect = irc.get_clients();
+	std::vector<Client *> & vec_client 		= irc.get_clients();
+	std::vector<Server *> & vec_server 		= irc.get_servers();
+	std::vector<Client *>::iterator temp 	= this->find_fd(&vec_client, fd);
 
-	std::vector<Server *> vec_server = irc.get_servers();
-	std::vector<Client *>::iterator temp = this->find_fd(&vect, fd);
+	if (!this->check_args_number(3))
+		return (0);
 
-	if (temp == vect.end())
+	if (IRC::find_fd(vec_server, fd) >= 0)
+		return (ERR_ALREADYREGISTRED);
+
+	if (temp == vec_client.end())
 	{
 		Utils::print_error(ERR_FINDFD, "FD don't find in vector!");
 		return 0;
 	}
-
-	if (!this->check_args_number(3))
-		return (ERR_NEEDMOREPARAMS);
 
 	if (!this->check_password(**temp))
 		return 0;
