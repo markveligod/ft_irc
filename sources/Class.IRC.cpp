@@ -90,10 +90,11 @@ void IRC::create_socket_network()
 ** ---------------------------------------------------------------------------------------------
 */
 
-typedef void (Command::*doCommand)(IRC& irc, int fd);
+typedef int (Command::*doCommand)(IRC& irc, int fd);
 
-void IRC::do_command(Command *command, int socket_fd)
+int IRC::do_command(Command *command, int socket_fd)
 {
+	int			result;
 	std::string cmd_name[4] =	{"NICK",
 							   	 "PASS",
 							  	 "USER",
@@ -106,10 +107,11 @@ void IRC::do_command(Command *command, int socket_fd)
 	for (int i = 0; i < 4; i++)
 		if (cmd_name[i] == command->getCommand())
 		{
-			(command->*(cmd_func[i]))(*this, socket_fd);
-			return;
+			result = (command->*(cmd_func[i]))(*this, socket_fd);
+			return (result);
 		}
 	Utils::print_error(123, "Command not found");
+	return (0);
 }
 
 /*
