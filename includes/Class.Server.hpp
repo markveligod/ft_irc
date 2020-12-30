@@ -15,14 +15,15 @@
 class Server
 {
     private:
-        int _fd_socket;
+        int			_fd_socket;
         std::string _server_name;
-        int _hopcount;
+        int			_hopcount;
         std::string _info;
-        std::vector<User *> _users;
-        //std::vector<Channel *> _channels
+        std::vector<User *> 	_users;
+		std::vector<Client *>	_clients;
+		//std::vector<Channel *> _channels
 
-        Server();
+		Server();
         Server(const Server & other);
         Server &operator=(const Server & other);
     public:
@@ -30,6 +31,8 @@ class Server
         ~Server();
 
         const int & getFdSocket() const;
-        void addUser(User *new_user);
+		int		getSocketFd() const;
+		void	addUser(User *new_user);
+		void	addClient(Client *new_client);
 };
 

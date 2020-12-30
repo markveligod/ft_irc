@@ -61,3 +61,25 @@ void User::user_from_client(std::string username, std::string hostname,
 	this->realname	 = realname;
 	this->mode		 = mode;
 }
+
+void	User::change_user(std::string const & username, std::string const & hostname,
+						  std::string const & servername, std::string const realname)
+{
+	this->username = username;
+	this->hostname = hostname;
+	this->servername = servername;
+	this->realname = realname;
+}
+
+void User::setUsername(std::string const &username) { this->username = username; }
+void User::setHostname(std::string const &hostname) { this->hostname = hostname; }
+void User::setServername(std::string const &servername) { this->servername = servername; }
+void User::setRealname(std::string const &realname) { this->realname = realname; }
+void User::setMode(ModeUser mode) { this->mode = mode; }
+
+void User::print_user()
+{
+	std::cout << "socket " << this->socket_fd << std::endl;
+	std::cout << "nick " << this->nickname << std::endl;
+	std::cout << "username " << this->username << std::endl;
+}

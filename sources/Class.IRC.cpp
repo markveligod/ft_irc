@@ -313,7 +313,7 @@ void	IRC::delete_user(int fd)
 	int i;
 	if ((i = IRC::find_fd(&this->_users, fd)) > -1)
 	{
-		User *out_user = (*(this->_users.begin() + i));
+		User *out_user = this->_users[i];
 		this->_users.erase(this->_users.begin() + i);
 		delete out_user;
 	}
@@ -330,7 +330,7 @@ void	IRC::delete_client(int fd)
 	int i;
 	if ((i = IRC::find_fd(&this->_clients, fd)) > -1)
 	{
-		Client *out_client = (*(this->_clients.begin() + i));
+		Client *out_client = this->_clients[i];
 		this->_clients.erase(this->_clients.begin() + i);
 		delete out_client;
 	}

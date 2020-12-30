@@ -72,8 +72,8 @@ void	Command::cmd_pass(IRC& irc, int fd)
 	int i;
 	int j;
 	bool res;
-	std::vector<Client *> clients	= irc.get_clients();
-	std::vector<User *> users 		= irc.get_users();
+	std::vector<Client *> &clients	= irc.get_clients();
+	std::vector<User *> &users 		= irc.get_users();
 
 	if (!(check_args_number(1)))
 		return;
@@ -145,9 +145,9 @@ bool Command::nick_available(std::vector<T> vect, std::string const &nick)
 
 void  Command::cmd_nick(IRC& irc, int fd)
 {
-	std::vector<Client *> clients 	= irc.get_clients();
-	std::vector<User *> users 		= irc.get_users();
-	std::vector<Server *> servers	= irc.get_servers();
+	std::vector<Client *> &clients 	= irc.get_clients();
+	std::vector<User *> &users 		= irc.get_users();
+	std::vector<Server *> &servers	= irc.get_servers();
 	int i = -1;
 	int j = -1;
 
@@ -164,8 +164,16 @@ void  Command::cmd_nick(IRC& irc, int fd)
 			Utils::print_line("New nickname for user" + this->arguments[0] + " set");
 	}
 
-	else if (this->prefix.empty() && IRC::find_fd(&clients, fd) < 0) // если префикс пуст и если нет клиента с таким fd //!!!!!&& (IRC::find_fd(&servers, fd)) >= 0)!!!!!
-		clients.push_back(new Client(fd, this->arguments[0], std::atoi(this->arguments[1].c_str())));
+	else if (this->prefix.empty() &&					// если префикс пуст
+			IRC::find_fd(&clients, fd) < 0 &&			// и нет клиента с таким fd
+			(i = IRC::find_fd(&servers, fd)) >= 0)		// и есть сервер с таким fd
+	{
+		Client *new_client = new Client(fd, this->arguments[0], std::atoi(this->arguments[1].c_str()));
+		clients.push_back(new_client);
+		servers[i]->addClient(new_client);
+		Utils::print_line("New client created");
+		i = -1;
+	}
 
 	else if (!(this->prefix.empty()) && (i = IRC::find_nickname(&clients, this->prefix)) >= 0) // если есть префикс и если есть клиент с ником, который пришел в префикс
 	{
@@ -191,80 +199,61 @@ void  Command::cmd_nick(IRC& irc, int fd)
 ** =============================================================
 */
 
-bool Command::user(User *curr_user)
+void Command::user_change(User * curr_user)
 {
-	std::string temp_str;
-	if (this->arguments.size() != 4)
-		return false;
-	curr_user->user_from_client(this->arguments[0], this->arguments[1], this->arguments[2], this->arguments[3]);
-	return true;
+	curr_user->change_user(this->arguments[0], this->arguments[1],
+						   this->arguments[2], this->arguments[3]);
+	Utils::print_line("Users information changed");
+}
+
+void Command::user_create(Client * curr_client, std::vector<User *> &users, Server * curr_server)
+{
+	User *curr_user = new User(curr_client);
+	curr_user->user_from_client(this->arguments[0], this->arguments[1],
+								this->arguments[2], this->arguments[3]);
+	users.push_back(curr_user);
+	Utils::print_line("USER created");
+	if (curr_server != NULL)
+	{
+		curr_server->addUser(curr_user);
+		Utils::print_line("USER added to servers vector");
+	}
 }
 
 void Command::cmd_user(IRC& irc, int fd)
 {
-	std::vector<Client *> vect = irc.get_clients();
+	int i = -1;
+	int j = -1;
+	int server_fd = -1;
+	std::vector<Client *> &clients = irc.get_clients();
+	std::vector<User *> &users 		= irc.get_users();
+	std::vector<Server *> &servers 	= irc.get_servers();
 
-	std::vector<User *> vec_user = irc.get_users();
-	std::vector<Client *>::iterator temp;
-
-	if ((temp = this->find_fd(&vect, fd)) == vect.end())
-	{
-		Utils::print_error(ERR_FINDFD, "FD don't find in vector!");
+	if (!(this->check_args_number(4)))
 		return;
-	}
-
-	if (!(*temp)->getPassword())
+	if (this->prefix.empty() &&										// если префикс пуст
+	   (i = IRC::find_fd(&clients, fd)) >= 0)						// и сообщение от клиента
 	{
-		Utils::print_error(ERR_PASSWORD, "Enter PASS <password>");
-		return;
+		if (!(check_password(*clients[i])) ||						// проверяем, ввел ли клиент пароль
+			!(check_nickname(*clients[i])))							// и ввел ли клиент ник
+			return;
+		if ((j = IRC::find_fd(&users, fd)) >= 0)
+			this->user_change(users[j]);
+		else
+			this->user_create(clients[i], users, NULL);
 	}
-
-	if ((*temp)->getNickname().size() == 0)
+	else if (!(this->prefix.empty()) &&								// если префикс есть
+			(server_fd = IRC::find_fd(&servers, fd)) >= 0 &&		// и сообщение пришло с сервера
+			(i = IRC::find_nickname(&clients, this->prefix)) >= 0)	// и есть клиент с таким ником
 	{
-		Utils::print_error(ERR_NICKNAME, "ENTER NICK <nickname>");
-		return;
+		if (!(check_password(*clients[i])) ||						// проверяем, ввел ли клиент пароль
+			!(check_nickname(*clients[i])))							// и ввел ли клиент ник
+			return;
+		if ((j = IRC::find_nickname(&users, this->prefix)))			// если уже есть юзер с таким именем
+			this->user_change(users[j]);
+		else
+			this->user_create(clients[i], users, servers[server_fd]);
 	}
-
-	User *curr_user = new User(*temp);
-
-	if (this->user(curr_user))
-	{
-		vec_user.push_back(curr_user);
-		Utils::print_line("Client is done!");
-	}
-	else
-	{
-		delete curr_user;
-		Utils::print_error(ERR_DATACLIENT, "Incorrect client data!");
-	}
-
-	/*int i;
-	std::vector<Client *> clients 	= irc.get_clients();
-	std::vector<User *> users 		= irc.get_users();
-
-	if ()
-	if ((i = IRC::find_fd(&clients, fd)) >= 0)
-	{
-		Utils::print_error(ERR_FINDFD, "FD don't find in vector!");
-		return ;
-	}
-
-	if (!(check_password(*clients[i])) ||
-		!(check_nickname(*clients[i])))
-		return ;
-
-	User *curr_user = new User(*temp);
-
-	if (this->user(curr_user))
-	{
-		vec_user.push_back(curr_user);
-		Utils::print_line("Client is done!");
-	}
-	else
-	{
-		delete curr_user;
-		Utils::print_error(ERR_DATACLIENT, "Incorrect client data!");
-	}*/
 }
 
 /*

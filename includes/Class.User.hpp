@@ -30,6 +30,16 @@ public:
 									 std::string servername, std::string realname);
 	void			user_from_client(std::string username, std::string hostname,
 									 std::string servername, std::string realname, ModeUser mode);
+
+	void			change_user(std::string const & username, std::string const & hostname,
+								std::string const & servername, std::string const realname);
+
+	void			setUsername(std::string const & username);
+	void			setHostname(std::string const & hostname);
+	void			setServername(std::string const & servername);
+	void			setRealname(std::string const & realname);
+	void			setMode(ModeUser mode);
+	void			print_user();
 };
 
 #endif

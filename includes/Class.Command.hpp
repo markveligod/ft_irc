@@ -10,6 +10,7 @@
 #pragma once
 #include "main.hpp"
 class IRC;
+class Server;
 #include "Class.User.hpp"
 #include "Class.IRC.hpp"
 
@@ -25,7 +26,8 @@ private:
 	template <typename T> bool		nick_available(std::vector<T> vect, std::string const &nick);
 
 	bool							pass(std::string password, std::string local_pass);
-	bool							user(User *curr_user);
+	void							user_change(User * curr_user);
+	void							user_create(Client * curr_client, std::vector<User *> &users, Server * curr_server);
 	std::vector<Client *>::iterator find_fd(std::vector<Client *> *vect, int fd);
 	
 public:
