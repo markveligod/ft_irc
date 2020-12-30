@@ -125,9 +125,12 @@ int IRC::do_command(Command *command, int socket_fd)
 
 void IRC::init_fd_select()
 {
-	FD_ZERO(&_fd_set_sockets);
+	FD_ZERO(&_fd_set_read);
+	FD_ZERO(&_fd_set_write);
 	for (std::map<int, int>::iterator it = _array_fd_select.begin(); it != _array_fd_select.end(); it++)
-		FD_SET(it->first, &_fd_set_sockets);
+		FD_SET(it->first, &_fd_set_read);
+	if (!_command_queue.empty())
+		FD_SET(_command_queue.front().first, &_fd_set_write);
 }
 
 /*
@@ -138,7 +141,7 @@ void IRC::init_fd_select()
 
 void IRC::do_select()
 {
-	if ((_select_res = select(FD_SETSIZE, &_fd_set_sockets, NULL, NULL, NULL)) < 0)
+	if ((_select_res = select(FD_SETSIZE, &_fd_set_read, &_fd_set_write, NULL, NULL)) < 0)
 		Utils::print_error(ERR_SELECT, "SELECT");
 }
 
@@ -157,7 +160,13 @@ void IRC::check_fd_select()
 {
 	for (std::map<int, int>::iterator it = _array_fd_select.begin(); it != _array_fd_select.end() && _select_res > 0; it++)
 	{
-		if (FD_ISSET(it->first, &_fd_set_sockets))
+		if (FD_ISSET(it->first, &_fd_set_write))
+		{
+			_send(it->second, it->first, _command_queue.front().second.c_str(), strlen(_command_queue.front().second.c_str()), 0);
+			_command_queue.pop();
+		}
+
+		if (FD_ISSET(it->first, &_fd_set_read))
 		{
 			if (it->second == FD_CLIENT || it->second == FD_CLIENT_SSL)
 			{
@@ -197,6 +206,7 @@ void IRC::check_fd_select()
 				int client_socket = (it->second == FD_SERVER)
 									? _localhost._accept()
 									: _localhost_ssl._accept();
+				_command_queue.push(std::make_pair(client_socket, "HELLLO\n"));
 
 				_array_fd_select[client_socket] = (it->second == FD_SERVER)
 																? FD_CLIENT

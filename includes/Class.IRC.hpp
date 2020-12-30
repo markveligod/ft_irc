@@ -19,6 +19,8 @@
 using std::map;
 using std::string;
 using std::vector;
+using std::pair;
+using std::queue;
 
 class Channel;
 class Command;
@@ -36,7 +38,9 @@ class IRC
 		string						_localhost_pass;
 
 		map<int, int>				_array_fd_select;
-		fd_set						_fd_set_sockets;
+		queue<pair<int, string> >	_command_queue;
+		fd_set						_fd_set_read;
+		fd_set						_fd_set_write;
 
 		vector<User *>				_users;
 		vector<Client *>			_clients;

@@ -22,6 +22,7 @@
 #include <limits>
 #include <iostream>
 #include <vector>
+#include <queue>
 #include <map>
 #include <cstring> // for bzero and strcpy in Linux
 #include <cctype>
