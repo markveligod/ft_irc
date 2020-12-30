@@ -358,5 +358,5 @@ void Command::cmd_server(IRC& irc, int fd)
 
 	Server *new_server = new Server((*temp)->getSocketFd(), this->arguments[0], atoi(this->arguments[1].c_str()), this->arguments[2]);
 	vec_server.push_back(new_server);
-	vect.erase(temp);
+	irc.delete_client(fd);
 }
