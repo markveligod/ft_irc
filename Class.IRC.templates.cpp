@@ -11,13 +11,12 @@
 */
 
 template <typename T>
-int IRC::find_nickname(std::vector<T> *vect, std::string const &nickname)
+int IRC::find_nickname(T& cont, std::string const &nickname)
 {
-	typename std::vector<T>::iterator v_begin = (*vect).begin();
-	typename std::vector<T>::iterator v_end = (*vect).end();
+	typename T::iterator v_begin = cont.begin();
 	int i = 0;
 
-	while (v_begin != v_end)
+	while (v_begin != cont.end())
 	{
 		if ((*v_begin)->getNickname() == nickname)
 			return (i);
@@ -28,13 +27,12 @@ int IRC::find_nickname(std::vector<T> *vect, std::string const &nickname)
 }
 
 template <typename T>
-int IRC::find_fd(std::vector<T> *vect, int fd)
+int IRC::find_fd(T& cont, int fd)
 {
-	typename std::vector<T>::iterator v_begin = (*vect).begin();
-	typename std::vector<T>::iterator v_end = (*vect).end();
+	typename T::iterator v_begin = cont.begin();
 	int i = 0;
 
-	while (v_begin != v_end)
+	while (v_begin != cont.end())
 	{
 		if ((*v_begin)->getSocketFd() == fd)
 			return (i);

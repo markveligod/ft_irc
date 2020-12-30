@@ -41,7 +41,8 @@ class IRC
 		vector<User *>				_users;
 		vector<Client *>			_clients;
 		vector<Server *>			_servers;
-		map<string, Channel>		_channels;
+		map<string, Channel>		_local_channels;
+		map<string, Channel>		_shared_channels;
 
 		int							_select_res;
 		SSL*						_ssl;
@@ -82,13 +83,13 @@ class IRC
 		vector<User *> & 			get_users();
 		vector<Client *> & 			get_clients();
 		vector<Server *> & 			get_servers();
-		map<string, Channel> & 		get_channels();
+		map<string, Channel> & 		get_shared_channels();
 		string const &				get_localhost_pass() const;
 
 		template <typename T>
-		static int					find_fd(vector<T> *vect, int fd);
+		static int					find_fd(T& container, int fd);
 		template <typename T>
-		static int					find_nickname(vector<T> *vect, string const & nickname);
+		static int					find_nickname(T& container, string const & nickname);
 };
 
 #include "../Class.IRC.templates.cpp"

@@ -79,21 +79,21 @@ void	Command::cmd_pass(IRC& irc, int fd)
 		return;
 	if (this->prefix.empty())
 	{
-		if ((i = IRC::find_fd(&clients, fd)) < 0)
+		if ((i = IRC::find_fd(clients, fd)) < 0)
 		{
 			Utils::print_error(ERR_FINDFD, "There is no client with such fd");
 			return;
 		}
-		j = IRC::find_fd(&users, fd);
+		j = IRC::find_fd(users, fd);
 	}
 	else
 	{
-		if ((i = IRC::find_nickname(&clients, this->prefix)) < 0)
+		if ((i = IRC::find_nickname(clients, this->prefix)) < 0)
 		{
 			Utils::print_error(ERR_FINDFD, "There is no client with such nickname");
 			return;
 		}
-		j = IRC::find_nickname(&users, this->prefix);
+		j = IRC::find_nickname(users, this->prefix);
 	}
 	res = this->pass(this->arguments[0], irc.get_localhost_pass());
 	clients[i]->setPassword(res);
@@ -155,18 +155,18 @@ void  Command::cmd_nick(IRC& irc, int fd)
 		!(this->nick_available(clients, this->arguments[0])))
 		return;
 
-	if (this->prefix.empty() && (i = IRC::find_fd(&clients, fd)) >= 0) // если префикс пуст и если есть клиент с таким fd
+	if (this->prefix.empty() && (i = IRC::find_fd(clients, fd)) >= 0) // если префикс пуст и если есть клиент с таким fd
 	{
 		if (!(this->check_password(*clients[i])))							// если он уже установил верный пароль
 			return;
 		Utils::print_line("Nickname for client " + this->arguments[0] + " set");
-		if ((j = IRC::find_fd(&users, fd)) >= 0)
+		if ((j = IRC::find_fd(users, fd)) >= 0)
 			Utils::print_line("New nickname for user" + this->arguments[0] + " set");
 	}
 
 	else if (this->prefix.empty() &&					// если префикс пуст
-			IRC::find_fd(&clients, fd) < 0 &&			// и нет клиента с таким fd
-			(i = IRC::find_fd(&servers, fd)) >= 0)		// и есть сервер с таким fd
+			IRC::find_fd(clients, fd) < 0 &&			// и нет клиента с таким fd
+			(i = IRC::find_fd(servers, fd)) >= 0)		// и есть сервер с таким fd
 	{
 		Client *new_client = new Client(fd, this->arguments[0], std::atoi(this->arguments[1].c_str()));
 		clients.push_back(new_client);
@@ -175,12 +175,12 @@ void  Command::cmd_nick(IRC& irc, int fd)
 		i = -1;
 	}
 
-	else if (!(this->prefix.empty()) && (i = IRC::find_nickname(&clients, this->prefix)) >= 0) // если есть префикс и если есть клиент с ником, который пришел в префикс
+	else if (!(this->prefix.empty()) && (i = IRC::find_nickname(clients, this->prefix)) >= 0) // если есть префикс и если есть клиент с ником, который пришел в префикс
 	{
 		if (!(this->check_password(*clients[i])))												// если он уже установил верный пароль
 			return;
 		Utils::print_line("Nickname for client changed from " + clients[i]->getNickname() + " to " + this->arguments[0]);
-		if ((j = IRC::find_nickname(&users, this->prefix)) >= 0)
+		if ((j = IRC::find_nickname(users, this->prefix)) >= 0)
 			Utils::print_line("Nickname for user changed from " + users[j]->getNickname() + " to " + this->arguments[0]);
 	}
 
@@ -232,24 +232,24 @@ void Command::cmd_user(IRC& irc, int fd)
 	if (!(this->check_args_number(4)))
 		return;
 	if (this->prefix.empty() &&										// если префикс пуст
-	   (i = IRC::find_fd(&clients, fd)) >= 0)						// и сообщение от клиента
+	   (i = IRC::find_fd(clients, fd)) >= 0)						// и сообщение от клиента
 	{
 		if (!(check_password(*clients[i])) ||						// проверяем, ввел ли клиент пароль
 			!(check_nickname(*clients[i])))							// и ввел ли клиент ник
 			return;
-		if ((j = IRC::find_fd(&users, fd)) >= 0)
+		if ((j = IRC::find_fd(users, fd)) >= 0)
 			this->user_change(users[j]);
 		else
 			this->user_create(clients[i], users, NULL);
 	}
 	else if (!(this->prefix.empty()) &&								// если префикс есть
-			(server_fd = IRC::find_fd(&servers, fd)) >= 0 &&		// и сообщение пришло с сервера
-			(i = IRC::find_nickname(&clients, this->prefix)) >= 0)	// и есть клиент с таким ником
+			(server_fd = IRC::find_fd(servers, fd)) >= 0 &&		// и сообщение пришло с сервера
+			(i = IRC::find_nickname(clients, this->prefix)) >= 0)	// и есть клиент с таким ником
 	{
 		if (!(check_password(*clients[i])) ||						// проверяем, ввел ли клиент пароль
 			!(check_nickname(*clients[i])))							// и ввел ли клиент ник
 			return;
-		if ((j = IRC::find_nickname(&users, this->prefix)))			// если уже есть юзер с таким именем
+		if ((j = IRC::find_nickname(users, this->prefix)))			// если уже есть юзер с таким именем
 			this->user_change(users[j]);
 		else
 			this->user_create(clients[i], users, servers[server_fd]);

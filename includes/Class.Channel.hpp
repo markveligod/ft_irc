@@ -7,6 +7,7 @@
 
 using std::string;
 using std::vector;
+using std::set;
 
 struct ModeChannel
 {
@@ -26,16 +27,17 @@ class Channel
 private:
 	string			_name;
 	string			_creator;
-	//std::set<string>	users;
-	//std::set<string>	operators;
-	vector<User *>	_users;
-	vector<User *>	_operators;
-	vector<User *>	_banned;
+	set<User *>		_users;
+	set<User *>		_operators;
+	set<User*>		_banned;
+	// vector<User *>	_users;
+	// vector<User *>	_operators;
+	// vector<User*>	_banned;
 	string			_topic;
 	ModeChannel		_mode;
-	int				_limit_users;
-	string			_key;
-	string			_ban;
+	// int				_limit_users;
+	// string			_key;
+	// string			_ban;
 	IRC&			_irc;
 
 public:

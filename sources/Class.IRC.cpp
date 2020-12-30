@@ -311,7 +311,7 @@ SSL *IRC::ssl_connection(int fd)
 void	IRC::delete_user(int fd)
 {
 	int i;
-	if ((i = IRC::find_fd(&this->_users, fd)) > -1)
+	if ((i = IRC::find_fd(this->_users, fd)) > -1)
 	{
 		User *out_user = this->_users[i];
 		this->_users.erase(this->_users.begin() + i);
@@ -328,7 +328,7 @@ void	IRC::delete_user(int fd)
 void	IRC::delete_client(int fd)
 {
 	int i;
-	if ((i = IRC::find_fd(&this->_clients, fd)) > -1)
+	if ((i = IRC::find_fd(this->_clients, fd)) > -1)
 	{
 		Client *out_client = this->_clients[i];
 		this->_clients.erase(this->_clients.begin() + i);
@@ -344,7 +344,7 @@ void	IRC::delete_client(int fd)
 
 std::vector<std::string> IRC::check_buffer(int fd, const char *buffer)
 {
-	Client *temp_ptr_client = this->_clients[IRC::find_fd(&this->_clients, fd)];
+	Client *temp_ptr_client = this->_clients[IRC::find_fd(this->_clients, fd)];
 	std::vector<std::string> temp_vec;
 
 	std::string temp = temp_ptr_client->getBuffer();
@@ -368,20 +368,20 @@ std::vector<std::string> IRC::check_buffer(int fd, const char *buffer)
 
 void IRC::join_channel(string channel_name, string nickname)
 {
-	if (!_channels.count(channel_name))
+	if (!_shared_channels.count(channel_name))
 	{
-		_channels.insert(make_pair(channel_name, Channel(channel_name, nickname, *this)));
+		_shared_channels.insert(make_pair(channel_name, Channel(channel_name, nickname, *this)));
 		// отправить всем серверам, что создан канал
 	}
 	else
 	{
-		// if (_channels[channel_name].is_banned(nickname)) TODO
+		// if (_shared_channels[channel_name].is_banned(nickname)) TODO
 		// 	// отправить пользователю, что он забанен и не может подключиться
 
-		int index = find_nickname(&_users, nickname);
+		int index = find_nickname(_users, nickname);
 		if (index >= 0)
 		{
-			map<string, Channel>::iterator it = _channels.find(channel_name);
+			map<string, Channel>::iterator it = _shared_channels.find(channel_name);
 			it->second.add_user(_users[index]);
 		}
 	}
@@ -390,12 +390,12 @@ void IRC::join_channel(string channel_name, string nickname)
 
 User *					IRC::get_user(string nickname)
 {
-	int index = find_nickname(&_users, nickname);
+	int index = find_nickname(_users, nickname);
 
 	return (index >= 0) ? _users[index] : NULL;
 }
 vector<User *> &		IRC::get_users() {return (this->_users);}
 vector<Client *> &		IRC::get_clients() {return (this->_clients);}
 vector<Server *> &		IRC::get_servers() {return (this->_servers);}
-map<string, Channel> &	IRC::get_channels() {return (this->_channels);}
+map<string, Channel> &	IRC::get_shared_channels() {return (this->_shared_channels);}
 string const &			IRC::get_localhost_pass() const {return (this->_localhost_pass);}
