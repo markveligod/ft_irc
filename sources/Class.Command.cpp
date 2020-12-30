@@ -350,17 +350,13 @@ void Command::cmd_server(IRC& irc, int fd)
 		return ;
 	}
 
-	if (this->arguments.size() > 3)
-	{
-		Utils::print_error(ERR_ARG_NUMBER, "Invalid number of arguments!");
+	if (!this->check_args_number(3))
 		return ;
-	}
 
-	if ((*temp)->getPassword())
-	{
-		Server *new_server = new Server((*temp)->getSocketFd(), this->arguments[0], atoi(this->arguments[1].c_str()), this->arguments[2]);
-		vec_server.push_back(new_server);
-	}
-	else
-		Utils::print_error(ERR_PASSWORD, "Enter PASS <password>!");
+	if (!this->check_password(**temp))
+		return ;
+
+	Server *new_server = new Server((*temp)->getSocketFd(), this->arguments[0], atoi(this->arguments[1].c_str()), this->arguments[2]);
+	vec_server.push_back(new_server);
+	vect.erase(temp);
 }
