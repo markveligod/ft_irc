@@ -19,23 +19,29 @@ endif
 
 NAME	= ircserv
 
-SRC_DIR = ./sources/
-OBJ_DIR	= ./objects/
+SRC_DIR		= ./sources/
+OBJ_DIR		= ./objects/
+COMM_DIR	= ./sources/commands/
+OBJ_DIR_C	= ./sources/objects/
 
-SRCS	= main.cpp \
-		  Class.Utils.cpp \
-		  Class.IRC.cpp \
-		  Class.Socket.cpp \
-		  Class.Client.cpp \
-		  Class.Command.cpp \
-		  Class.User.cpp \
-		  Class.Channel.cpp \
-		  Class.Server.cpp
+SRCS		= main.cpp \
+			Class.Utils.cpp \
+			Class.IRC.cpp \
+			Class.Socket.cpp \
+			Class.Client.cpp \
+			Class.Command.cpp \
+			Class.User.cpp \
+			Class.Channel.cpp \
+			Class.Server.cpp \
 
-SRC		= $(addprefix $(SRC_DIR), $(SRCS))
-OBJS	= $(SRC:.cpp=.o) $(CLASS:.cpp=.o)
-OBJ		= $(patsubst %.cpp,$(OBJ_DIR)%.o,$(SRCS))
-DEP		= $(OBJ:.o=.d)
+COMMS		= nick.cpp
+
+SRC			= $(addprefix $(SRC_DIR), $(SRCS))
+COMM		= $(addprefix $(COMM_DIR), $(COMMS))
+OBJ			= $(patsubst %.cpp,$(OBJ_DIR)%.o,$(SRCS))
+OBJ_C		= $(patsubst %.cpp,$(OBJ_DIR_C)%.o,$(COMMS))
+DEP			= $(OBJ:.o=.d)
+DEP_C		= $(OBJ_C:.o=.d)
 
 all: $(NAME)
 
@@ -46,8 +52,13 @@ $(OBJ_DIR)%.o:$(SRC_DIR)%.cpp
 	@$(CC) $(DEBUG) -o $@ -c $< $(FLAGS) $(INCLUDES)
 	@echo "[$(GREEN)OK$(RESET)]$(YELLOW) Compiling $<$(RESET)"
 
-$(NAME): $(OBJ)
-	@$(CC) -o $(NAME) $(DEBUG) $(OBJ) $(FLAGS) $(INCLUDES) $(SSL)
+$(OBJ_DIR_C)%.o:$(COMM_DIR)%.cpp
+	@test -d $(OBJ_DIR_C) || mkdir $(OBJ_DIR_C)
+	@$(CC) $(DEBUG) -o $@ -c $< $(FLAGS) $(INCLUDES)
+	@echo "[$(GREEN)OK$(RESET)]$(YELLOW) Compiling $<$(RESET)"
+
+$(NAME): $(OBJ) $(OBJ_C)
+	@$(CC) -o $(NAME) $(DEBUG) $(OBJ) $(OBJ_C) $(FLAGS) $(INCLUDES) $(SSL)
 	@echo "[$(GREEN)Success$(RESET)]$(GREEN) Successfully compiled $(NAME) project.$(RESET)"
 	@echo ""
 	@echo "$(CYAN)      /|/|"
