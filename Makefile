@@ -34,7 +34,8 @@ SRCS		= main.cpp \
 			Class.Channel.cpp \
 			Class.Server.cpp \
 
-COMMS		= nick.cpp
+COMMS		= nick.cpp \
+			join.cpp
 
 SRC			= $(addprefix $(SRC_DIR), $(SRCS))
 COMM		= $(addprefix $(COMM_DIR), $(COMMS))

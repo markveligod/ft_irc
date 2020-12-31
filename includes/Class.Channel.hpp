@@ -18,6 +18,8 @@ struct ModeChannel
 	bool	limit_users_mode;
 	bool	key_mode;
 	bool	ban_mode;
+
+	ModeChannel() { bzero(this, sizeof(*this)); }
 };
 
 class IRC;
@@ -26,23 +28,26 @@ class Channel
 {
 private:
 	string			_name;
+	string			_key;
 	string			_creator;
-	vector<User *>	_users;
-	vector<User *>	_operators;
+	vector<User*>	_users;
+	vector<User*>	_operators;
 	vector<User*>	_banned;
 	string			_topic;
 	ModeChannel		_mode;
 	// int				_limit_users;
-	// string			_key;
 	// string			_ban;
 	IRC&			_irc;
 
 public:
-	Channel(string name, string creator, IRC&);
-	Channel(const Channel&);
+	Channel(const string& name, const string& key, const string& creator, IRC& irc);
+	Channel(const Channel& x);
 
 	void add_user(User*);
 	void add_operator(User*);
-	void set_mode(string);
-	bool is_banned(string);
+	void set_mode(const string&);
+	bool is_banned(const string&) const;
+
+	const ModeChannel&	get_mode();
+	const string&		get_key();
 };

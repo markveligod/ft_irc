@@ -7,7 +7,7 @@
 ** ==========================================
 */
 
-Command::Command(std::string const & str)
+Command::Command(const std::string& str)
 {
 	std::istringstream	ss(str);
 	std::string			word;
@@ -20,7 +20,10 @@ Command::Command(std::string const & str)
 		getline(ss, this->command, ' ');
 	}
 	else
+	{
+		this->prefix = std::string();
 		this->command = word;
+	}
 
 	while (getline(ss, word, ' '))
 	{
@@ -91,8 +94,6 @@ int	Command::cmd_pass(IRC& irc, int fd)
 	clients[i]->setPassword(res);
 	return (res == false ? ERR_PASSWDMISMATCH : 0);	// в документации нет такой ошибки
 }
-
-
 
 // int  Command::cmd_nick(IRC& irc, int fd)
 // {

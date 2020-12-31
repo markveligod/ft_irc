@@ -11,9 +11,9 @@
 */
 
 template <typename T>
-int IRC::find_nickname(T& cont, std::string const &nickname)
+int IRC::find_nickname(T& cont, const std::string& nickname)
 {
-	typename T::iterator v_begin = cont.begin();
+	typename T::const_iterator v_begin = cont.begin();
 	int i = 0;
 
 	while (v_begin != cont.end())

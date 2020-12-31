@@ -19,7 +19,7 @@
 ** =====================================================================
 */
 
-bool Command::nick_valid()
+bool Command::nick_valid() const
 {
 	int i = 1;
 	if (this->arguments[0].size() > 9 || this->arguments[0].size() == 0)

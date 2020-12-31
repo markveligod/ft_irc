@@ -6,6 +6,8 @@
 # define FD_CLIENT_SSL 3
 # define FD_SERVER_SSL 4
 
+# define COMM_COUNT 6
+
 # define CERTIFICATE "cert/cert.pem"
 # define PRIVATE_KEY "cert/key.pem"
 
@@ -97,21 +99,25 @@ typedef int (Command::*doCommand)(IRC& irc, int fd);
 int IRC::do_command(Command *command, int socket_fd)
 {
 	int			result;
-	std::string cmd_name[4] =	{"NICK",
+	std::string cmd_name[COMM_COUNT] =	{"NICK",
 							   	 "PASS",
 							  	 "USER",
-								 "SERVER"};
-	doCommand	cmd_func[4] = 	{&Command::cmd_nick,
+								 "SERVER",
+								 "JOIN"};
+	doCommand	cmd_func[COMM_COUNT] = 	{&Command::cmd_nick,
 							   	 &Command::cmd_pass,
 							   	 &Command::cmd_user,
-								 &Command::cmd_server};
+								 &Command::cmd_server,
+								 &Command::cmd_join};
 
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < COMM_COUNT; i++)
+	{
 		if (cmd_name[i] == command->getCommand())
 		{
 			result = (command->*(cmd_func[i]))(*this, socket_fd);
 			return (result);
 		}
+	}
 	Utils::print_error(123, "Command not found");
 	return (0);
 }
@@ -379,7 +385,7 @@ std::vector<std::string> IRC::check_buffer(int fd, const char *buffer)
 ** ----------------------------------------------------------
 */
 
-void IRC::push_cmd_queue(int fd, std::string str)
+void IRC::push_cmd_queue(int fd, const std::string& str)
 {
 	this->_command_queue.push(std::make_pair(fd, str));
 }
@@ -390,26 +396,53 @@ void IRC::push_cmd_queue(int fd, std::string str)
 ** ----------------------------------------------------------
 */
 
-void IRC::join_channel(string channel_name, string nickname)
+void IRC::join_channel(const string& channel_name,
+						const string& channel_key,
+						char channel_type,
+						const string& nickname,
+						int fd)
 {
-	if (!_shared_channels.count(channel_name))
-	{
-		_shared_channels.insert(make_pair(channel_name, Channel(channel_name, nickname, *this)));
-		// отправить всем серверам, что создан канал
-	}
+	map<string, Channel> channels;
+	(void)fd;
+
+	if (channel_type == '&')
+		channels = get_local_channels();
 	else
+		channels = get_shared_channels();
+
+	map<string, Channel>::iterator it = channels.find(channel_name);
+	if (it == channels.end())							// add new channel
 	{
-		// if (_shared_channels[channel_name].is_banned(nickname)) TODO
-		// 	// отправить пользователю, что он забанен и не может подключиться
+		channels.insert(make_pair(channel_name, Channel(channel_name, channel_key, nickname, *this)));
+		// отправить всем серверам, что создан канал	TODO
+	}
+	else												// channel already exist
+	{
+		if (it->second.is_banned(nickname))				// check if user is banned 
+		{
+			_command_queue.push(std::make_pair(fd, Utils::convert_int_to_str(ERR_BANNEDFROMCHAN)));
+			return;
+		}
+
+		if (channel_key != it->second.get_key())		// check channel password
+		{
+			_command_queue.push(std::make_pair(fd, Utils::convert_int_to_str(ERR_PASSWDMISMATCH)));
+			return;
+		}
+
+		if (it->second.get_mode().invite_only_mode)		// check if invite only channel
+		{
+			_command_queue.push(std::make_pair(fd, Utils::convert_int_to_str(ERR_INVITEONLYCHAN)));
+			return;
+		}
 
 		int index = find_nickname(_users, nickname);
 		if (index >= 0)
 		{
-			map<string, Channel>::iterator it = _shared_channels.find(channel_name);
+			map<string, Channel>::iterator it = channels.find(channel_name);
 			it->second.add_user(_users[index]);
 		}
 	}
-	
 }
 
 User *					IRC::get_user(string nickname)
@@ -418,8 +451,9 @@ User *					IRC::get_user(string nickname)
 
 	return (index >= 0) ? _users[index] : NULL;
 }
-vector<User *> &		IRC::get_users() {return (this->_users);}
-vector<Client *> &		IRC::get_clients() {return (this->_clients);}
-vector<Server *> &		IRC::get_servers() {return (this->_servers);}
-map<string, Channel> &	IRC::get_shared_channels() {return (this->_shared_channels);}
-string const &			IRC::get_localhost_pass() const {return (this->_localhost_pass);}
+vector<User*>&			IRC::get_users() {return (this->_users);}
+vector<Client*>&		IRC::get_clients() {return (this->_clients);}
+vector<Server*>&		IRC::get_servers() {return (this->_servers);}
+map<string, Channel>&	IRC::get_local_channels() {return (this->_local_channels);}
+map<string, Channel>&	IRC::get_shared_channels() {return (this->_shared_channels);}
+const string&			IRC::get_localhost_pass() const {return (this->_localhost_pass);}

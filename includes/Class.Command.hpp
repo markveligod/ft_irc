@@ -15,32 +15,36 @@ class Server;
 #include "Class.IRC.hpp"
 #include "codes.hpp"
 
+using std::string;
+using std::vector;
+
 class Command
 {
 private:
-	std::string						prefix;
-	std::string						command;
-	std::vector<std::string> 		arguments;
+	string				prefix;
+	string				command;
+	vector<string> 		arguments;
 
 
-	bool							nick_valid();
-	template <typename T> bool		nick_available(std::vector<T> vect, std::string const &nick);
+	bool							nick_valid() const;
+	template <typename T> bool		nick_available(vector<T> vect, const string& nick);
 
-	bool							pass(std::string password, std::string local_pass);
-	void							user_change(User * curr_user);
-	void							user_create(Client * curr_client, std::vector<User *> &users, Server * curr_server);
-	std::vector<Client *>::iterator find_fd(std::vector<Client *> *vect, int fd);
-	
+	bool							pass(string password, string local_pass);
+	void							user_change(User* curr_user);
+	void							user_create(Client* curr_client, vector<User*>& users, Server* curr_server);
+	vector<Client *>::iterator		find_fd(vector<Client *>* vect, int fd);
+
 public:
-	Command(std::string const & str);
+	Command(string const & str);
 	~Command();
 
 	int					cmd_nick(IRC& irc, int fd);
 	int					cmd_pass(IRC& irc, int fd);
 	int					cmd_user(IRC& irc, int fd);
 	int					cmd_server(IRC& irc, int fd);
+	int					cmd_join(IRC& irc, int fd);
 
-	std::string const &	getCommand() const;
+	const string&		getCommand() const;
 	bool				check_args_number(int n) const;
 	bool				check_password(Client const & client) const;
 	bool				check_nickname(Client const & client) const;
