@@ -94,6 +94,7 @@ class IRC
 		static int					find_fd(T& container, int fd);
 		template <typename T>
 		static int					find_nickname(T& container, string const & nickname);
+		void 						push_cmd_queue(int fd, std::string str);
 };
 
 #include "../Class.IRC.templates.cpp"

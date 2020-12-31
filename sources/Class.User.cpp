@@ -83,3 +83,23 @@ void User::print_user()
 	std::cout << "nick " << this->nickname << std::endl;
 	std::cout << "username " << this->username << std::endl;
 }
+
+std::string const &User::getUsername() const
+{
+	return (this->username);
+}
+
+std::string const &User::getHostname() const
+{
+	return (this->hostname);
+}
+
+std::string const &User::getServername() const
+{
+	return(this->servername);
+}
+
+std::string const &User::getRealname() const
+{
+	return (this->realname);
+}

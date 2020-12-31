@@ -40,6 +40,11 @@ public:
 	void			setRealname(std::string const & realname);
 	void			setMode(ModeUser mode);
 	void			print_user();
+
+	std::string const &		getUsername() const;
+	std::string const &		getHostname() const;
+	std::string const &		getServername() const;
+	std::string const &		getRealname() const;
 };
 
 #endif

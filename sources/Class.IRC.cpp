@@ -208,7 +208,6 @@ void IRC::check_fd_select()
 				int client_socket = (it->second == FD_SERVER)
 									? _localhost._accept()
 									: _localhost_ssl._accept();
-				_command_queue.push(std::make_pair(client_socket, "HELLLO\n"));
 
 				_array_fd_select[client_socket] = (it->second == FD_SERVER)
 																? FD_CLIENT
@@ -372,6 +371,17 @@ std::vector<std::string> IRC::check_buffer(int fd, const char *buffer)
 		temp_vec.push_back(temp_str);
 	}
 	return (temp_vec);
+}
+
+/*
+** ----------------------------------------------------------
+** push_cmd_queue - пушит строку в очередь
+** ----------------------------------------------------------
+*/
+
+void IRC::push_cmd_queue(int fd, std::string str)
+{
+	this->_command_queue.push(std::make_pair(fd, str));
 }
 
 /*
