@@ -43,6 +43,7 @@ int main(int ac, char **av)
 		server.do_select();
 		server.check_fd_select();
 	}
+
 	// SSL_CTX_free(_ctx);
 	return (0);
 }

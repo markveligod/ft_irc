@@ -84,7 +84,7 @@ fclean: clean
 re: fclean all
 
 server: all
-	./$(NAME) 1080 111
+	./$(NAME) 1080 123
 
 client: all
 	./$(NAME) localhost:1080:111 1280 123

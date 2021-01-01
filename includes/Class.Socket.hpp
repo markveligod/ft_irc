@@ -39,4 +39,6 @@ public:
 	int		_connect();
 	int		_listen(int backlog = 5);
 	int		_accept();
+	
+	int		get_fd();
 };
