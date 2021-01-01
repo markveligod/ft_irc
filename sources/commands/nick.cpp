@@ -24,12 +24,12 @@ bool Command::nick_valid() const
 	int i = 1;
 	if (this->arguments[0].size() > 9 || this->arguments[0].size() == 0)
 	{
-		Utils::print_error(ERR_NICKNAME, "Nickname length must be between 1 and 9 symbols");
+		utils::print_error(ERR_NICKNAME, "Nickname length must be between 1 and 9 symbols");
 		return false;
 	}
 	if (!(std::isalpha(this->arguments[0][0])))
 	{
-		Utils::print_error(ERR_NICKNAME, "First symbol must be a letter");
+		utils::print_error(ERR_NICKNAME, "First symbol must be a letter");
 		return false;
 	}
 	while (i != (int)this->arguments[0].size())
@@ -39,7 +39,7 @@ bool Command::nick_valid() const
 			i++;
 		else
 		{
-			Utils::print_error(ERR_NICKNAME, "Not valid symbols");
+			utils::print_error(ERR_NICKNAME, "Not valid symbols");
 			return false;
 		}
 	}
@@ -53,7 +53,7 @@ bool Command::nick_available(std::vector<T> vect, std::string const &nick)
 	{
 		if (vect[i]->getNickname() == nick)
 		{
-			Utils::print_error(ERR_NICKNAME, "Nickname is already in use");
+			utils::print_error(ERR_NICKNAME, "Nickname is already in use");
 			return false;
 		}
 	}
@@ -86,9 +86,9 @@ int  Command::cmd_nick(IRC& irc, int fd)
 	{
 		if (!(this->check_password(*clients[i])))							// если он уже установил верный пароль
 			return 0;
-		Utils::print_line("Nickname for client " + this->arguments[0] + " set");
+		utils::print_line("Nickname for client " + this->arguments[0] + " set");
 		if ((j = IRC::find_fd(users, fd)) >= 0)
-			Utils::print_line("New nickname for user" + this->arguments[0] + " set");
+			utils::print_line("New nickname for user" + this->arguments[0] + " set");
 	}
 
 	else if (this->prefix.empty() &&										// если префикс пуст
@@ -98,7 +98,7 @@ int  Command::cmd_nick(IRC& irc, int fd)
 		Client *new_client = new Client(fd, this->arguments[0], std::atoi(this->arguments[1].c_str()));
 		clients.push_back(new_client);
 		servers[i]->addClient(new_client);
-		Utils::print_line("New client created");
+		utils::print_line("New client created");
 		i = -1;
 	}
 
@@ -106,9 +106,9 @@ int  Command::cmd_nick(IRC& irc, int fd)
 	{
 		if (!(this->check_password(*clients[i])))												// если он уже установил верный пароль
 			return 0;
-		Utils::print_line("Nickname for client changed from " + clients[i]->getNickname() + " to " + this->arguments[0]);
+		utils::print_line("Nickname for client changed from " + clients[i]->getNickname() + " to " + this->arguments[0]);
 		if ((j = IRC::find_nickname(users, this->prefix)) >= 0)
-			Utils::print_line("Nickname for user changed from " + users[j]->getNickname() + " to " + this->arguments[0]);
+			utils::print_line("Nickname for user changed from " + users[j]->getNickname() + " to " + this->arguments[0]);
 	}
 
 	if (i >= 0)

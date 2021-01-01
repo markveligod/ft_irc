@@ -6,12 +6,12 @@ int main(int ac, char **av)
 	std::vector<std::string> network;
 
 	if (ac != 3 && ac != 4)
-		Utils::exit_error(ERR_COUNT, "ARG: ./ircserv [host:port_network:password_network] <port> <password>");
-	if (!Utils::check_av(ac, av))
-		Utils::exit_error(ERR_CHECKAV, "Incorrect enter to argv!");
+		utils::exit_error(ERR_COUNT, "ARG: ./ircserv [host:port_network:password_network] <port> <password>");
+	if (!utils::check_av(ac, av))
+		utils::exit_error(ERR_CHECKAV, "Incorrect enter to argv!");
 
 	if (ac == 4)
-		network = Utils::split(av[1], ':');
+		network = utils::split(av[1], ':');
 	else
 	{
 		network.push_back(LOCALHOST);

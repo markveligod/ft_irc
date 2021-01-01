@@ -25,7 +25,7 @@ COMM_DIR	= ./sources/commands/
 OBJ_DIR_C	= ./sources/objects/
 
 SRCS		= main.cpp \
-			Class.Utils.cpp \
+			utils.cpp \
 			Class.IRC.cpp \
 			Class.Socket.cpp \
 			Class.Client.cpp \

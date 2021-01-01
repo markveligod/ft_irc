@@ -87,8 +87,8 @@ class IRC
 		vector<User*>& 				get_users();
 		vector<Client*>& 			get_clients();
 		vector<Server*>& 			get_servers();
-		map<string, Channel>& 		get_local_channels();
-		map<string, Channel>& 		get_shared_channels();
+		// map<string, Channel>& 		get_local_channels();
+		// map<string, Channel>& 		get_shared_channels();
 		const string&				get_localhost_pass() const;
 
 		template <typename T>

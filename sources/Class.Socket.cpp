@@ -14,7 +14,7 @@ Socket::Socket(const char *host_ip, int port, int fd, int sin_family, int type, 
 	{
 		hostent *host = gethostbyname(host_ip);
 		if (!host)
-			Utils::exit_error(1, "Unknown address");
+			utils::exit_error(1, "Unknown address");
 		inet_pton(_sin_family, host->h_name, &_addr.sin_addr);
 	}
 	else
@@ -37,7 +37,7 @@ const Socket &Socket::operator=(const Socket &other)
 int Socket::_socket() {
 
 	if ((_fd = socket(_sin_family, _type, _protocol)) < 0)
-		Utils::exit_error(ERR_SOCKET, "Establishing socket error");
+		utils::exit_error(ERR_SOCKET, "Establishing socket error");
 	//fcntl(_fd, F_SETFL, O_NONBLOCK); // с этим не работает подсоединение к серверу
 	return _fd;
 }
@@ -47,7 +47,7 @@ int Socket::_bind() {
 	int res = 0;
 
 	if ((res = bind(_fd, reinterpret_cast<struct sockaddr *>(&_addr), _addr_size)) < 0)
-		Utils::exit_error(ERR_BIND, "Binding error");
+		utils::exit_error(ERR_BIND, "Binding error");
 	return res;
 }
 
@@ -56,7 +56,7 @@ int Socket::_connect() {
 	int res = 0;
 
 	if ((res = connect(_fd, reinterpret_cast<struct sockaddr *>(&_addr), _addr_size)) < 0)
-		Utils::exit_error(ERR_CONNECT_TO_SERVER, "Unable to connect to server");
+		utils::exit_error(ERR_CONNECT_TO_SERVER, "Unable to connect to server");
 	return res;
 }
 
@@ -65,7 +65,7 @@ int Socket::_listen(int backlog) {
 	int res = 0;
 
 	if ((res = listen(_fd, backlog)) < 0)
-		Utils::exit_error(ERR_LISTEN, "Listening error");
+		utils::exit_error(ERR_LISTEN, "Listening error");
 	return res;
 }
 
@@ -75,7 +75,7 @@ int Socket::_accept() {
 	int client = 0;
 
 	if ((client = accept(_fd, reinterpret_cast<struct sockaddr *>(&_addr), &_addr_size)) < 0)
-		Utils::exit_error(ERR_ACCEPT, "Accepting error");
+		utils::exit_error(ERR_ACCEPT, "Accepting error");
 	// fcntl(client, F_SETFL, O_NONBLOCK);
 	return client;
 }

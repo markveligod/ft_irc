@@ -32,8 +32,8 @@ IRC::IRC(std::string network_ip,
 	int port = std::atoi(localhost_port.c_str());
 	_localhost = Socket(LOCALHOST, port);
 	_localhost_ssl = Socket(LOCALHOST, port + 1);
-	Utils::print_line("Constructor IRC done!");
-	Utils::print_line("Socket local done!");
+	utils::print_line("Constructor IRC done!");
+	utils::print_line("Socket local done!");
 }
 
 /*
@@ -47,32 +47,32 @@ void IRC::create_socket_local()
 	// local socket created on IRC conctructor
 
 	_array_fd_select[_localhost._socket()] = FD_SERVER;
-	Utils::print_line("Socket local FD done!");
+	utils::print_line("Socket local FD done!");
 
 	_array_fd_select[_localhost_ssl._socket()] = FD_SERVER_SSL;
-	Utils::print_line("Socket ssl local FD done!");
+	utils::print_line("Socket ssl local FD done!");
 
 	_localhost._bind();
-	Utils::print_line("Socket local bind done!");
+	utils::print_line("Socket local bind done!");
 
 	_localhost_ssl._bind();
-	Utils::print_line("Socket ssl local bind done!");
+	utils::print_line("Socket ssl local bind done!");
 
 	_localhost._listen();
-	Utils::print_line("Socket local listen...");
+	utils::print_line("Socket local listen...");
 
 	_localhost_ssl._listen();
-	Utils::print_line("Socket ssl local listen...");
+	utils::print_line("Socket ssl local listen...");
 }
 
 void IRC::create_socket_network()
 {
 	_network = Socket(_network_ip.c_str(), _network_port);
-	Utils::print_line("Socket network done!");
+	utils::print_line("Socket network done!");
 	int fd = _network._socket();
-	Utils::print_line("Socket network FD done!");
+	utils::print_line("Socket network FD done!");
 	_network._connect();
-	Utils::print_line("Socket network connection!");
+	utils::print_line("Socket network connection!");
 
 	_array_fd_select[fd] = FD_CLIENT;
 	// std::string pass = "PASS " + _network_pass + "\r\n";
@@ -118,7 +118,7 @@ int IRC::do_command(Command *command, int socket_fd)
 			return (result);
 		}
 	}
-	Utils::print_error(123, "Command not found");
+	utils::print_error(123, "Command not found");
 	return (0);
 }
 
@@ -138,7 +138,9 @@ void IRC::init_fd_select()
 	for (std::map<int, int>::iterator it = _array_fd_select.begin(); it != _array_fd_select.end(); it++)
 		FD_SET(it->first, &_fd_set_read);
 	if (!_command_queue.empty())
+	{
 		FD_SET(_command_queue.front().first, &_fd_set_write);
+	}
 }
 
 /*
@@ -150,7 +152,7 @@ void IRC::init_fd_select()
 void IRC::do_select()
 {
 	if ((_select_res = select(FD_SETSIZE, &_fd_set_read, &_fd_set_write, NULL, NULL)) < 0)
-		Utils::print_error(ERR_SELECT, "SELECT");
+		utils::print_error(ERR_SELECT, "SELECT");
 }
 
 /*
@@ -170,6 +172,7 @@ void IRC::check_fd_select()
 	{
 		if (FD_ISSET(it->first, &_fd_set_write))
 		{
+			std::cout << "DEBUG: Сообщение отправлено клиенту " << it->first << ": " << _command_queue.front().second << std::endl;
 			_send(it->second, it->first, _command_queue.front().second.c_str(), strlen(_command_queue.front().second.c_str()), 0);
 			_command_queue.pop();
 		}
@@ -200,7 +203,8 @@ void IRC::check_fd_select()
 
 					// передаем в исполнение команды сообщение и сокет, из которого пришло сообщение
 					this->do_command(&mess, it->first);
-					_send(it->second, it->first, buffer_cmd[i].c_str(), strlen(buffer_cmd[i].c_str()), 0);
+					// _send(it->second, it->first, buffer_cmd[i].c_str(), strlen(buffer_cmd[i].c_str()), 0);
+					push_cmd_queue(it->first, buffer_cmd[i]);
 				}
 				bzero(buffer, 512);
 			}
@@ -222,7 +226,8 @@ void IRC::check_fd_select()
 					ssl_connection(client_socket);
 											
 				std::cout << "New client#" << client_socket << " joined server\n";
-				_send(it->second, client_socket, response, 10, 0);
+				// _send(it->second, client_socket, response, 10, 0);
+				push_cmd_queue(client_socket, string(response));
 				this->_clients.push_back(new Client(client_socket));
 			}
 			_select_res--;
@@ -290,14 +295,14 @@ void IRC::init_ctx()
 	// if (client)
 	// 	method = TLS_client_method();
 	if (!(_ctx = SSL_CTX_new(method)))	/* create new context from method */
-		Utils::print_error(1, "SSL: SSL_CTX_new failed\n");
+		utils::print_error(1, "SSL: SSL_CTX_new failed\n");
 
 	if (SSL_CTX_use_certificate_file(_ctx, CERTIFICATE, SSL_FILETYPE_PEM) <= 0)
-		Utils::print_error(1, "SSL: SSL_CTX_use_certificate_file failed\n");
+		utils::print_error(1, "SSL: SSL_CTX_use_certificate_file failed\n");
 	if (SSL_CTX_use_PrivateKey_file(_ctx, PRIVATE_KEY, SSL_FILETYPE_PEM) <= 0)
-		Utils::print_error(1, "SSL: SSL_CTX_use_PrivateKey_file SSL failed\n");
+		utils::print_error(1, "SSL: SSL_CTX_use_PrivateKey_file SSL failed\n");
 	if (!SSL_CTX_check_private_key(_ctx))
-		Utils::print_error(1, "SSL: SSL_CTX_check_private_key failed\n");
+		utils::print_error(1, "SSL: SSL_CTX_check_private_key failed\n");
 }
 
 SSL *IRC::ssl_connection(int fd)
@@ -305,16 +310,16 @@ SSL *IRC::ssl_connection(int fd)
 	_ssl = SSL_new(_ctx);
 
 	if (SSL_set_fd(_ssl, fd) <= 0)
-		Utils::print_error(1, "SSL: SSL_set_fd failed\n");
+		utils::print_error(1, "SSL: SSL_set_fd failed\n");
 
 	if (SSL_accept(_ssl) < 0)		/* do SSL-protocol accept */
-		Utils::print_error(1, "SSL: SSL_accept failed\n");
+		utils::print_error(1, "SSL: SSL_accept failed\n");
 
 	return _ssl;
 }
 
 /*
-** ===========================UTILS PART=============================
+** ===========================utils PART=============================
 ** ------------------------------------------------------------------
 ** delete_user		- находит и удаляет клиента или юзера с 
 ** delete_client      соответствующим fd
@@ -402,44 +407,50 @@ void IRC::join_channel(const string& channel_name,
 						const string& nickname,
 						int fd)
 {
-	map<string, Channel> channels;
-	(void)fd;
+	if (!Channel::is_valid_channel_name(channel_name))	// check channel name
+	{
+		_command_queue.push(std::make_pair(fd, utils::convert_int_to_str(ERR_NOSUCHCHANNEL)));
+		return;
+	}
+
+	map<string, Channel>* channels;
 
 	if (channel_type == '&')
-		channels = get_local_channels();
+		channels = &_local_channels;
 	else
-		channels = get_shared_channels();
+		channels = &_shared_channels;
 
-	map<string, Channel>::iterator it = channels.find(channel_name);
-	if (it == channels.end())							// add new channel
+	map<string, Channel>::iterator it = (*channels).find(channel_name);
+	if (it == (*channels).end())						// add new channel
 	{
-		channels.insert(make_pair(channel_name, Channel(channel_name, channel_key, nickname, *this)));
+		(*channels).insert(make_pair(channel_name, Channel(channel_name, channel_key, nickname, *this)));
+
 		// отправить всем серверам, что создан канал	TODO
 	}
 	else												// channel already exist
 	{
 		if (it->second.is_banned(nickname))				// check if user is banned 
 		{
-			_command_queue.push(std::make_pair(fd, Utils::convert_int_to_str(ERR_BANNEDFROMCHAN)));
+			_command_queue.push(std::make_pair(fd, utils::convert_int_to_str(ERR_BANNEDFROMCHAN)));
 			return;
 		}
 
 		if (channel_key != it->second.get_key())		// check channel password
 		{
-			_command_queue.push(std::make_pair(fd, Utils::convert_int_to_str(ERR_PASSWDMISMATCH)));
+			_command_queue.push(std::make_pair(fd, utils::convert_int_to_str(ERR_PASSWDMISMATCH)));
 			return;
 		}
 
 		if (it->second.get_mode().invite_only_mode)		// check if invite only channel
 		{
-			_command_queue.push(std::make_pair(fd, Utils::convert_int_to_str(ERR_INVITEONLYCHAN)));
+			_command_queue.push(std::make_pair(fd, utils::convert_int_to_str(ERR_INVITEONLYCHAN)));
 			return;
 		}
 
 		int index = find_nickname(_users, nickname);
 		if (index >= 0)
 		{
-			map<string, Channel>::iterator it = channels.find(channel_name);
+			map<string, Channel>::iterator it = (*channels).find(channel_name);
 			it->second.add_user(_users[index]);
 		}
 	}
@@ -454,6 +465,6 @@ User *					IRC::get_user(string nickname)
 vector<User*>&			IRC::get_users() {return (this->_users);}
 vector<Client*>&		IRC::get_clients() {return (this->_clients);}
 vector<Server*>&		IRC::get_servers() {return (this->_servers);}
-map<string, Channel>&	IRC::get_local_channels() {return (this->_local_channels);}
-map<string, Channel>&	IRC::get_shared_channels() {return (this->_shared_channels);}
+// map<string, Channel>&	IRC::get_local_channels() {return (this->_local_channels);}
+// map<string, Channel>&	IRC::get_shared_channels() {return (this->_shared_channels);}
 const string&			IRC::get_localhost_pass() const {return (this->_localhost_pass);}
