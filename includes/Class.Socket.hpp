@@ -28,10 +28,8 @@ public:
 			int sin_family = AF_INET,
 			int type = SOCK_STREAM,
 			int protocol = 0);
-	// Socket(const Socket&);
-	
 	~Socket();
-
+	
 	const Socket &operator=(const Socket &other);
 
 	int		_socket();

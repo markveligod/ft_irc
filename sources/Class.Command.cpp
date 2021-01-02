@@ -1,17 +1,20 @@
 #include "Class.Command.hpp"
 #include "Class.IRC.hpp"
 
+using std::vector;
+using std::string;
+
 /*
 ** ==========================================
 ** конструктор и деструктор Command()
 ** ==========================================
 */
 
-Command::Command(const std::string& str)
+Command::Command(const string& str)
 {
 	std::istringstream	ss(str);
-	std::string			word;
-	std::string			last_arg;
+	string				word;
+	string				last_arg;
 
 	getline(ss, word, ' ');
 	if (word[0] == ':')
@@ -21,7 +24,7 @@ Command::Command(const std::string& str)
 	}
 	else
 	{
-		this->prefix = std::string();
+		this->prefix = string();
 		this->command = word;
 	}
 
@@ -59,7 +62,8 @@ Command::~Command() {}
 ** =================================================================
 */
 
-bool Command::pass(std::string password, std::string local_pass)
+bool Command::
+pass(string password, string local_pass)
 {
     if (password == local_pass)
 	{
@@ -70,12 +74,13 @@ bool Command::pass(std::string password, std::string local_pass)
 	return false;
 }
 
-int	Command::cmd_pass(IRC& irc, int fd)
+int	Command::
+cmd_pass(IRC& irc, int fd)
 {
 	int i;
 	bool res;
-	std::vector<Client *> &clients	= irc.get_clients();
-	std::vector<Server *> &servers 	= irc.get_servers();
+	vector<Client *> &clients	= irc.get_clients();
+	vector<Server *> &servers 	= irc.get_servers();
 
 	if (!(check_args_number(1)))
 		return (ERR_NEEDMOREPARAMS);
@@ -97,9 +102,9 @@ int	Command::cmd_pass(IRC& irc, int fd)
 
 // int  Command::cmd_nick(IRC& irc, int fd)
 // {
-// 	std::vector<Client *> &clients 	= irc.get_clients();
-// 	std::vector<User *> &users 		= irc.get_users();
-// 	std::vector<Server *> &servers	= irc.get_servers();
+// 	vector<Client *> &clients 	= irc.get_clients();
+// 	vector<User *> &users 		= irc.get_users();
+// 	vector<Server *> &servers	= irc.get_servers();
 // 	int i = -1;
 // 	int j = -1;
 
@@ -162,20 +167,22 @@ int	Command::cmd_pass(IRC& irc, int fd)
 ** =============================================================
 */
 
-void Command::user_change(User * curr_user)
+void Command::
+user_change(User * curr_user)
 {
 	curr_user->change_user(this->arguments[0], this->arguments[1],
 						   this->arguments[2], this->arguments[3]);
 	utils::print_line("Users information changed");
 }
 
-void Command::user_create(Client * curr_client, std::vector<User *> &users, Server * curr_server)
+void Command::user_create(Client * curr_client, vector<User *> &users, Server * curr_server)
 {
 	User *curr_user = new User(curr_client);
 	curr_user->user_from_client(this->arguments[0], this->arguments[1],
 								this->arguments[2], this->arguments[3]);
 	users.push_back(curr_user);
 	utils::print_line("USER created");
+
 	if (curr_server != NULL)
 	{
 		curr_server->addUser(curr_user);
@@ -183,13 +190,14 @@ void Command::user_create(Client * curr_client, std::vector<User *> &users, Serv
 	}
 }
 
-int Command::cmd_user(IRC& irc, int fd)
+int Command::
+cmd_user(IRC& irc, int fd)
 {
 	int i = -1;
 	int server_fd = -1;
-	std::vector<Client *> &clients	= irc.get_clients();
-	std::vector<User *> &users 		= irc.get_users();
-	std::vector<Server *> &servers 	= irc.get_servers();
+	vector<Client *> &clients	= irc.get_clients();
+	vector<User *> &users 		= irc.get_users();
+	vector<Server *> &servers 	= irc.get_servers();
 
 	if (!(this->check_args_number(4)))
 		return (ERR_NEEDMOREPARAMS);
@@ -232,18 +240,18 @@ int Command::cmd_user(IRC& irc, int fd)
 ** =====================================================================
 */
 
-std::vector<Client *>::iterator Command::find_fd(std::vector<Client *> *vect, int fd)
+vector<Client*>::iterator Command::
+find_fd(vector<Client*>& vect, int fd)
 {
-	std::vector<Client *>::iterator v_begin = (*vect).begin();
-	std::vector<Client *>::iterator v_end	= (*vect).end();
+	vector<Client*>::iterator v_begin	= vect.begin();
 
-	while (v_begin != v_end)
+	while (v_begin != vect.end())
 	{
 		if ((*v_begin)->getSocketFd() == fd)
 			return (v_begin);
 		v_begin++;
 	}
-	return (v_end);
+	return (vect.end());
 }
 
 /*
@@ -252,7 +260,8 @@ std::vector<Client *>::iterator Command::find_fd(std::vector<Client *> *vect, in
 ** ==================================================
 */
 
-std::string const & Command::getCommand() const
+const string& Command::
+getCommand() const
 {
 	return (this->command);
 }
@@ -267,7 +276,8 @@ bool Command::check_args_number(int n) const
 	return true;
 }
 
-bool Command::check_password(Client const &client) const
+bool Command::
+check_password(Client const &client) const
 {
 	if (client.getPassword() == false)
 	{
@@ -277,7 +287,8 @@ bool Command::check_password(Client const &client) const
 	return true;
 }
 
-bool Command::check_nickname(Client const & client) const
+bool Command::
+check_nickname(Client const & client) const
 {
 	if (client.getNickname().empty())
 	{
@@ -295,12 +306,13 @@ bool Command::check_nickname(Client const & client) const
 ** ==================================================
 */
 
-int Command::cmd_server(IRC& irc, int fd)
+int Command::
+cmd_server(IRC& irc, int fd)
 {
-	std::vector<Client *> & vec_client 		= irc.get_clients();
-	std::vector<User *> & vec_users			= irc.get_users();
-	std::vector<Server *> & vec_server 		= irc.get_servers();
-	std::vector<Client *>::iterator temp 	= this->find_fd(&vec_client, fd);
+	vector<Client*>& vec_client 	= irc.get_clients();
+	vector<User*>& vec_users		= irc.get_users();
+	vector<Server*>& vec_server 	= irc.get_servers();
+	vector<Client*>::iterator temp 	= this->find_fd(vec_client, fd);
 
 	if (!this->check_args_number(3))
 		return (0);
@@ -323,7 +335,7 @@ int Command::cmd_server(IRC& irc, int fd)
 
 	for (size_t i = 0; i < vec_users.size(); i++)
 	{
-		std::string temp_str = "NICK " + vec_users[i]->getNickname() + " " + utils::convert_int_to_str(vec_users[i]->getHopcount()) + "\r\nUSER " + vec_users[i]->getUsername() + " " + vec_users[i]->getHostname() + " " + vec_users[i]->getServername() + " " + vec_users[i]->getRealname() + "\r\n";
+		string temp_str = "NICK " + vec_users[i]->getNickname() + " " + utils::convert_int_to_str(vec_users[i]->getHopcount()) + "\r\nUSER " + vec_users[i]->getUsername() + " " + vec_users[i]->getHostname() + " " + vec_users[i]->getServername() + " " + vec_users[i]->getRealname() + "\r\n";
 		irc.push_cmd_queue(new_server->getFdSocket(), temp_str);
 	}
 	

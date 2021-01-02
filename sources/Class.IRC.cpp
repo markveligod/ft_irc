@@ -17,9 +17,11 @@
 ** ----------------------------------------------------------
 */
 
-IRC::IRC() {}
+IRC::
+IRC() {}
 
-IRC::IRC(std::string network_ip,
+IRC::
+IRC(std::string network_ip,
 		 std::string network_port,
 		 std::string network_pass,
 		 std::string localhost_port,
@@ -42,7 +44,8 @@ IRC::IRC(std::string network_ip,
 ** ----------------------------------------------------------
 */
 
-void IRC::create_socket_local()
+void IRC::
+create_socket_local()
 {
 	// local socket created on IRC conctructor
 
@@ -65,7 +68,8 @@ void IRC::create_socket_local()
 	utils::print_line("Socket ssl local listen...");
 }
 
-void IRC::create_socket_network()
+void IRC::
+create_socket_network()
 {
 	_network = Socket(_network_ip.c_str(), _network_port);
 	utils::print_line("Socket network done!");
@@ -96,7 +100,8 @@ void IRC::create_socket_network()
 
 typedef int (Command::*doCommand)(IRC& irc, int fd);
 
-int IRC::do_command(Command *command, int socket_fd)
+int IRC::
+do_command(Command *command, int socket_fd)
 {
 	int			result;
 	std::string cmd_name[COMM_COUNT] =	{"NICK",
@@ -131,7 +136,8 @@ int IRC::do_command(Command *command, int socket_fd)
 ** ----------------------------------------------------------
 */
 
-void IRC::init_fd_select()
+void IRC::
+init_fd_select()
 {
 	FD_ZERO(&_fd_set_read);
 	FD_ZERO(&_fd_set_write);
@@ -149,7 +155,8 @@ void IRC::init_fd_select()
 ** ----------------------------------------------------------
 */
 
-void IRC::do_select()
+void IRC::
+do_select()
 {
 	if ((_select_res = select(FD_SETSIZE, &_fd_set_read, &_fd_set_write, NULL, NULL)) < 0)
 		utils::print_error(ERR_SELECT, "SELECT");
@@ -166,7 +173,8 @@ void IRC::do_select()
 ** -----------------------------------------------------------------------------------
 */
 
-void IRC::check_fd_select()
+void IRC::
+check_fd_select()
 {
 	for (std::map<int, int>::iterator it = _array_fd_select.begin(); it != _array_fd_select.end() && _select_res > 0; it++)
 	{
@@ -235,7 +243,8 @@ void IRC::check_fd_select()
 	}
 }
 
-int IRC::_send(int connection_type, int fd, const char *response, size_t size, int flags)
+int IRC::
+_send(int connection_type, int fd, const char *response, size_t size, int flags)
 {
 	int n;
 
@@ -250,7 +259,8 @@ int IRC::_send(int connection_type, int fd, const char *response, size_t size, i
 	return n;
 }
 
-int IRC::_recv(int connection_type, int fd, char *response, size_t size, int flags)
+int IRC::
+_recv(int connection_type, int fd, char *response, size_t size, int flags)
 {
 	int n;
 
@@ -278,7 +288,8 @@ int IRC::_recv(int connection_type, int fd, char *response, size_t size, int fla
 ** ----------------------------------------------------------
 */
 
-void IRC::init_ssl()
+void IRC::
+init_ssl()
 {
 	SSL_library_init();					/*load encryption and hash algo's in ssl*/
 	OpenSSL_add_all_algorithms();		/* load & register all cryptos, etc. */
@@ -286,7 +297,8 @@ void IRC::init_ssl()
 	SSL_load_error_strings();			/* load all error messages */
 }
 
-void IRC::init_ctx()
+void IRC::
+init_ctx()
 {
 	const SSL_METHOD *method;
 
@@ -305,7 +317,8 @@ void IRC::init_ctx()
 		utils::print_error(1, "SSL: SSL_CTX_check_private_key failed\n");
 }
 
-SSL *IRC::ssl_connection(int fd)
+SSL* IRC::
+ssl_connection(int fd)
 {
 	_ssl = SSL_new(_ctx);
 
@@ -332,7 +345,8 @@ SSL *IRC::ssl_connection(int fd)
 ** нужно будет смотреть на префиксы, а не только на fd
 */
 
-void	IRC::delete_user(int fd)
+void IRC::
+delete_user(int fd)
 {
 	int i;
 	if ((i = IRC::find_fd(this->_users, fd)) > -1)
@@ -349,7 +363,8 @@ void	IRC::delete_user(int fd)
 ** нужно будет смотреть на префиксы, а не только на fd
 */
 
-void	IRC::delete_client(int fd)
+void IRC::
+delete_client(int fd)
 {
 	int i;
 	if ((i = IRC::find_fd(this->_clients, fd)) > -1)
@@ -366,7 +381,8 @@ void	IRC::delete_client(int fd)
 ** ----------------------------------------------------------
 */
 
-std::vector<std::string> IRC::check_buffer(int fd, const char *buffer)
+std::vector<std::string> IRC::
+check_buffer(int fd, const char *buffer)
 {
 	Client *temp_ptr_client = this->_clients[IRC::find_fd(this->_clients, fd)];
 	std::vector<std::string> temp_vec;
@@ -390,7 +406,8 @@ std::vector<std::string> IRC::check_buffer(int fd, const char *buffer)
 ** ----------------------------------------------------------
 */
 
-void IRC::push_cmd_queue(int fd, const std::string& str)
+void IRC::
+push_cmd_queue(int fd, const std::string& str)
 {
 	this->_command_queue.push(std::make_pair(fd, str));
 }
@@ -401,7 +418,8 @@ void IRC::push_cmd_queue(int fd, const std::string& str)
 ** ----------------------------------------------------------
 */
 
-void IRC::join_channel(const string& channel_name,
+void IRC::
+join_channel(const string& channel_name,
 						const string& channel_key,
 						char channel_type,
 						const string& nickname,
@@ -413,17 +431,14 @@ void IRC::join_channel(const string& channel_name,
 		return;
 	}
 
-	map<string, Channel>* channels;
+	map<string, Channel>& channels = (channel_type == '&')
+									? _local_channels
+									: _shared_channels;
 
-	if (channel_type == '&')
-		channels = &_local_channels;
-	else
-		channels = &_shared_channels;
-
-	map<string, Channel>::iterator it = (*channels).find(channel_name);
-	if (it == (*channels).end())						// add new channel
+	map<string, Channel>::iterator it = channels.find(channel_name);
+	if (it == channels.end())						// add new channel
 	{
-		(*channels).insert(make_pair(channel_name, Channel(channel_name, channel_key, nickname, *this)));
+		channels.insert(make_pair(channel_name, Channel(channel_name, channel_key, nickname, *this)));
 
 		// отправить всем серверам, что создан канал	TODO
 	}
@@ -450,21 +465,28 @@ void IRC::join_channel(const string& channel_name,
 		int index = find_nickname(_users, nickname);
 		if (index >= 0)
 		{
-			map<string, Channel>::iterator it = (*channels).find(channel_name);
+			map<string, Channel>::iterator it = channels.find(channel_name);
 			it->second.add_user(_users[index]);
 		}
 	}
 }
 
-User *					IRC::get_user(string nickname)
+User* IRC::
+get_user(string nickname)
 {
 	int index = find_nickname(_users, nickname);
 
 	return (index >= 0) ? _users[index] : NULL;
 }
-vector<User*>&			IRC::get_users() {return (this->_users);}
-vector<Client*>&		IRC::get_clients() {return (this->_clients);}
-vector<Server*>&		IRC::get_servers() {return (this->_servers);}
-// map<string, Channel>&	IRC::get_local_channels() {return (this->_local_channels);}
-// map<string, Channel>&	IRC::get_shared_channels() {return (this->_shared_channels);}
-const string&			IRC::get_localhost_pass() const {return (this->_localhost_pass);}
+
+vector<User*>& IRC::
+get_users()					{return (this->_users);}
+
+vector<Client*>& IRC::
+get_clients()				{return (this->_clients);}
+
+vector<Server*>& IRC::
+get_servers()				{return (this->_servers);}
+
+const string& IRC::
+get_localhost_pass() const	{return (this->_localhost_pass);}

@@ -4,47 +4,53 @@
 #include "main.hpp"
 #include "Class.Client.hpp"
 
+using std::string;
+
 struct ModeUser
 {
 	bool i;
 	bool s;
 	bool w;
 	bool o;
+
+	ModeUser& operator=(const ModeUser&);
 };
 
 class User : public Client
 {
 private:
-	std::string 	username;
-	std::string 	hostname;
-	std::string 	servername;
-	std::string 	realname;
-	Client *		client;
-	struct ModeUser	mode;
+	string 		username;
+	string 		hostname;
+	string 		servername;
+	string 		realname;
+	Client*		client;
+	ModeUser	mode;
 
 public:
-	//User(Client const &src);
-	User(Client * src);
+	User(Client* src);
+	User(const Client& src);
+	User(const User&);
+	User& operator=(const User&);
 
-	void			user_from_client(std::string username, std::string hostname, 
-									 std::string servername, std::string realname);
-	void			user_from_client(std::string username, std::string hostname,
-									 std::string servername, std::string realname, ModeUser mode);
+	void			user_from_client(const string& username, const string& hostname, 
+									 const string& servername, const string& realname);
+	void			user_from_client(const string& username, const string& hostname,
+									 const string& servername, const string& realname, const ModeUser& mode);
 
-	void			change_user(std::string const & username, std::string const & hostname,
-								std::string const & servername, std::string const realname);
+	void			change_user(const string& username, const string& hostname,
+								const string& servername, const string& realname);
 
-	void			setUsername(std::string const & username);
-	void			setHostname(std::string const & hostname);
-	void			setServername(std::string const & servername);
-	void			setRealname(std::string const & realname);
-	void			setMode(ModeUser mode);
+	void			setUsername(const string& username);
+	void			setHostname(const string& hostname);
+	void			setServername(const string& servername);
+	void			setRealname(const string& realname);
+	void			setMode(const ModeUser& mode);
 	void			print_user();
 
-	std::string const &		getUsername() const;
-	std::string const &		getHostname() const;
-	std::string const &		getServername() const;
-	std::string const &		getRealname() const;
+	const string&	getUsername() const;
+	const string&	getHostname() const;
+	const string&	getServername() const;
+	const string&	getRealname() const;
 };
 
 #endif

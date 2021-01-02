@@ -1,19 +1,47 @@
 #include "Class.User.hpp"
 #include "Class.Client.hpp"
 
+using std::string;
+
 /*
 ** ----------------------------------------------------------
 ** Constructor
 ** ----------------------------------------------------------
 */
 
-User::User(Client * src) : Client(*src)
+ModeUser& ModeUser::
+operator=(const ModeUser& src)
+{
+	i = src.i;
+	s = src.s;
+	w = src.w;
+	o = src.o;
+	return *this;
+}
+
+User::
+User(Client* src) : Client(*src)
 {
 	this->nickname	= src->getNickname();
 	this->password	= src->getPassword();
 	this->hopcount	= src->getHopcount();
 	this->socket_fd = src->getSocketFd();
 	this->client 	= src;
+}
+
+User::
+User(const User& src) { *this = src; }
+
+User& User::
+operator=(const User& src)
+{
+	username = src.username;
+	hostname = src.hostname;
+	servername = src.servername;
+	realname = src.realname;
+	client = src.client;
+	mode = src.mode;
+	return *this;
 }
 
 /*User::User(Client const &src) : Client(src)
@@ -39,8 +67,9 @@ User::User(Client * src) : Client(*src)
 ** ---------------------------------------------------------------
 */
 
-void User::user_from_client(std::string username, std::string hostname,
-					  std::string servername, std::string realname)
+void User::
+user_from_client(const string& username, const string& hostname, 
+				 const string& servername, const string& realname)
 {
 	this->username	 = username;
 	this->hostname	 = hostname;
@@ -52,8 +81,10 @@ void User::user_from_client(std::string username, std::string hostname,
 	this->mode.w	 = 0;
 }
 
-void User::user_from_client(std::string username, std::string hostname,
-					  std::string servername, std::string realname, ModeUser mode)
+void User::
+user_from_client(const string& username, const string& hostname,
+				 const string& servername, const string& realname,
+				 const ModeUser& mode)
 {
 	this->username 	 = username;
 	this->hostname	 = hostname;
@@ -62,8 +93,9 @@ void User::user_from_client(std::string username, std::string hostname,
 	this->mode		 = mode;
 }
 
-void	User::change_user(std::string const & username, std::string const & hostname,
-						  std::string const & servername, std::string const realname)
+void User::
+change_user(const string& username, const string& hostname,
+			const string& servername, const string& realname)
 {
 	this->username = username;
 	this->hostname = hostname;
@@ -71,35 +103,37 @@ void	User::change_user(std::string const & username, std::string const & hostnam
 	this->realname = realname;
 }
 
-void User::setUsername(std::string const &username) { this->username = username; }
-void User::setHostname(std::string const &hostname) { this->hostname = hostname; }
-void User::setServername(std::string const &servername) { this->servername = servername; }
-void User::setRealname(std::string const &realname) { this->realname = realname; }
-void User::setMode(ModeUser mode) { this->mode = mode; }
+void User::
+setUsername(const string& username)		{ this->username = username; }
 
-void User::print_user()
+void User::
+setHostname(const string& hostname)		{ this->hostname = hostname; }
+
+void User::
+setServername(const string& servername)	{ this->servername = servername; }
+
+void User::
+setRealname(const string& realname)		{ this->realname = realname; }
+
+void User::
+setMode(const ModeUser& mode)			{ this->mode = mode; }
+
+const string& User::
+getUsername() const						{ return (this->username); }
+
+const string& User::
+getHostname() const						{ return (this->hostname); }
+
+const string& User::
+getServername() const					{ return(this->servername); }
+
+const string& User::
+getRealname() const						{ return (this->realname); }
+
+void User::
+print_user()
 {
-	std::cout << "socket " << this->socket_fd << std::endl;
-	std::cout << "nick " << this->nickname << std::endl;
+	std::cout << "socket "   << this->socket_fd << std::endl;
+	std::cout << "nick "     << this->nickname << std::endl;
 	std::cout << "username " << this->username << std::endl;
-}
-
-std::string const &User::getUsername() const
-{
-	return (this->username);
-}
-
-std::string const &User::getHostname() const
-{
-	return (this->hostname);
-}
-
-std::string const &User::getServername() const
-{
-	return(this->servername);
-}
-
-std::string const &User::getRealname() const
-{
-	return (this->realname);
 }

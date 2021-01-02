@@ -13,7 +13,8 @@ using std::map;
 ** ====================================================================
 */
 
-int Command::cmd_join(IRC& irc, int fd)
+int Command::
+cmd_join(IRC& irc, int fd)
 {
 	vector<string> channels = utils::split(arguments[0], ',');
 	vector<string> keys = (arguments.size() > 1) ? utils::split(arguments[1], ',') : vector<string>();

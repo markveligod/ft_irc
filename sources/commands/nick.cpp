@@ -19,7 +19,8 @@
 ** =====================================================================
 */
 
-bool Command::nick_valid() const
+bool Command::
+nick_valid() const
 {
 	int i = 1;
 	if (this->arguments[0].size() > 9 || this->arguments[0].size() == 0)
@@ -47,7 +48,8 @@ bool Command::nick_valid() const
 }
 
 template <typename T>
-bool Command::nick_available(std::vector<T> vect, std::string const &nick)
+bool Command::
+nick_available(std::vector<T> vect, std::string const &nick)
 {
 	for (size_t i = 0; i < vect.size(); i++)
 	{
@@ -60,7 +62,8 @@ bool Command::nick_available(std::vector<T> vect, std::string const &nick)
 	return true;
 }
 
-int  Command::cmd_nick(IRC& irc, int fd)
+int Command::
+cmd_nick(IRC& irc, int fd)
 {
 	std::vector<Client *> &clients 	= irc.get_clients();
 	std::vector<User *> &users 		= irc.get_users();
