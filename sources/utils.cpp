@@ -13,7 +13,7 @@
 namespace utils
 {
 	static bool
-	check_network(char const *av)
+	check_network(char const* av)
 	{
 		std::string network(av);
 
@@ -41,7 +41,7 @@ namespace utils
 
 	//<port> 2 22 222 2222
 	static bool
-	check_port(char const *av)
+	check_port(char const* av)
 	{
 		size_t len = strlen(av);
 		

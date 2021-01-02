@@ -5,7 +5,7 @@
 #include <string.h>
 #include "bircd.h"
 
-int	x_int(int err, int res, char *str, char *file, int line)
+int	x_int(int err, int res, char* str, char* file, int line)
 {
   if (res == err)
     {
@@ -16,7 +16,7 @@ int	x_int(int err, int res, char *str, char *file, int line)
   return (res);
 }
 
-void	*x_void(void *err, void *res, char *str, char *file, int line)
+void	*x_void(void* err, void* res, char* str, char* file, int line)
 {
   if (res == err)
     {

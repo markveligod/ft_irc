@@ -16,7 +16,7 @@ operator=(const ModeUser& src)
 	s = src.s;
 	w = src.w;
 	o = src.o;
-	return *this;
+	return* this;
 }
 
 User::
@@ -44,7 +44,7 @@ operator=(const User& src)
 	return *this;
 }
 
-/*User::User(Client const &src) : Client(src)
+/*User::User(const Client& src) : Client(src)
 {
 	this->nickname	= src.getNickname();
 	this->password	= src.getPassword();

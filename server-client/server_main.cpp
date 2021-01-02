@@ -1,7 +1,7 @@
 #include "Server.hpp"
 #include "Client.hpp"
 
-int main(int ac, char **av)
+int main(int ac, char* *av)
 {
 	Server server = Server();
 	Client client = Client(1080, SERVER_IP, av[2]);

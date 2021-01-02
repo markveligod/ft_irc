@@ -23,7 +23,7 @@ Socket(const char* host_ip,
 
 	if (host_ip)
 	{
-		hostent *host = gethostbyname(host_ip);
+		hostent* host = gethostbyname(host_ip);
 		if (!host)
 			utils::exit_error(1, "Unknown address");
 		inet_pton(_sin_family, host->h_name, &_addr.sin_addr);
@@ -34,7 +34,7 @@ Socket(const char* host_ip,
 }
 
 const Socket& Socket::
-operator=(const Socket &other)
+operator=(const Socket& other)
 {
 	this->_port			= other._port;
 	this->_fd			= other._fd;
@@ -60,7 +60,7 @@ _bind() {
 	
 	int res = 0;
 
-	if ((res = bind(_fd, reinterpret_cast<struct sockaddr *>(&_addr), _addr_size)) < 0)
+	if ((res = bind(_fd, reinterpret_cast<struct sockaddr*>(&_addr), _addr_size)) < 0)
 		utils::exit_error(ERR_BIND, "Binding error");
 	return res;
 }
@@ -70,7 +70,7 @@ _connect() {
 	
 	int res = 0;
 
-	if ((res = connect(_fd, reinterpret_cast<struct sockaddr *>(&_addr), _addr_size)) < 0)
+	if ((res = connect(_fd, reinterpret_cast<struct sockaddr*>(&_addr), _addr_size)) < 0)
 		utils::exit_error(ERR_CONNECT_TO_SERVER, "Unable to connect to server");
 	return res;
 }
@@ -90,7 +90,7 @@ _accept() {
 	
 	int client = 0;
 
-	if ((client = accept(_fd, reinterpret_cast<struct sockaddr *>(&_addr), &_addr_size)) < 0)
+	if ((client = accept(_fd, reinterpret_cast<struct sockaddr*>(&_addr), &_addr_size)) < 0)
 		utils::exit_error(ERR_ACCEPT, "Accepting error");
 	// fcntl(client, F_SETFL, O_NONBLOCK);
 	return client;
@@ -101,3 +101,5 @@ Socket::
 	if (_fd)
 		close(_fd);
 }
+
+int Socket::get_fd() const {return (this->_fd);}

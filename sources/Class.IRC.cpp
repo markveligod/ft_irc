@@ -6,7 +6,7 @@
 # define FD_CLIENT_SSL 3
 # define FD_SERVER_SSL 4
 
-# define COMM_COUNT 6
+# define COMM_COUNT 7
 
 # define CERTIFICATE "cert/cert.pem"
 # define PRIVATE_KEY "cert/key.pem"
@@ -25,8 +25,12 @@ IRC(std::string network_ip,
 		 std::string network_port,
 		 std::string network_pass,
 		 std::string localhost_port,
-		 std::string localhost_pass)
+		 std::string localhost_pass,
+		 string operator_user,
+		 string operator_pass)
 {
+	_operator_user = operator_user;
+	_operator_pass = operator_pass;
 	_network_ip = network_ip;
 	_network_port = std::atoi(network_port.c_str());
 	_network_pass = network_pass;
@@ -101,19 +105,21 @@ create_socket_network()
 typedef int (Command::*doCommand)(IRC& irc, int fd);
 
 int IRC::
-do_command(Command *command, int socket_fd)
+do_command(Command* command, int socket_fd)
 {
 	int			result;
 	std::string cmd_name[COMM_COUNT] =	{"NICK",
 							   	 "PASS",
 							  	 "USER",
 								 "SERVER",
-								 "JOIN"};
+								 "JOIN",
+								 "OPER"};
 	doCommand	cmd_func[COMM_COUNT] = 	{&Command::cmd_nick,
 							   	 &Command::cmd_pass,
 							   	 &Command::cmd_user,
 								 &Command::cmd_server,
-								 &Command::cmd_join};
+								 &Command::cmd_join,
+								 &Command::cmd_oper};
 
 	for (int i = 0; i < COMM_COUNT; i++)
 	{
@@ -244,14 +250,14 @@ check_fd_select()
 }
 
 int IRC::
-_send(int connection_type, int fd, const char *response, size_t size, int flags)
+_send(int connection_type, int fd, const char* response, size_t size, int flags)
 {
 	int n;
 
 	if (connection_type == FD_CLIENT || connection_type == FD_SERVER)
-		n = send(fd, reinterpret_cast<const void *>(response), size, flags);
+		n = send(fd, reinterpret_cast<const void*>(response), size, flags);
 	else
-		n = SSL_write(_ssl, reinterpret_cast<const void *>(response), size);
+		n = SSL_write(_ssl, reinterpret_cast<const void*>(response), size);
 	
 	if (n < 0)
 		std::cout << "message sending failed\n";
@@ -260,14 +266,14 @@ _send(int connection_type, int fd, const char *response, size_t size, int flags)
 }
 
 int IRC::
-_recv(int connection_type, int fd, char *response, size_t size, int flags)
+_recv(int connection_type, int fd, char* response, size_t size, int flags)
 {
 	int n;
 
 	if (connection_type == FD_CLIENT || connection_type == FD_SERVER)
-		n = recv(fd, reinterpret_cast<void *>(response), size, flags);
+		n = recv(fd, reinterpret_cast<void*>(response), size, flags);
 	else
-		n = SSL_read(_ssl, reinterpret_cast<void *>(response), size);
+		n = SSL_read(_ssl, reinterpret_cast<void*>(response), size);
 	
 	if (n == 0 || n < 0)
 	{
@@ -292,7 +298,7 @@ void IRC::
 init_ssl()
 {
 	SSL_library_init();					/*load encryption and hash algo's in ssl*/
-	OpenSSL_add_all_algorithms();		/* load & register all cryptos, etc. */
+	OpenSSL_add_all_algorithms();		/* load & register all cryptos, etc.*/
 	ERR_load_crypto_strings();		
 	SSL_load_error_strings();			/* load all error messages */
 }
@@ -300,7 +306,7 @@ init_ssl()
 void IRC::
 init_ctx()
 {
-	const SSL_METHOD *method;
+	const SSL_METHOD* method;
 
 	// if (server)
 		method = TLS_server_method();	/* create new server-method instance */
@@ -351,7 +357,7 @@ delete_user(int fd)
 	int i;
 	if ((i = IRC::find_fd(this->_users, fd)) > -1)
 	{
-		User *out_user = this->_users[i];
+		User* out_user = this->_users[i];
 		this->_users.erase(this->_users.begin() + i);
 		delete out_user;
 	}
@@ -369,7 +375,7 @@ delete_client(int fd)
 	int i;
 	if ((i = IRC::find_fd(this->_clients, fd)) > -1)
 	{
-		Client *out_client = this->_clients[i];
+		Client* out_client = this->_clients[i];
 		this->_clients.erase(this->_clients.begin() + i);
 		delete out_client;
 	}
@@ -382,9 +388,9 @@ delete_client(int fd)
 */
 
 std::vector<std::string> IRC::
-check_buffer(int fd, const char *buffer)
+check_buffer(int fd, const char* buffer)
 {
-	Client *temp_ptr_client = this->_clients[IRC::find_fd(this->_clients, fd)];
+	Client* temp_ptr_client = this->_clients[IRC::find_fd(this->_clients, fd)];
 	std::vector<std::string> temp_vec;
 
 	std::string temp = temp_ptr_client->getBuffer();
@@ -480,7 +486,7 @@ get_user(string nickname)
 }
 
 vector<User*>& IRC::
-get_users()					{return (this->_users);}
+get_users() 				{return (this->_users);}
 
 vector<Client*>& IRC::
 get_clients()				{return (this->_clients);}
@@ -490,3 +496,12 @@ get_servers()				{return (this->_servers);}
 
 const string& IRC::
 get_localhost_pass() const	{return (this->_localhost_pass);}
+
+const string& IRC::
+get_operator_user() const	{return (this->_operator_user);}
+
+const string& IRC::
+get_operator_pass() const	{return (this->_operator_pass);}
+
+const Socket& IRC::
+get_socket() const			{return (this->_localhost);}

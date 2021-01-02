@@ -15,7 +15,7 @@ int Server::
 getSocketFd() const				{ return (this->_fd_socket); }
 
 void Server::
-addUser(User *new_user)			{ this->_users.push_back(new_user); }
+addUser(User* new_user)			{ this->_users.push_back(new_user); }
 
 void Server::
-addClient(Client *new_client)	{ this->_clients.push_back(new_client); }
+addClient(Client* new_client)	{ this->_clients.push_back(new_client); }

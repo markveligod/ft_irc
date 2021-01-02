@@ -79,8 +79,8 @@ cmd_pass(IRC& irc, int fd)
 {
 	int i;
 	bool res;
-	vector<Client *> &clients	= irc.get_clients();
-	vector<Server *> &servers 	= irc.get_servers();
+	vector<Client*>& clients	= irc.get_clients();
+	vector<Server*>& servers 	= irc.get_servers();
 
 	if (!(check_args_number(1)))
 		return (ERR_NEEDMOREPARAMS);
@@ -102,9 +102,9 @@ cmd_pass(IRC& irc, int fd)
 
 // int  Command::cmd_nick(IRC& irc, int fd)
 // {
-// 	vector<Client *> &clients 	= irc.get_clients();
-// 	vector<User *> &users 		= irc.get_users();
-// 	vector<Server *> &servers	= irc.get_servers();
+// 	vector<Client*>& clients 	= irc.get_clients();
+// 	vector<User*>& users 		= irc.get_users();
+// 	vector<Server*>& servers	= irc.get_servers();
 // 	int i = -1;
 // 	int j = -1;
 
@@ -135,7 +135,7 @@ cmd_pass(IRC& irc, int fd)
 // 			IRC::find_fd(clients, fd) < 0 &&								// и нет клиента с таким fd
 // 			(i = IRC::find_fd(servers, fd)) >= 0)							// и есть сервер с таким fd
 // 	{
-// 		Client *new_client = new Client(fd, this->arguments[0], std::atoi(this->arguments[1].c_str()));
+// 		Client* new_client = new Client(fd, this->arguments[0], std::atoi(this->arguments[1].c_str()));
 // 		clients.push_back(new_client);
 // 		servers[i]->addClient(new_client);
 // 		utils::print_line("New client created");
@@ -168,16 +168,17 @@ cmd_pass(IRC& irc, int fd)
 */
 
 void Command::
-user_change(User * curr_user)
+user_change(User* curr_user)
 {
 	curr_user->change_user(this->arguments[0], this->arguments[1],
 						   this->arguments[2], this->arguments[3]);
 	utils::print_line("Users information changed");
 }
 
-void Command::user_create(Client * curr_client, vector<User *> &users, Server * curr_server)
+void Command::
+user_create(Client* curr_client, vector<User*>& users, Server* curr_server)
 {
-	User *curr_user = new User(curr_client);
+	User* curr_user = new User(curr_client);
 	curr_user->user_from_client(this->arguments[0], this->arguments[1],
 								this->arguments[2], this->arguments[3]);
 	users.push_back(curr_user);
@@ -195,9 +196,9 @@ cmd_user(IRC& irc, int fd)
 {
 	int i = -1;
 	int server_fd = -1;
-	vector<Client *> &clients	= irc.get_clients();
-	vector<User *> &users 		= irc.get_users();
-	vector<Server *> &servers 	= irc.get_servers();
+	vector<Client*>& clients	= irc.get_clients();
+	vector<User*>& users 		= irc.get_users();
+	vector<Server*>& servers 	= irc.get_servers();
 
 	if (!(this->check_args_number(4)))
 		return (ERR_NEEDMOREPARAMS);
@@ -277,7 +278,7 @@ bool Command::check_args_number(int n) const
 }
 
 bool Command::
-check_password(Client const &client) const
+check_password(const Client& client) const
 {
 	if (client.getPassword() == false)
 	{
@@ -288,7 +289,7 @@ check_password(Client const &client) const
 }
 
 bool Command::
-check_nickname(Client const & client) const
+check_nickname(const Client& client) const
 {
 	if (client.getNickname().empty())
 	{
@@ -329,7 +330,7 @@ cmd_server(IRC& irc, int fd)
 	if (!this->check_password(**temp))
 		return 0;
 
-	Server *new_server = new Server((*temp)->getSocketFd(), this->arguments[0], atoi(this->arguments[1].c_str()), this->arguments[2]);
+	Server* new_server = new Server((*temp)->getSocketFd(), this->arguments[0], atoi(this->arguments[1].c_str()), this->arguments[2]);
 	vec_server.push_back(new_server);
 	irc.delete_client(fd);
 

@@ -4,7 +4,7 @@
 #include <netinet/in.h>
 #include "bircd.h"
 
-void			srv_create(t_env *e, int port)
+void			srv_create(t_env* e, int port)
 {
   int			s;
   struct sockaddr_in	sin;

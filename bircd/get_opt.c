@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include "bircd.h"
 
-void	get_opt(t_env *e, int ac, char **av)
+void	get_opt(t_env* e, int ac, char **av)
 {
   if (ac != 2)
     {

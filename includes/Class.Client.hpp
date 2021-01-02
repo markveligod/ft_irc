@@ -16,14 +16,14 @@ protected:
 
 public:
 	Client(int socket_fd = 0, int hopcount = 0);
-	Client(int socket_fd, string const &nickname, int hopcount = 0);
+	Client(int socket_fd, const string& nickname, int hopcount = 0);
 	Client(const Client& src);
 	Client& operator=(const Client&);
 
-	void			setNickname(string const & nickname);
+	void			setNickname(const string& nickname);
 	void			setHopcount(int hopcount);
 	void			setPassword(bool password = true);
-	void			setBuffer(const string &buff);
+	void			setBuffer(const string& buff);
 
 	int				getHopcount() const;
 	const string&	getNickname() const;

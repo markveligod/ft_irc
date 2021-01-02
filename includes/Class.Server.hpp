@@ -19,20 +19,20 @@ class Server
         std::string _server_name;
         int			_hopcount;
         std::string _info;
-        std::vector<User *> 	_users;
-		std::vector<Client *>	_clients;
-		//std::vector<Channel *> _channels
+        std::vector<User*> 	_users;
+		std::vector<Client*>	_clients;
+		//std::vector<Channel*> _channels
 
 		Server();
         Server(const Server& other);
-        Server &operator=(const Server& other);
+        Server& operator=(const Server& other);
 
     public:
         Server(int fd, const std::string& servername, int hopcount, const std::string& info);
 
         int 	getFdSocket() const;
 		int		getSocketFd() const;
-		void	addUser(User *new_user);
-		void	addClient(Client *new_client);
+		void	addUser(User* new_user);
+		void	addClient(Client* new_client);
 };
 

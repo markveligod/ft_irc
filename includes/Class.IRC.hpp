@@ -36,15 +36,17 @@ class IRC
 		Socket						_localhost;
 		Socket						_localhost_ssl;
 		string						_localhost_pass;
+		string						_operator_user;
+		string						_operator_pass;
 
 		map<int, int>				_array_fd_select;
 		queue<pair<int, string> >	_command_queue;
 		fd_set						_fd_set_read;
 		fd_set						_fd_set_write;
 
-		vector<User *>				_users;
-		vector<Client *>			_clients;
-		vector<Server *>			_servers;
+		vector<User*>				_users;
+		vector<Client*>			_clients;
+		vector<Server*>			_servers;
 		map<string, Channel>		_local_channels;
 		map<string, Channel>		_shared_channels;
 
@@ -58,7 +60,9 @@ class IRC
 			string network_port,
 			string network_pass,
 			string current_port,
-			string _current_pass);
+			string _current_pass,
+			string operator_user = "foo",
+			string operator_pass = "bar");
 
 		IRC&						operator=(const IRC& other);
 
@@ -90,6 +94,9 @@ class IRC
 		// map<string, Channel>& 		get_local_channels();
 		// map<string, Channel>& 		get_shared_channels();
 		const string&				get_localhost_pass() const;
+		const string&				get_operator_user() const;
+		const string&				get_operator_pass() const;
+		const Socket&				get_socket() const;
 
 		template <typename T>
 		static int					find_fd(T& container, int fd);

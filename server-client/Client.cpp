@@ -3,7 +3,7 @@
 // --------------------------------Constructors--------------------------------
 
 Client::Client() : port(SERVER_PORT), ip(SERVER_IP) {}
-Client::Client(int port, std::string const & ip, std::string const & pass) : port(port), ip(ip), pass(pass) {}
+Client::Client(int port, const std::string& ip, const std::string& pass) : port(port), ip(ip), pass(pass) {}
 
 
 // ---------------------------Creating connection------------------------------
@@ -23,7 +23,7 @@ void	Client::create_socket()
 
 void	Client::connection()
 {
-	if ((connect(this->client, reinterpret_cast<struct sockaddr *>(&this->server_addr), sizeof(this->server_addr))) == 0)
+	if ((connect(this->client, reinterpret_cast<struct sockaddr*>(&this->server_addr), sizeof(this->server_addr))) == 0)
 		std::cout << "Connection to server...\n"
 				  << inet_ntoa(server_addr.sin_addr)
 				  << " with port number "
@@ -47,7 +47,7 @@ void	Client::connection()
 
 void Client::connection_server()
 {
-	if ((connect(this->client, reinterpret_cast<struct sockaddr *>(&this->server_addr), sizeof(this->server_addr))) == 0)
+	if ((connect(this->client, reinterpret_cast<struct sockaddr*>(&this->server_addr), sizeof(this->server_addr))) == 0)
 		std::cout << "Connection to server...\n"
 				  << inet_ntoa(server_addr.sin_addr)
 				  << " with port number "
@@ -97,7 +97,7 @@ void	Client::close_connection()
 
 // --------------------------Helpful functions----------------------------
 
-bool	Client::end_connection(const char *line)
+bool	Client::end_connection(const char* line)
 {
 	std::string str(line);
 
@@ -106,7 +106,7 @@ bool	Client::end_connection(const char *line)
 	return (false);
 }
 
-void	Client::error(std::string const &str)
+void	Client::error(const std::string& str)
 {
 	std::cout << str << std::endl;
 	exit(0);

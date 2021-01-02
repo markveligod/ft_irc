@@ -9,7 +9,7 @@ Channel(const string& name, const string& key, const string& creator, IRC& irc)
 }
 
 Channel::
-Channel(const Channel& x): _irc(x._irc) { *this = x; }
+Channel(const Channel& x): _irc(x._irc) {* this = x; }
 
 Channel& Channel::operator=(const Channel& x)
 {

@@ -46,7 +46,7 @@ operator=(const Client& src)
 */
 
 void Client::
-setNickname(string const &nickname)
+setNickname(const string& nickname)
 {
 	if (this->password == true)
 		this->nickname = nickname;

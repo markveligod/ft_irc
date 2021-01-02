@@ -4,7 +4,7 @@
 #include <arpa/inet.h>
 #include "bircd.h"
 
-void			srv_accept(t_env *e, int s)
+void			srv_accept(t_env* e, int s)
 {
   int			cs;
   struct sockaddr_in	csin;

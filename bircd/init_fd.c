@@ -3,7 +3,7 @@
 # include <sys/select.h>
 #include "bircd.h"
 
-void	init_fd(t_env *e)
+void	init_fd(t_env* e)
 {
   int	i;
 
