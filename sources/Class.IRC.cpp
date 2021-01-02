@@ -276,14 +276,17 @@ _recv(int connection_type, int fd, char* response, size_t size, int flags)
 		n = SSL_read(_ssl, reinterpret_cast<void*>(response), size);
 	
 	if (n == 0 || n < 0)
-	{
-		this->delete_client(fd);
-		this->delete_user(fd);
-
-		std::cout << (n == 0 ? "connection closed\n" : "message receiving failed\n");
-		_array_fd_select.erase(fd);
-	}
+		this->close_connect(fd, n);
 	return n;
+}
+
+void IRC::close_connect(int fd, int n)
+{
+	this->delete_client(fd);
+	this->delete_user(fd);
+
+	std::cout << (n == 0 ? "connection closed\n" : "message receiving failed\n");
+	_array_fd_select.erase(fd);
 }
 
 /*

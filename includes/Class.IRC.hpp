@@ -103,6 +103,7 @@ class IRC
 		template <typename T>
 		static int					find_nickname(T& container, const string& nickname);
 		void 						push_cmd_queue(int fd, const std::string& str);
+		void 						close_connect(int fd, int n);
 };
 
 #include "../Class.IRC.templates.cpp"
