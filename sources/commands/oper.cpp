@@ -1,5 +1,6 @@
 #include "Class.Command.hpp"
 #include "Class.IRC.hpp"
+#include "utils.hpp"
 
 /*
 ** ====================================================================
@@ -23,15 +24,22 @@
 int Command::cmd_oper(IRC& irc, int fd)
 {
     std::vector<User *> & vec_users = irc.get_users();
-    std::vector<Server *>& vec_servers = irc.get_servers();
     int pos;
 
     if (!this->check_args_number(2))
 		return (ERR_NEEDMOREPARAMS);
-    if ((pos = irc.find_fd(vec_users, fd)) >= 0)
+    if ((pos = irc.find_fd(vec_users, fd)) == -1)
         return (ERR_ALREADYREGISTRED);
     if (this->arguments[0] == irc.get_operator_user() && this->arguments[1] == irc.get_operator_pass())
-        irc.push_cmd_queue(vec_servers[irc.find_fd(vec_servers, irc.get_socket().get_fd())]->getFdSocket(), "MODE " + vec_users[pos]->getNickname() + " +o\r\n");
+    {
+        utils::print_line("cmd_oper is correct");
+        this->command = "MODE";
+        this->arguments.clear();
+        this->arguments.push_back(vec_users[pos]->getNickname());
+        this->arguments.push_back("+o");
+        utils::print_line("Mode run!");
+        //this->cmd_mode(irc, fd);
+    }
     else
         return (ERR_PASSWDMISMATCH);
     return (0);
