@@ -6,7 +6,7 @@
 # define FD_CLIENT_SSL 3
 # define FD_SERVER_SSL 4
 
-# define COMM_COUNT 7
+# define COMM_COUNT 8
 
 # define CERTIFICATE "cert/cert.pem"
 # define PRIVATE_KEY "cert/key.pem"
@@ -111,13 +111,15 @@ do_command(Command* command, int socket_fd)
 							  	 "USER",
 								 "SERVER",
 								 "JOIN",
-								 "OPER"};
+								 "OPER",
+								 "QUIT"};
 	doCommand	cmd_func[COMM_COUNT] = 	{&Command::cmd_nick,
 							   	 &Command::cmd_pass,
 							   	 &Command::cmd_user,
 								 &Command::cmd_server,
 								 &Command::cmd_join,
-								 &Command::cmd_oper};
+								 &Command::cmd_oper,
+								 &Command::cmd_quit};
 
 	for (int i = 0; i < COMM_COUNT; i++)
 	{
