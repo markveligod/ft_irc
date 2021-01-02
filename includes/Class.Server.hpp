@@ -15,11 +15,11 @@
 class Server
 {
     private:
-        int			_fd_socket;
-        std::string _server_name;
-        int			_hopcount;
-        std::string _info;
-        std::vector<User*> 	_users;
+        int						_fd_socket;
+        std::string 			_server_name;
+        int						_hopcount;
+        std::string 			_info;
+        std::vector<User*> 		_users;
 		std::vector<Client*>	_clients;
 		//std::vector<Channel*> _channels
 

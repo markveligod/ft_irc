@@ -14,7 +14,8 @@
 
 #define ERR_NOSUCHCHANNEL		403		// <channel name> :No such channel"
 										// - Used to indicate the given channel name is invalid.
-									
+#define ERR_NOSUCHCHANNEL_MESS	" :No such channel\r\n"
+
 #define ERR_CANNOTSENDTOCHAN	404		// "<channel name> :Cannot send to channel"
 										// - Sent to a user who is either (a) not on a channel
 										// which is mode +n or (b) not a chanop (or mode +v) on
@@ -121,6 +122,7 @@
 										// - Returned by the server by numerous commands to
 										// indicate to the client that it didn't supply enough
 										// parameters.
+#define ERR_NEEDMOREPARAMS_MESS	" :Not enough parameters\r\n"
 
 #define ERR_ALREADYREGISTRED	462		// ":You may not reregister"
 										// - Returned by the server to any link which tries to
@@ -137,6 +139,7 @@
 										// - Returned to indicate a failed attempt at registering
 										// a connection for which a password was required and
 										// was either not given or incorrect.
+#define ERR_PASSWDMISMATCH_MESS	" :Password incorrect\r\n"
 
 #define ERR_YOUREBANNEDCREEP	465		// ":You are banned from this server"
 										// - Returned after an attempt to connect and register
@@ -146,8 +149,13 @@
 #define ERR_KEYSET				467		// "<channel> :Channel key already set"
 #define ERR_CHANNELISFULL		471		// "<channel> :Cannot join channel (+l)"
 #define ERR_UNKNOWNMODE			472		// "<char> :is unknown mode char to me"
+
 #define ERR_INVITEONLYCHAN		473		// "<channel> :Cannot join channel (+i)"
+#define ERR_INVITEONLYCHAN_MESS	":Cannot join channel (+i)\r\n"
+
 #define ERR_BANNEDFROMCHAN		474		// "<channel> :Cannot join channel (+b)"
+#define ERR_BANNEDFROMCHAN_MESS	" :Cannot join channel (+b)\r\n"
+
 #define ERR_BADCHANNELKEY		475		// "<channel> :Cannot join channel (+k)"
 #define ERR_NOPRIVILEGES		481		// ":Permission Denied- You're not an IRC operator"
 										// - Any command requiring operator privileges to operate

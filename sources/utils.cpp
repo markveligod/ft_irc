@@ -124,12 +124,12 @@ namespace utils
 
 	/*
 	**==========================
-	** convert_int_to_str - конвертирует int в std::string
+	** int_to_str - конвертирует int в std::string
 	**==========================
 	*/
 
 	std::string
-	convert_int_to_str(int num)
+	int_to_str(int num)
 	{
 		std::stringstream ss;
 		ss << num;

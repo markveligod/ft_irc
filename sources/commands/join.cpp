@@ -22,12 +22,12 @@ int Command::cmd_join(IRC& irc, int fd)
 	{
 		if (arguments[i].empty())
 		{
-			irc.push_cmd_queue(fd, utils::convert_int_to_str(ERR_NEEDMOREPARAMS));
+			irc.push_cmd_queue(fd, irc.response_to_client(ERR_NEEDMOREPARAMS, fd, channels[i], ERR_NEEDMOREPARAMS_MESS));
 			continue;
 		}
 		if (!(arguments[i][0] == '&' || arguments[i][0] == '#'))
 		{
-			irc.push_cmd_queue(fd, utils::convert_int_to_str(ERR_NOSUCHCHANNEL));
+			irc.push_cmd_queue(fd, irc.response_to_client(ERR_NOSUCHCHANNEL, fd, channels[i], ERR_NOSUCHCHANNEL_MESS));
 			continue;
 		}
 		string key = (i < keys.size()) ? keys[i] : string();

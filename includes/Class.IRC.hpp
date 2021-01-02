@@ -28,6 +28,8 @@ class Command;
 class IRC
 {
 	private:
+		string						_server_name;
+
 		Socket						_network;
 		string						_network_ip;
 		int							_network_port;
@@ -45,8 +47,8 @@ class IRC
 		fd_set						_fd_set_write;
 
 		vector<User*>				_users;
-		vector<Client*>			_clients;
-		vector<Server*>			_servers;
+		vector<Client*>				_clients;
+		vector<Server*>				_servers;
 		map<string, Channel>		_local_channels;
 		map<string, Channel>		_shared_channels;
 
@@ -79,7 +81,6 @@ class IRC
 
 		int 						_send(int, int, const char*, size_t, int);
 		int 						_recv(int, int, char*, size_t, int);
-
 		
 		void						delete_user(int fd);
 		void						delete_client(int fd);
@@ -91,8 +92,6 @@ class IRC
 		vector<User*>& 				get_users();
 		vector<Client*>& 			get_clients();
 		vector<Server*>& 			get_servers();
-		// map<string, Channel>& 		get_local_channels();
-		// map<string, Channel>& 		get_shared_channels();
 		const string&				get_localhost_pass() const;
 		const string&				get_operator_user() const;
 		const string&				get_operator_pass() const;
@@ -102,8 +101,10 @@ class IRC
 		static int					find_fd(T& container, int fd);
 		template <typename T>
 		static int					find_nickname(T& container, const string& nickname);
-		void 						push_cmd_queue(int fd, const std::string& str);
+		void 						push_cmd_queue(int fd, const string& str);
 		void 						close_connect(int fd, int n);
+		
+		string						response_to_client(int response_code, int client_fd, string message_prefix, string message);
 };
 
 #include "../Class.IRC.templates.cpp"

@@ -37,7 +37,9 @@ is_valid_channel_name(const string& name)
 {
 	if (name.size() > 200)
 		return false;
-	if (name.find(',') != string::npos || name.find(' ') != string::npos)
+	if (name.find(',') != string::npos
+		|| name.find(' ') != string::npos
+		|| name.find(7) != string::npos)
 		return false;
 	return true;
 }

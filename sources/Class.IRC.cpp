@@ -21,14 +21,15 @@ IRC::
 IRC() {}
 
 IRC::
-IRC(std::string network_ip,
-		 std::string network_port,
-		 std::string network_pass,
-		 std::string localhost_port,
-		 std::string localhost_pass,
-		 string operator_user,
-		 string operator_pass)
+IRC(string network_ip,
+	string network_port,
+	string network_pass,
+	string localhost_port,
+	string localhost_pass,
+	string operator_user,
+	string operator_pass)
 {
+	_server_name = LOCALHOST + string("/") + localhost_port;
 	_operator_user = operator_user;
 	_operator_pass = operator_pass;
 	_network_ip = network_ip;
@@ -83,12 +84,9 @@ create_socket_network()
 	utils::print_line("Socket network connection!");
 
 	_array_fd_select[fd] = FD_CLIENT;
-	// std::string pass = "PASS " + _network_pass + "\r\n";
-	// std::string pass = "PASS \r\nSERVER banda 1 HALLO\r\n";
-	std::string pass = "SERVER 91.211.105.88:6666 1 \r\n";
 	_clients.push_back(new Client(fd));
-	send(fd, pass.c_str(), pass.size(), 0);
-	// отправить список пользователей и каналов
+	push_cmd_queue(fd, "PASS " + _network_pass + " \r\n");
+	// отправить список пользователей и каналов TODO
 }
 
 /*
@@ -108,7 +106,7 @@ int IRC::
 do_command(Command* command, int socket_fd)
 {
 	int			result;
-	std::string cmd_name[COMM_COUNT] =	{"NICK",
+	string cmd_name[COMM_COUNT] =	{"NICK",
 							   	 "PASS",
 							  	 "USER",
 								 "SERVER",
@@ -147,7 +145,7 @@ init_fd_select()
 {
 	FD_ZERO(&_fd_set_read);
 	FD_ZERO(&_fd_set_write);
-	for (std::map<int, int>::iterator it = _array_fd_select.begin(); it != _array_fd_select.end(); it++)
+	for (map<int, int>::iterator it = _array_fd_select.begin(); it != _array_fd_select.end(); it++)
 		FD_SET(it->first, &_fd_set_read);
 	if (!_command_queue.empty())
 	{
@@ -182,7 +180,7 @@ do_select()
 void IRC::
 check_fd_select()
 {
-	for (std::map<int, int>::iterator it = _array_fd_select.begin(); it != _array_fd_select.end() && _select_res > 0; it++)
+	for (map<int, int>::iterator it = _array_fd_select.begin(); it != _array_fd_select.end() && _select_res > 0; it++)
 	{
 		if (FD_ISSET(it->first, &_fd_set_write))
 		{
@@ -207,7 +205,7 @@ check_fd_select()
 				}
 				buffer[n] = '\0';
 				//получаем распарсенный вектор команд если нашли \r\n
-				std::vector<std::string> buffer_cmd = this->check_buffer(it->first, buffer);
+				vector<string> buffer_cmd = this->check_buffer(it->first, buffer);
 
 				for (size_t i = 0; i < buffer_cmd.size(); i++)
 				{
@@ -218,7 +216,7 @@ check_fd_select()
 					// передаем в исполнение команды сообщение и сокет, из которого пришло сообщение
 					this->do_command(&mess, it->first);
 					// _send(it->second, it->first, buffer_cmd[i].c_str(), strlen(buffer_cmd[i].c_str()), 0);
-					push_cmd_queue(it->first, buffer_cmd[i]);
+					// push_cmd_queue(it->first, buffer_cmd[i]);
 				}
 				bzero(buffer, 512);
 			}
@@ -227,7 +225,6 @@ check_fd_select()
 			{
 				// _accept() возвращает fd клиента, который мы добавляем в map
 				// в качестве ключа, в качестве значения добавляем FD_CLIENT(_SSL)
-				char response[] = "Accepted\n";
 
 				int client_socket = (it->second == FD_SERVER)
 									? _localhost._accept()
@@ -240,8 +237,9 @@ check_fd_select()
 					ssl_connection(client_socket);
 											
 				std::cout << "New client#" << client_socket << " joined server\n";
+				// char response[] = "Accepted\n";
 				// _send(it->second, client_socket, response, 10, 0);
-				push_cmd_queue(client_socket, string(response));
+				// push_cmd_queue(client_socket, string(response));
 				this->_clients.push_back(new Client(client_socket));
 			}
 			_select_res--;
@@ -390,18 +388,18 @@ delete_client(int fd)
 ** ----------------------------------------------------------
 */
 
-std::vector<std::string> IRC::
+vector<string> IRC::
 check_buffer(int fd, const char* buffer)
 {
 	Client* temp_ptr_client = this->_clients[IRC::find_fd(this->_clients, fd)];
-	std::vector<std::string> temp_vec;
+	vector<string> temp_vec;
 
-	std::string temp = temp_ptr_client->getBuffer();
-	temp_ptr_client->setBuffer(temp + static_cast<std::string>(buffer));
+	string temp = temp_ptr_client->getBuffer();
+	temp_ptr_client->setBuffer(temp + static_cast<string>(buffer));
 	
 	while (temp_ptr_client->find_line_break())
 	{
-		std::string temp_str = temp_ptr_client->get_line_break();
+		string temp_str = temp_ptr_client->get_line_break();
 		if (temp_str == "CAP LS")
 			continue ;
 		temp_vec.push_back(temp_str);
@@ -416,7 +414,7 @@ check_buffer(int fd, const char* buffer)
 */
 
 void IRC::
-push_cmd_queue(int fd, const std::string& str)
+push_cmd_queue(int fd, const string& str)
 {
 	this->_command_queue.push(std::make_pair(fd, str));
 }
@@ -436,7 +434,7 @@ join_channel(const string& channel_name,
 {
 	if (!Channel::is_valid_channel_name(channel_name))	// check channel name
 	{
-		_command_queue.push(std::make_pair(fd, utils::convert_int_to_str(ERR_NOSUCHCHANNEL)));
+		push_cmd_queue(fd, response_to_client(ERR_NOSUCHCHANNEL, fd, channel_name, ERR_NOSUCHCHANNEL_MESS));
 		return;
 	}
 
@@ -455,19 +453,19 @@ join_channel(const string& channel_name,
 	{
 		if (it->second.is_banned(nickname))				// check if user is banned 
 		{
-			_command_queue.push(std::make_pair(fd, utils::convert_int_to_str(ERR_BANNEDFROMCHAN)));
+			push_cmd_queue(fd, response_to_client(ERR_BANNEDFROMCHAN, fd, channel_name, ERR_BANNEDFROMCHAN_MESS));
 			return;
 		}
 
 		if (channel_key != it->second.get_key())		// check channel password
 		{
-			_command_queue.push(std::make_pair(fd, utils::convert_int_to_str(ERR_PASSWDMISMATCH)));
+			push_cmd_queue(fd, response_to_client(ERR_PASSWDMISMATCH, fd, channel_name, ERR_PASSWDMISMATCH_MESS));
 			return;
 		}
 
 		if (it->second.get_mode().invite_only_mode)		// check if invite only channel
 		{
-			_command_queue.push(std::make_pair(fd, utils::convert_int_to_str(ERR_INVITEONLYCHAN)));
+			push_cmd_queue(fd, response_to_client(ERR_INVITEONLYCHAN, fd, channel_name, ERR_INVITEONLYCHAN_MESS));
 			return;
 		}
 
@@ -508,3 +506,23 @@ get_operator_pass() const	{return (this->_operator_pass);}
 
 const Socket& IRC::
 get_socket() const			{return (this->_localhost);}
+
+string IRC::
+response_to_client(int response_code, int client_fd, string message_prefix, string message)
+{
+	string code = utils::int_to_str(response_code);
+	string client_name = _clients[find_fd(_clients, client_fd)]->getNickname();
+
+	string response = ":"
+					+ _server_name + " "
+					+ code + " "
+					+ client_name + " "
+					+ message_prefix
+					+ message;
+
+	std::cout << "DEBUG " << "_server_name " << _server_name << " "
+						  << "response_code " << response_code << " "
+						  << "client_name " << client_name
+						  << std::endl;
+	return response;
+}

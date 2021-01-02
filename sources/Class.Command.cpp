@@ -336,8 +336,8 @@ cmd_server(IRC& irc, int fd)
 
 	for (size_t i = 0; i < vec_users.size(); i++)
 	{
-		string temp_str = "NICK " + vec_users[i]->getNickname() + " " + utils::convert_int_to_str(vec_users[i]->getHopcount()) + "\r\nUSER " + vec_users[i]->getUsername() + " " + vec_users[i]->getHostname() + " " + vec_users[i]->getServername() + " " + vec_users[i]->getRealname() + "\r\n";
-		irc.push_cmd_queue(new_server->getFdSocket(), temp_str);
+		string temp_str = "NICK " + vec_users[i]->getNickname() + " " + utils::int_to_str(vec_users[i]->getHopcount()) + "\r\nUSER " + vec_users[i]->getUsername() + " " + vec_users[i]->getHostname() + " " + vec_users[i]->getServername() + " " + vec_users[i]->getRealname() + "\r\n";
+		// irc.push_cmd_queue(new_server->getFdSocket(), temp_str);
 	}
 	
 

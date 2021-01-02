@@ -14,5 +14,5 @@ namespace utils
 	void exit_error(int num_error, std::string fail_msg);
 	void print_error(int num_error, std::string fail_msg);
 	void print_line(std::string msg);
-	std::string convert_int_to_str(int num);
+	std::string int_to_str(int num);
 }
