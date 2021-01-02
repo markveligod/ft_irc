@@ -20,7 +20,8 @@
 ** =====================================================================
 */
 
-int Command::cmd_oper(IRC& irc, int fd)
+int Command::
+cmd_oper(IRC& irc, int fd)
 {
     std::vector<User*>& vec_users = irc.get_users();
     std::vector<Server*>& vec_servers = irc.get_servers();
