@@ -1,7 +1,7 @@
 
 #include "bircd.h"
 
-void	main_loop(t_env *e)
+void	main_loop(t_env* e)
 {
   while (1)
     {

@@ -1,18 +1,29 @@
 #include <cstring>
 #include "Class.Socket.hpp"
 
-Socket::Socket() {}
+Socket::
+Socket() {}
 
-Socket::Socket(const char *host_ip, int port, int fd, int sin_family, int type, int protocol)
-				: _port(port), _fd(fd), _sin_family(sin_family),
-				  _type(type), _protocol(protocol)
+Socket::
+Socket(const char* host_ip,
+		int port,
+		int fd,
+		int sin_family,
+		int type,
+		int protocol)
+			  : _port(port),
+				_fd(fd),
+				_sin_family(sin_family),
+				_type(type),
+				_protocol(protocol)
 {
 	_addr_size = sizeof(_addr);
 	bzero(&_addr, _addr_size);
 	_addr.sin_family = _sin_family;
+
 	if (host_ip)
 	{
-		hostent *host = gethostbyname(host_ip);
+		hostent* host = gethostbyname(host_ip);
 		if (!host)
 			utils::exit_error(1, "Unknown address");
 		inet_pton(_sin_family, host->h_name, &_addr.sin_addr);
@@ -22,7 +33,8 @@ Socket::Socket(const char *host_ip, int port, int fd, int sin_family, int type, 
 	_addr.sin_port = htons(_port);
 }
 
-const Socket &Socket::operator=(const Socket &other)
+const Socket& Socket::
+operator=(const Socket& other)
 {
 	this->_port			= other._port;
 	this->_fd			= other._fd;
@@ -34,7 +46,8 @@ const Socket &Socket::operator=(const Socket &other)
 	return (*this);
 }
 
-int Socket::_socket() {
+int Socket::
+_socket() {
 
 	if ((_fd = socket(_sin_family, _type, _protocol)) < 0)
 		utils::exit_error(ERR_SOCKET, "Establishing socket error");
@@ -42,25 +55,28 @@ int Socket::_socket() {
 	return _fd;
 }
 
-int Socket::_bind() {
+int Socket::
+_bind() {
 	
 	int res = 0;
 
-	if ((res = bind(_fd, reinterpret_cast<struct sockaddr *>(&_addr), _addr_size)) < 0)
+	if ((res = bind(_fd, reinterpret_cast<struct sockaddr*>(&_addr), _addr_size)) < 0)
 		utils::exit_error(ERR_BIND, "Binding error");
 	return res;
 }
 
-int Socket::_connect() {
+int Socket::
+_connect() {
 	
 	int res = 0;
 
-	if ((res = connect(_fd, reinterpret_cast<struct sockaddr *>(&_addr), _addr_size)) < 0)
+	if ((res = connect(_fd, reinterpret_cast<struct sockaddr*>(&_addr), _addr_size)) < 0)
 		utils::exit_error(ERR_CONNECT_TO_SERVER, "Unable to connect to server");
 	return res;
 }
 
-int Socket::_listen(int backlog) {
+int Socket::
+_listen(int backlog) {
 
 	int res = 0;
 
@@ -69,18 +85,19 @@ int Socket::_listen(int backlog) {
 	return res;
 }
 
-// int Socket::_accept(struct sockaddr *addr, socklen_t *__restrict addrlen) {
-int Socket::_accept() {
+int Socket::
+_accept() {
 	
 	int client = 0;
 
-	if ((client = accept(_fd, reinterpret_cast<struct sockaddr *>(&_addr), &_addr_size)) < 0)
+	if ((client = accept(_fd, reinterpret_cast<struct sockaddr*>(&_addr), &_addr_size)) < 0)
 		utils::exit_error(ERR_ACCEPT, "Accepting error");
 	// fcntl(client, F_SETFL, O_NONBLOCK);
 	return client;
 }
 
-Socket::~Socket() {
+Socket::
+~Socket() {
 	if (_fd)
 		close(_fd);
 }

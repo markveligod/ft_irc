@@ -30,8 +30,8 @@ public:
 	Server();
 	Server(int port);
 
-	static bool			end_connection(const char *line);
-	static void 		error(std::string const &str);
+	static bool			end_connection(const char* line);
+	static void 		error(const std::string& str);
 
 	void				create_socket();
 	void				connection();

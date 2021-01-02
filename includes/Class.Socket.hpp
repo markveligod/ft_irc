@@ -23,16 +23,14 @@ protected:
 
 public:
 	Socket();
-	Socket(const char *host_ip,
+	Socket(const char* host_ip,
 			int port, int fd = 0,
 			int sin_family = AF_INET,
 			int type = SOCK_STREAM,
 			int protocol = 0);
-	// Socket(const Socket&);
-	
 	~Socket();
-
-	const Socket &operator=(const Socket &other);
+	
+	const Socket& operator=(const Socket& other);
 
 	int		_socket();
 	int		_bind();

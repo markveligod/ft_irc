@@ -29,10 +29,10 @@ private:
 
 public:
 	Client();
-	Client(int port, std::string const & ip, std::string const & pass);
+	Client(int port, const std::string& ip, const std::string& pass);
 
-	static bool			end_connection(const char *line);
-	static void 		error(std::string const &str);
+	static bool			end_connection(const char* line);
+	static void 		error(const std::string& str);
 
 	void				create_socket();
 	void				connection();
@@ -40,7 +40,7 @@ public:
 	void				chat();
 	void				close_connection();
 	void				send_to_server();
-	void set_buffer(char const *buffer) { strcpy(this->buffer, buffer);};
+	void set_buffer(char const* buffer) { strcpy(this->buffer, buffer);};
 };
 
 #endif

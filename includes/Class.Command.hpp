@@ -32,10 +32,10 @@ private:
 	bool							pass(string password, string local_pass);
 	void							user_change(User* curr_user);
 	void							user_create(Client* curr_client, vector<User*>& users, Server* curr_server);
-	vector<Client *>::iterator		find_fd(vector<Client *>* vect, int fd);
+	vector<Client*>::iterator		find_fd(vector<Client*>& vect, int fd);
 
 public:
-	Command(string const & str);
+	Command(const string& str);
 	~Command();
 
 	int					cmd_nick(IRC& irc, int fd);
@@ -47,6 +47,6 @@ public:
 
 	const string&		getCommand() const;
 	bool				check_args_number(int n) const;
-	bool				check_password(Client const & client) const;
-	bool				check_nickname(Client const & client) const;
+	bool				check_password(const Client& client) const;
+	bool				check_nickname(const Client& client) const;
 };

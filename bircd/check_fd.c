@@ -1,7 +1,7 @@
 
 #include "bircd.h"
 
-void	check_fd(t_env *e)
+void	check_fd(t_env* e)
 {
   int	i;
 

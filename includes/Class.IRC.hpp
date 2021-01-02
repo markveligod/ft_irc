@@ -44,9 +44,9 @@ class IRC
 		fd_set						_fd_set_read;
 		fd_set						_fd_set_write;
 
-		vector<User *>				_users;
-		vector<Client *>			_clients;
-		vector<Server *>			_servers;
+		vector<User*>				_users;
+		vector<Client*>			_clients;
+		vector<Server*>			_servers;
 		map<string, Channel>		_local_channels;
 		map<string, Channel>		_shared_channels;
 

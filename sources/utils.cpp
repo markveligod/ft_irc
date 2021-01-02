@@ -12,7 +12,8 @@
 //127.0.0.1:5555:egrjgiure
 namespace utils
 {
-	static bool check_network(char const *av)
+	static bool
+	check_network(char const* av)
 	{
 		std::string network(av);
 
@@ -39,7 +40,8 @@ namespace utils
 	}
 
 	//<port> 2 22 222 2222
-	static bool check_port(char const *av)
+	static bool
+	check_port(char const* av)
 	{
 		size_t len = strlen(av);
 		
@@ -59,7 +61,8 @@ namespace utils
 		return (true);
 	}
 
-	bool check_av(int ac, char **av)
+	bool
+	check_av(int ac, char **av)
 	{
 		if (ac == 3)
 		{
@@ -82,12 +85,14 @@ namespace utils
 	**==========================
 	*/
 
-	void print_line(std::string msg)
+	void
+	print_line(std::string msg)
 	{
 		std::cout << CYAN << "[SERVER]: " << YELLOW << msg << std::endl << RESET;
 	}
 
-	void print_error(int num_error, std::string fail_msg)
+	void
+	print_error(int num_error, std::string fail_msg)
 	{
 		std::cerr << CYAN << "[SERVER]: " << RED << "ERROR: " << RESET << "code: " << num_error << " " << YELLOW << fail_msg << std::endl << RESET;
 	}
@@ -104,7 +109,8 @@ namespace utils
 	**==========================
 	*/
 
-	std::vector<std::string> split(std::string str, char type)
+	std::vector<std::string>
+	split(std::string str, char type)
 	{
 		std::vector<std::string> temp_vec;
 		std::stringstream ss(str);
@@ -122,7 +128,8 @@ namespace utils
 	**==========================
 	*/
 
-	std::string convert_int_to_str(int num)
+	std::string
+	convert_int_to_str(int num)
 	{
 		std::stringstream ss;
 		ss << num;

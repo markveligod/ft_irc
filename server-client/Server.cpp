@@ -25,13 +25,13 @@ void			Server::connection()
 {
 	socklen_t size = sizeof(this->server_addr);
 
-	if (bind(this->client, reinterpret_cast<struct sockaddr *>(&this->server_addr), sizeof(this->server_addr)) < 0)
+	if (bind(this->client, reinterpret_cast<struct sockaddr*>(&this->server_addr), sizeof(this->server_addr)) < 0)
 		Server::error("Binding error");
 	std::cout << "Socket binded\n";
 	if (listen(this->client, 10) < 0)
 		Server::error("Listening error");
 	std::cout << "Listening...\n";
-	if ((this->server = accept(this->client, reinterpret_cast<struct sockaddr *>(&this->server_addr), &size)) < 0)
+	if ((this->server = accept(this->client, reinterpret_cast<struct sockaddr*>(&this->server_addr), &size)) < 0)
 		Server::error("Accepting error");
 	std::cout << "Connection accepted!\n";
 }
@@ -77,7 +77,7 @@ void			Server::chat()
 
 // --------------------------Helpful functions----------------------------
 
-bool Server::end_connection(const char *line)
+bool Server::end_connection(const char* line)
 {
 	std::string str(line);
 
@@ -86,7 +86,7 @@ bool Server::end_connection(const char *line)
 	return (false);
 }
 
-void Server::error(std::string const &str)
+void Server::error(const std::string& str)
 {
 	std::cout << str << std::endl;
 	exit(0);

@@ -44,10 +44,10 @@ public:
 	Channel(const Channel& x);
 	Channel& operator=(const Channel& x);
 
-	void add_user(User*);
-	void add_operator(User*);
-	void set_mode(const string&);
-	bool is_banned(const string&) const;
+	void 		add_user(User*);
+	void 		add_operator(User*);
+	void 		set_mode(const string&);
+	bool 		is_banned(const string&) const;
 	static bool is_valid_channel_name(const string&);
 
 	const ModeChannel&	get_mode();

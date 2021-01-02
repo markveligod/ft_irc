@@ -19,7 +19,8 @@
 ** =====================================================================
 */
 
-bool Command::nick_valid() const
+bool Command::
+nick_valid() const
 {
 	int i = 1;
 	if (this->arguments[0].size() > 9 || this->arguments[0].size() == 0)
@@ -47,7 +48,8 @@ bool Command::nick_valid() const
 }
 
 template <typename T>
-bool Command::nick_available(std::vector<T> vect, std::string const &nick)
+bool Command::
+nick_available(std::vector<T> vect, const std::string& nick)
 {
 	for (size_t i = 0; i < vect.size(); i++)
 	{
@@ -60,11 +62,12 @@ bool Command::nick_available(std::vector<T> vect, std::string const &nick)
 	return true;
 }
 
-int  Command::cmd_nick(IRC& irc, int fd)
+int Command::
+cmd_nick(IRC& irc, int fd)
 {
-	std::vector<Client *> &clients 	= irc.get_clients();
-	std::vector<User *> &users 		= irc.get_users();
-	std::vector<Server *> &servers	= irc.get_servers();
+	std::vector<Client*>& clients 	= irc.get_clients();
+	std::vector<User*>& users 		= irc.get_users();
+	std::vector<Server*>& servers	= irc.get_servers();
 	int i = -1;
 	int j = -1;
 
@@ -95,7 +98,7 @@ int  Command::cmd_nick(IRC& irc, int fd)
 			IRC::find_fd(clients, fd) < 0 &&								// и нет клиента с таким fd
 			(i = IRC::find_fd(servers, fd)) >= 0)							// и есть сервер с таким fd
 	{
-		Client *new_client = new Client(fd, this->arguments[0], std::atoi(this->arguments[1].c_str()));
+		Client* new_client = new Client(fd, this->arguments[0], std::atoi(this->arguments[1].c_str()));
 		clients.push_back(new_client);
 		servers[i]->addClient(new_client);
 		utils::print_line("New client created");
