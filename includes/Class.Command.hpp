@@ -43,6 +43,7 @@ public:
 	int					cmd_user(IRC& irc, int fd);
 	int					cmd_server(IRC& irc, int fd);
 	int					cmd_join(IRC& irc, int fd);
+	int					cmd_oper(IRC& irc, int fd);
 
 	const string&		getCommand() const;
 	bool				check_args_number(int n) const;

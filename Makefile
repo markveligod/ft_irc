@@ -35,7 +35,8 @@ SRCS		= main.cpp \
 			Class.Server.cpp \
 
 COMMS		= nick.cpp \
-			join.cpp
+			join.cpp \
+			oper.cpp
 
 SRC			= $(addprefix $(SRC_DIR), $(SRCS))
 COMM		= $(addprefix $(COMM_DIR), $(COMMS))

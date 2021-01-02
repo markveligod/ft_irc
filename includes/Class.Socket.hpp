@@ -40,5 +40,5 @@ public:
 	int		_listen(int backlog = 5);
 	int		_accept();
 	
-	int		get_fd();
+	int		get_fd() const;
 };

@@ -6,7 +6,7 @@
 # define FD_CLIENT_SSL 3
 # define FD_SERVER_SSL 4
 
-# define COMM_COUNT 6
+# define COMM_COUNT 7
 
 # define CERTIFICATE "cert/cert.pem"
 # define PRIVATE_KEY "cert/key.pem"
@@ -23,8 +23,12 @@ IRC::IRC(std::string network_ip,
 		 std::string network_port,
 		 std::string network_pass,
 		 std::string localhost_port,
-		 std::string localhost_pass)
+		 std::string localhost_pass,
+		 string operator_user,
+		 string operator_pass)
 {
+	_operator_user = operator_user;
+	_operator_pass = operator_pass;
 	_network_ip = network_ip;
 	_network_port = std::atoi(network_port.c_str());
 	_network_pass = network_pass;
@@ -103,12 +107,14 @@ int IRC::do_command(Command *command, int socket_fd)
 							   	 "PASS",
 							  	 "USER",
 								 "SERVER",
-								 "JOIN"};
+								 "JOIN",
+								 "OPER"};
 	doCommand	cmd_func[COMM_COUNT] = 	{&Command::cmd_nick,
 							   	 &Command::cmd_pass,
 							   	 &Command::cmd_user,
 								 &Command::cmd_server,
-								 &Command::cmd_join};
+								 &Command::cmd_join,
+								 &Command::cmd_oper};
 
 	for (int i = 0; i < COMM_COUNT; i++)
 	{
@@ -468,3 +474,6 @@ vector<Server*>&		IRC::get_servers() {return (this->_servers);}
 // map<string, Channel>&	IRC::get_local_channels() {return (this->_local_channels);}
 // map<string, Channel>&	IRC::get_shared_channels() {return (this->_shared_channels);}
 const string&			IRC::get_localhost_pass() const {return (this->_localhost_pass);}
+const string&			IRC::get_operator_user() const {return (this->_operator_user);}
+const string&			IRC::get_operator_pass() const {return (this->_operator_pass);}
+const Socket&			IRC::get_socket() const {return (this->_localhost);}

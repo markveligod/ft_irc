@@ -84,3 +84,5 @@ Socket::~Socket() {
 	if (_fd)
 		close(_fd);
 }
+
+int Socket::get_fd() const {return (this->_fd);}
