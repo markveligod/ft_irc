@@ -84,11 +84,13 @@ class IRC
 		
 		void						delete_user(int fd);
 		void						delete_client(int fd);
+		void						delete_channel(string channel_name, char type);
 
 		vector<string> 				check_buffer(int fd, const char* buffer);
 		void						join_channel(const string& name, const string& key, char type, const string& nickname, int fd);
 
 		User*						get_user(string nickname);
+		User*						get_user(int fd);
 		vector<User*>& 				get_users();
 		vector<Client*>& 			get_clients();
 		vector<Server*>& 			get_servers();
@@ -96,6 +98,8 @@ class IRC
 		const string&				get_operator_user() const;
 		const string&				get_operator_pass() const;
 		const Socket&				get_socket() const;
+		map<string, Channel>&		get_local_channels();
+		map<string, Channel>&		get_shared_channels();
 
 		template <typename T>
 		static int					find_fd(T& container, int fd);
@@ -105,6 +109,8 @@ class IRC
 		void 						close_connect(int fd, int n);
 		
 		string						response_to_client(int response_code, int client_fd, string message_prefix, string message);
+
+		void print_channels() const;
 };
 
 #include "../Class.IRC.templates.cpp"

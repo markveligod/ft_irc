@@ -122,6 +122,9 @@ const string& User::
 getUsername() const						{ return (this->username); }
 
 const string& User::
+getNickname() const						{ return client->getNickname(); }
+
+const string& User::
 getHostname() const						{ return (this->hostname); }
 
 const string& User::

@@ -14,7 +14,7 @@
 
 #define ERR_NOSUCHCHANNEL		403		// <channel name> :No such channel"
 										// - Used to indicate the given channel name is invalid.
-#define ERR_NOSUCHCHANNEL_MESS	" :No such channel\r\n"
+#define ERR_NOSUCHCHANNEL_MESS	" :No such channel"
 
 #define ERR_CANNOTSENDTOCHAN	404		// "<channel name> :Cannot send to channel"
 										// - Sent to a user who is either (a) not on a channel
@@ -95,6 +95,7 @@
 										// - Returned by the server whenever a client tries to
 										// perform a channel effecting command for which the
 										// client isn't a member.
+#define ERR_NOTONCHANNEL_MESS	" :You're not on that channel"
 
 #define ERR_USERONCHANNEL		443		// "<user> <channel> :is already on channel"
 										// - Returned when a client tries to invite a user to a
@@ -122,7 +123,7 @@
 										// - Returned by the server by numerous commands to
 										// indicate to the client that it didn't supply enough
 										// parameters.
-#define ERR_NEEDMOREPARAMS_MESS	" :Not enough parameters\r\n"
+#define ERR_NEEDMOREPARAMS_MESS	" :Not enough parameters"
 
 #define ERR_ALREADYREGISTRED	462		// ":You may not reregister"
 										// - Returned by the server to any link which tries to
@@ -139,7 +140,7 @@
 										// - Returned to indicate a failed attempt at registering
 										// a connection for which a password was required and
 										// was either not given or incorrect.
-#define ERR_PASSWDMISMATCH_MESS	" :Password incorrect\r\n"
+#define ERR_PASSWDMISMATCH_MESS	" :Password incorrect"
 
 #define ERR_YOUREBANNEDCREEP	465		// ":You are banned from this server"
 										// - Returned after an attempt to connect and register
@@ -151,12 +152,14 @@
 #define ERR_UNKNOWNMODE			472		// "<char> :is unknown mode char to me"
 
 #define ERR_INVITEONLYCHAN		473		// "<channel> :Cannot join channel (+i)"
-#define ERR_INVITEONLYCHAN_MESS	":Cannot join channel (+i)\r\n"
+#define ERR_INVITEONLYCHAN_MESS	":Cannot join channel (+i)"
 
 #define ERR_BANNEDFROMCHAN		474		// "<channel> :Cannot join channel (+b)"
-#define ERR_BANNEDFROMCHAN_MESS	" :Cannot join channel (+b)\r\n"
+#define ERR_BANNEDFROMCHAN_MESS	" :Cannot join channel (+b)"
 
 #define ERR_BADCHANNELKEY		475		// "<channel> :Cannot join channel (+k)"
+#define ERR_BADCHANNELKEY_MESS	" :Cannot join channel (+k)"
+
 #define ERR_NOPRIVILEGES		481		// ":Permission Denied- You're not an IRC operator"
 										// - Any command requiring operator privileges to operate
 										// must return this error to indicate the attempt was
@@ -215,6 +218,7 @@
 										// query list.
 
 #define RPL_UNAWAY				305		// ":You are no longer marked as being away"
+
 #define RPL_NOWAWAY				306		// ":You have been marked as being away"
 										// - These replies are used with the AWAY command (if
 										// allowed).  RPL_AWAY is sent to any client sending a
@@ -246,6 +250,7 @@
 										// the end of processing a WHOIS message.
 
 #define RPL_WHOWASUSER			314		// "<nick> <user> <host> * :<real name>"
+
 #define RPL_ENDOFWHOWAS			369		// "<nick> :End of WHOWAS"
 										// - When replying to a WHOWAS message, a server must use
 										// the replies RPL_WHOWASUSER, RPL_WHOISSERVER or
@@ -457,3 +462,12 @@
 										// (RPL_ADMINLOC2) and finally the administrative
 										// contact for the server (an email address here
 										// is required) in RPL_ADMINEMAIL.
+
+
+/*
+**==========================
+** OWN RESPONSES
+**==========================
+*/
+
+#define RPL_LEAVE_CHANNEL		100

@@ -106,20 +106,22 @@ int IRC::
 do_command(Command* command, int socket_fd)
 {
 	int			result;
-	string cmd_name[COMM_COUNT] =	{"NICK",
-							   	 "PASS",
-							  	 "USER",
-								 "SERVER",
-								 "JOIN",
-								 "OPER",
-								 "QUIT"};
-	doCommand	cmd_func[COMM_COUNT] = 	{&Command::cmd_nick,
-							   	 &Command::cmd_pass,
-							   	 &Command::cmd_user,
-								 &Command::cmd_server,
-								 &Command::cmd_join,
-								 &Command::cmd_oper,
-								 &Command::cmd_quit};
+	string cmd_name[COMM_COUNT] =  {"NICK",
+									"PASS",
+									"USER",
+									"SERVER",
+									"JOIN",
+									"OPER",
+									"QUIT",
+									"PART"};
+	doCommand	cmd_func[COMM_COUNT] = {&Command::cmd_nick,
+										&Command::cmd_pass,
+										&Command::cmd_user,
+										&Command::cmd_server,
+										&Command::cmd_join,
+										&Command::cmd_oper,
+										&Command::cmd_quit,
+										&Command::cmd_part};
 
 	for (int i = 0; i < COMM_COUNT; i++)
 	{
@@ -384,6 +386,15 @@ delete_client(int fd)
 	}
 }
 
+void IRC::
+delete_channel(string name, char type)
+{
+	if (type == '&')
+		_local_channels.erase(name);
+	else
+		_shared_channels.erase(name);
+}
+
 /*
 ** ----------------------------------------------------------
 ** check_buffer - возвращает расспарсенный вектор буфера с соединенными командами
@@ -429,10 +440,10 @@ push_cmd_queue(int fd, const string& str)
 
 void IRC::
 join_channel(const string& channel_name,
-						const string& channel_key,
-						char channel_type,
-						const string& nickname,
-						int fd)
+			const string& channel_key,
+			char channel_type,
+			const string& nickname,
+			int fd)
 {
 	if (!Channel::is_valid_channel_name(channel_name))	// check channel name
 	{
@@ -444,46 +455,58 @@ join_channel(const string& channel_name,
 									? _local_channels
 									: _shared_channels;
 
+	User* new_user = _users[find_nickname(_users, nickname)];
 	map<string, Channel>::iterator it = channels.find(channel_name);
-	if (it == channels.end())						// add new channel
+	
+	if (it == channels.end())							// add new channel
 	{
-		channels.insert(make_pair(channel_name, Channel(channel_name, channel_key, nickname, *this)));
-
+		channels.insert(make_pair(channel_name, Channel(channel_name, channel_key, new_user, *this)));
+		map<string, Channel>::iterator it = channels.find(channel_name);
+		it->second.add_operator(new_user);
+		it->second.add_user(new_user);
 		// отправить всем серверам, что создан канал	TODO
 	}
 	else												// channel already exist
 	{
+		if (it->second.is_user_in_channel(nickname))	// check if user already in channel
+			return;
+
 		if (it->second.is_banned(nickname))				// check if user is banned 
 		{
-			push_cmd_queue(fd, response_to_client(ERR_BANNEDFROMCHAN, fd, channel_name, ERR_BANNEDFROMCHAN_MESS));
+			push_cmd_queue(fd, response_to_client(ERR_BANNEDFROMCHAN, fd, "#" + channel_name, ERR_BANNEDFROMCHAN_MESS));
 			return;
 		}
 
-		if (channel_key != it->second.get_key())		// check channel password
+		if (!it->second.is_valid_key(channel_key))		// check channel password
 		{
-			push_cmd_queue(fd, response_to_client(ERR_PASSWDMISMATCH, fd, channel_name, ERR_PASSWDMISMATCH_MESS));
+			push_cmd_queue(fd, response_to_client(ERR_BADCHANNELKEY, fd, "#" + channel_name, ERR_BADCHANNELKEY_MESS));
 			return;
 		}
 
-		if (it->second.get_mode().invite_only_mode)		// check if invite only channel
+		if (it->second.is_invite_only())				// check if invite only channel
 		{
-			push_cmd_queue(fd, response_to_client(ERR_INVITEONLYCHAN, fd, channel_name, ERR_INVITEONLYCHAN_MESS));
+			push_cmd_queue(fd, response_to_client(ERR_INVITEONLYCHAN, fd, "#" + channel_name, ERR_INVITEONLYCHAN_MESS));
 			return;
 		}
 
-		int index = find_nickname(_users, nickname);
-		if (index >= 0)
-		{
-			map<string, Channel>::iterator it = channels.find(channel_name);
-			it->second.add_user(_users[index]);
-		}
+		map<string, Channel>::iterator it = channels.find(channel_name);
+		it->second.add_user(new_user);
 	}
+	print_channels();
 }
 
 User* IRC::
 get_user(string nickname)
 {
 	int index = find_nickname(_users, nickname);
+
+	return (index >= 0) ? _users[index] : NULL;
+}
+
+User* IRC::
+get_user(int fd)
+{
+	int index = find_fd(_users, fd);
 
 	return (index >= 0) ? _users[index] : NULL;
 }
@@ -509,6 +532,12 @@ get_operator_pass() const	{return (this->_operator_pass);}
 const Socket& IRC::
 get_socket() const			{return (this->_localhost);}
 
+map<string, Channel>& IRC::
+get_local_channels()		{return _local_channels;}
+
+map<string, Channel>& IRC::
+get_shared_channels()		{return _shared_channels;}
+
 string IRC::
 response_to_client(int response_code, int client_fd, string message_prefix, string message)
 {
@@ -520,11 +549,26 @@ response_to_client(int response_code, int client_fd, string message_prefix, stri
 					+ code + " "
 					+ client_name + " "
 					+ message_prefix
-					+ message;
+					+ message
+					+ "\r\n";
 
-	std::cout << "DEBUG " << "_server_name " << _server_name << " "
-						  << "response_code " << response_code << " "
-						  << "client_name " << client_name
-						  << std::endl;
+	std::cout << "DEBUG " << "_server_name " << _server_name << "\n"
+						  << "response_code " << response_code << "\n"
+						  << "message_prefix " << message_prefix << "\n"
+						  << "message " << message << "\n"
+						  << "RESPONSE " << response << "\n";
 	return response;
+}
+
+void IRC::print_channels() const {
+			std::cout << "Shared channels: \n";
+			for (map<string, Channel>::const_iterator it = _shared_channels.begin(); it != _shared_channels.end(); it++) {
+				std::cout << "DEBUG\t" << it->first << std::endl;
+				it->second.print_users();
+			}
+			std::cout << "Local channels: \n";
+			for (map<string, Channel>::const_iterator it = _local_channels.begin(); it != _local_channels.end(); it++) {
+				std::cout << "DEBUG\t" << it->first << std::endl;
+				it->second.print_users();
+			}
 }

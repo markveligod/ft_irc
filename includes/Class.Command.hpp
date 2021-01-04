@@ -9,14 +9,16 @@
 
 #pragma once
 #include "main.hpp"
-class IRC;
-class Server;
 #include "Class.User.hpp"
 #include "Class.IRC.hpp"
 #include "codes.hpp"
 
 using std::string;
 using std::vector;
+
+class IRC;
+class Server;
+class Channel;
 
 class Command
 {
@@ -45,9 +47,11 @@ public:
 	int					cmd_join(IRC& irc, int fd);
 	int					cmd_oper(IRC& irc, int fd);
 	int					cmd_quit(IRC& irc, int fd);
+	int					cmd_part(IRC& irc, int fd);
 
 	const string&		getCommand() const;
 	bool				check_args_number(int n) const;
 	bool				check_password(const Client& client) const;
 	bool				check_nickname(const Client& client) const;
+	void				leave_channel(IRC& irc, Channel& channels, char type, int fd, string message);
 };

@@ -29,7 +29,7 @@ class Channel
 private:
 	string			_name;
 	string			_key;
-	string			_creator;
+	User*			_creator;
 	vector<User*>	_users;
 	vector<User*>	_operators;
 	vector<User*>	_banned;
@@ -40,7 +40,7 @@ private:
 	IRC&			_irc;
 
 public:
-	Channel(const string& name, const string& key, const string& creator, IRC& irc);
+	Channel(const string& name, const string& key, User* creator, IRC& irc);
 	Channel(const Channel& x);
 	Channel& operator=(const Channel& x);
 
@@ -48,8 +48,23 @@ public:
 	void 		add_operator(User*);
 	void 		set_mode(const string&);
 	bool 		is_banned(const string&) const;
+	bool		is_valid_key(const string& key) const;
+	bool		is_invite_only() const;
+	bool		is_user_in_channel(const string&) const;
 	static bool is_valid_channel_name(const string&);
 
-	const ModeChannel&	get_mode();
-	const string&		get_key();
+	const string&		get_name() const;
+	const ModeChannel&	get_mode() const;
+	const string&		get_key() const;
+	vector<User*>&		get_users();
+	vector<User*>&		get_operators();
+
+	void print_users() const
+	{
+		for (size_t i = 0; i < _users.size(); i++)
+		{
+			User u = *(_users[i]);
+			std::cout << "DEBUG\t\t" << u.getNickname() << std::endl;
+		}
+	}
 };

@@ -217,7 +217,7 @@ cmd_user(IRC& irc, int fd)
 			this->user_create(clients[i], users, NULL);
 	}
 	else if (!(this->prefix.empty()) &&								// если префикс есть
-			(server_fd = IRC::find_fd(servers, fd)) >= 0 &&		// и сообщение пришло с сервера
+			(server_fd = IRC::find_fd(servers, fd)) >= 0 &&			// и сообщение пришло с сервера
 			(i = IRC::find_nickname(clients, this->prefix)) >= 0)	// и есть клиент с таким ником
 	{
 		if (!(check_password(*clients[i])) ||						// проверяем, ввел ли клиент пароль
