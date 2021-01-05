@@ -29,13 +29,18 @@ private:
 	vector<string> 		arguments;
 
 
-	bool							nick_valid() const;
-	template <typename T> bool		nick_available(vector<T> vect, const string& nick);
-
-	bool							pass(string password, string local_pass);
-	void							user_change(User* curr_user);
-	void							user_create(Client* curr_client, vector<User*>& users, Server* curr_server);
-	vector<Client*>::iterator		find_fd(vector<Client*>& vect, int fd);
+	bool						nick_valid() const;
+	template <typename T> bool	nick_available(vector<T> vect, const string& nick);
+	bool						pass(string password, string local_pass);
+	void						user_change(User* curr_user);
+	void						user_create(Client* curr_client, vector<User*>& users, Server* curr_server);
+	vector<Client*>::iterator	find_fd(vector<Client*>& vect, int fd);
+	bool						check_args_number(int n) const;
+	bool						check_password(const Client& client) const;
+	bool						check_nickname(const Client& client) const;
+	void						leave_channel(IRC& irc, Channel& channels, char type, int fd, string message);
+	void						send_channel_users(IRC& irc, int fd, char type, string cnannel_name);
+	bool						is_channel_visible(IRC& irc, int fd, char channel_type, const string& channel_name);
 
 public:
 	Command(const string& str);
@@ -53,9 +58,4 @@ public:
 	int					cmd_squit(IRC& irc, int fd);
 
 	const string&		getCommand() const;
-	bool				check_args_number(int n) const;
-	bool				check_password(const Client& client) const;
-	bool				check_nickname(const Client& client) const;
-	void				leave_channel(IRC& irc, Channel& channels, char type, int fd, string message);
-	void				send_channel_users(IRC& irc, int fd, char type, string cnannel_name);
 };

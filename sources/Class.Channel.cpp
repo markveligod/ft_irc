@@ -43,13 +43,25 @@ bool Channel::
 is_valid_key(const string& key) const				{ return key == _key; }
 
 bool Channel::
+is_private() const	 								{ return _mode.private_mode; }
+
+bool Channel::
+is_secret() const 									{ return _mode.secret_mode; }
+
+bool Channel::
 is_invite_only() const 								{ return _mode.invite_only_mode; }
+
+bool Channel::
+is_moderated() const 								{ return _mode.moderated_mode; }
 
 bool Channel::
 is_user_in_channel(const string& nickname) const	{ return IRC::find_nickname(_users, nickname) >= 0; }
 
 bool Channel::
 is_operator(const string& nickname) const			{ return IRC::find_nickname(_operators, nickname) >= 0; }
+
+bool Channel::
+is_visible()										{ return !is_private() && !is_secret(); }
 
 bool Channel::
 is_valid_channel_name(const string& name)

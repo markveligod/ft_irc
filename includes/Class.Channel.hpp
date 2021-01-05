@@ -49,9 +49,13 @@ public:
 	void 		set_mode(const string&);
 	bool 		is_banned(const string&) const;
 	bool		is_valid_key(const string& key) const;
+	bool		is_private() const;
+	bool		is_secret() const;
 	bool		is_invite_only() const;
+	bool		is_moderated() const;
 	bool		is_user_in_channel(const string&) const;
 	bool		is_operator(const string&) const;
+	bool		is_visible();
 	static bool is_valid_channel_name(const string&);
 
 	const string&		get_name() const;

@@ -31,13 +31,14 @@ cmd_names(IRC& irc, int fd)
 
 	if (arguments.empty() || args[0] == "0")
 	{
-		// отправить всех видимых пользователей
+		// отправить всех видимых пользователей(?)
 		return 0;
 	}
 	
 	for (size_t i = 0; i < args.size(); i++)
 	{
-		if (args[i][0] == '&' || args[i][0] == '#')
+		if ((args[i][0] == '&' || args[i][0] == '#')
+			&& is_channel_visible(irc, fd, args[i][0], args[i].substr(1)))
 			send_channel_users(irc, fd, args[i][0], args[i].substr(1));
 		else
 			irc.push_cmd_queue(fd, irc.response_to_client(RPL_ENDOFNAMES, fd, args[i], RPL_ENDOFNAMES_MESS));
