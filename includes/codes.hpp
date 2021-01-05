@@ -322,6 +322,7 @@
 										// channels and contents are sent back in a series of
 										// RPL_NAMEREPLY messages with a RPL_ENDOFNAMES to mark
 										// the end.
+#define RPL_ENDOFNAMES_MESS		" :End of NAMES list"
 
 #define RPL_LINKS				364		// "<mask> <server> :<hopcount> <server info>"
 

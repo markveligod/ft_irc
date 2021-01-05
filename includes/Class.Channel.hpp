@@ -51,6 +51,7 @@ public:
 	bool		is_valid_key(const string& key) const;
 	bool		is_invite_only() const;
 	bool		is_user_in_channel(const string&) const;
+	bool		is_operator(const string&) const;
 	static bool is_valid_channel_name(const string&);
 
 	const string&		get_name() const;

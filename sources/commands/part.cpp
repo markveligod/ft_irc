@@ -90,5 +90,5 @@ leave_channel(IRC& irc, Channel& channel, char type, int fd, string message)
 			irc.delete_channel(channel.get_name(), type);
 	}
 	else
-		irc.push_cmd_queue(fd, irc.response_to_client(ERR_NOTONCHANNEL, fd, type + channel.get_name(), ERR_NOTONCHANNEL_MESS));
+		irc.push_cmd_queue(fd, irc.response_to_client(RPL_ENDOFNAMES, fd, type + channel.get_name(), RPL_ENDOFNAMES_MESS));
 }

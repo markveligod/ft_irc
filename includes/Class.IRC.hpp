@@ -95,6 +95,7 @@ class IRC
 		vector<User*>& 				get_users();
 		vector<Client*>& 			get_clients();
 		vector<Server*>& 			get_servers();
+		const string& 				get_server_name();
 		const string&				get_localhost_pass() const;
 		const string&				get_operator_user() const;
 		const string&				get_operator_pass() const;

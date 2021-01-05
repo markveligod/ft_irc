@@ -37,8 +37,63 @@ cmd_names(IRC& irc, int fd)
 	
 	for (size_t i = 0; i < args.size(); i++)
 	{
-		// if (args[i][0] == '&' || args[i][0] == '#')
-		// 	send_channel_users(irc, fd, args[i][0], args[i].substr(1));
+		if (args[i][0] == '&' || args[i][0] == '#')
+			send_channel_users(irc, fd, args[i][0], args[i].substr(1));
+		else
+			irc.push_cmd_queue(fd, irc.response_to_client(RPL_ENDOFNAMES, fd, args[i], RPL_ENDOFNAMES_MESS));
 	}
 	return 0;
+}
+
+void Command::
+send_channel_users(IRC& irc, int fd, char channel_type, string cnannel_name)
+{
+	if ((channel_type == '&'
+					? irc.get_local_channels().count(cnannel_name)
+					: irc.get_shared_channels().count(cnannel_name)) == 0)
+	{
+		irc.push_cmd_queue(fd, irc.response_to_client(RPL_ENDOFNAMES, fd, channel_type + cnannel_name, RPL_ENDOFNAMES_MESS));
+		return;
+	}
+
+	int i = IRC::find_fd(irc.get_users(), fd);		// ищем никнейм пользователя по его fd
+	User* user = irc.get_users()[i];				// ????? МОЖЕТ НУЖНА ПРОВЕРКА
+	
+	Channel& channel = (channel_type == '&'
+						? irc.get_local_channels().find(cnannel_name)->second
+						: irc.get_shared_channels().find(cnannel_name)->second);
+
+	string prefix = ":"
+					+ irc.get_server_name() + " "
+					+ utils::int_to_str(RPL_NAMREPLY) + " "
+					+ user->getNickname()
+					+ " = "
+					+ channel_type
+					+ cnannel_name
+					+ " :";
+	const vector<User*>& users = channel.get_users();
+
+	for (size_t i = 0; i < users.size(); )
+	{
+		string response = prefix;
+	
+		bool first = true;
+		while (i < users.size())
+		{
+			string nickname = users[i]->getNickname();
+			if (channel.is_operator(nickname))
+				nickname = "@" + nickname;
+			if (!first)
+				nickname = " " + nickname;
+			first = false;
+			if (response.size() + nickname.size() < MAX_MESSAGE_LEN)
+			{
+				response += nickname;
+				i++;
+			} else
+				break;
+		}
+		irc.push_cmd_queue(fd, response + "\r\n");
+	}
+	irc.push_cmd_queue(fd, irc.response_to_client(RPL_ENDOFNAMES, fd, channel_type + cnannel_name, RPL_ENDOFNAMES_MESS));
 }

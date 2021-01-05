@@ -72,6 +72,7 @@
 #define DEF_PASS "123"
 #define FD_REQUEST 1
 #define FD_COMMIT 2
+#define MAX_MESSAGE_LEN 510
 
 /*
 **==========================

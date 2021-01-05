@@ -193,7 +193,9 @@ check_fd_select()
 	{
 		if (FD_ISSET(it->first, &_fd_set_write))
 		{
-			std::cout << "DEBUG: Сообщение отправлено клиенту " << it->first << ": " << _command_queue.front().second << std::endl;
+			string DEBUG = _command_queue.front().second;
+			size_t t = DEBUG.find("\r"); DEBUG[t] = 0; DEBUG[t+1] = 0;
+			std::cout << "DEBUG: Сообщение отправлено клиенту " << it->first << ": |" << DEBUG << "|\n";
 			_send(it->second, it->first, _command_queue.front().second.c_str(), strlen(_command_queue.front().second.c_str()), 0);
 			_command_queue.pop();
 		}
@@ -469,7 +471,6 @@ join_channel(const string& channel_name,
 		map<string, Channel>::iterator it = channels.find(channel_name);
 		it->second.add_operator(new_user);
 		it->second.add_user(new_user);
-		push_cmd_queue(fd, full_name(new_user) + " JOIN :" + channel_type + channel_name + "\r\n");
 		// отправить всем серверам, что создан канал	TODO
 	}
 	else												// channel already exist
@@ -498,6 +499,7 @@ join_channel(const string& channel_name,
 		map<string, Channel>::iterator it = channels.find(channel_name);
 		it->second.add_user(new_user);
 	}
+	push_cmd_queue(fd, full_name(new_user) + " JOIN :" + channel_type + channel_name + "\r\n");
 	print_channels();
 }
 
@@ -518,31 +520,34 @@ get_user(int fd)
 }
 
 vector<User*>& IRC::
-get_users() 				{return (this->_users);}
+get_users() 				{ return _users; }
 
 vector<Client*>& IRC::
-get_clients()				{return (this->_clients);}
+get_clients()				{ return _clients; }
 
 vector<Server*>& IRC::
-get_servers()				{return (this->_servers);}
+get_servers()				{ return _servers; }
 
 const string& IRC::
-get_localhost_pass() const	{return (this->_localhost_pass);}
+get_server_name()			{ return _server_name; }
 
 const string& IRC::
-get_operator_user() const	{return (this->_operator_user);}
+get_localhost_pass() const	{ return _localhost_pass; }
 
 const string& IRC::
-get_operator_pass() const	{return (this->_operator_pass);}
+get_operator_user() const	{ return _operator_user; }
+
+const string& IRC::
+get_operator_pass() const	{ return _operator_pass; }
 
 const Socket& IRC::
-get_socket() const			{return (this->_localhost);}
+get_socket() const			{ return _localhost; }
 
 map<string, Channel>& IRC::
-get_local_channels()		{return _local_channels;}
+get_local_channels()		{ return _local_channels; }
 
 map<string, Channel>& IRC::
-get_shared_channels()		{return _shared_channels;}
+get_shared_channels()		{ return _shared_channels; }
 
 string IRC::
 response_to_client(int response_code, int client_fd, string message_prefix, string message)
