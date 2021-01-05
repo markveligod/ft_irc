@@ -26,7 +26,7 @@ int Command::cmd_part(IRC& irc, int fd)
 	map<string, Channel>& local_channels = irc.get_local_channels();
 	map<string, Channel>& shared_channels = irc.get_shared_channels();
 
-	string exit_message = (arguments.size() == 2) ? (": " + arguments[1]) : ": Left the channel";
+	string exit_message = (arguments.size() == 2) ? (" :" + arguments[1]) : " :Left the channel";
 	std::cout << "DEBUG EXIT MESSAGE" << exit_message << std::endl;
 
 	// (void)fd; (void)irc;
@@ -76,15 +76,15 @@ leave_channel(IRC& irc, Channel& channel, char type, int fd, string message)
 	vector<User*>& users = channel.get_users();
 	vector<User*>& operators = channel.get_operators();
 
-	int index = IRC::find_fd(users, fd);
-	if (index >= 0)
+	int i = IRC::find_fd(users, fd);
+	if (i >= 0)
 	{
-		users.erase(users.begin() + index);
-		irc.push_cmd_queue(fd, irc.response_to_client(RPL_LEAVE_CHANNEL, fd, type + channel.get_name(), message));
+		users.erase(users.begin() + i);
+		irc.push_cmd_queue(fd, irc.full_name(users[i]) + " PART " + type + channel.get_name() + message + "\r\n");
 
-		index = IRC::find_fd(operators, fd);
-		if (index >= 0)
-			operators.erase(operators.begin() + index);
+		i = IRC::find_fd(operators, fd);
+		if (i >= 0)
+			operators.erase(operators.begin() + i);
 		
 		if (users.empty())
 			irc.delete_channel(channel.get_name(), type);

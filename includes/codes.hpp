@@ -464,12 +464,3 @@
 										// (RPL_ADMINLOC2) and finally the administrative
 										// contact for the server (an email address here
 										// is required) in RPL_ADMINEMAIL.
-
-
-/*
-**==========================
-** OWN RESPONSES
-**==========================
-*/
-
-#define RPL_LEAVE_CHANNEL		100

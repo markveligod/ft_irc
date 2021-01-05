@@ -133,7 +133,7 @@ do_command(Command* command, int socket_fd)
 			return (result);
 		}
 	}
-	this->push_cmd_queue(socket_fd, this->response_to_client(result, socket_fd, "client", "Command not found"));
+	this->push_cmd_queue(socket_fd, this->response_to_client(result, socket_fd, "client", " :Command not found"));
 	return (0);
 }
 
@@ -466,7 +466,7 @@ join_channel(const string& channel_name,
 		map<string, Channel>::iterator it = channels.find(channel_name);
 		it->second.add_operator(new_user);
 		it->second.add_user(new_user);
-		push_cmd_queue(fd, full_name(new_user) + " JOIN :#" + channel_name + "\r\n");
+		push_cmd_queue(fd, full_name(new_user) + " JOIN :" + channel_type + channel_name + "\r\n");
 		// отправить всем серверам, что создан канал	TODO
 	}
 	else												// channel already exist
