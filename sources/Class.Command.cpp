@@ -100,64 +100,6 @@ cmd_pass(IRC& irc, int fd)
 	return (res == false ? ERR_PASSWDMISMATCH : 0);	// в документации нет такой ошибки
 }
 
-// int  Command::cmd_nick(IRC& irc, int fd)
-// {
-// 	vector<Client*>& clients 	= irc.get_clients();
-// 	vector<User*>& users 		= irc.get_users();
-// 	vector<Server*>& servers	= irc.get_servers();
-// 	int i = -1;
-// 	int j = -1;
-
-// 	if (!(this->check_args_number(1)))
-// 		return (ERR_NONICKNAMEGIVEN);
-
-// 	if (!(this->nick_valid()))
-// 		return (ERR_ERRONEUSNICKNAME);
-
-// 	if (IRC::find_fd(servers, fd) >= 0 &&
-// 		this->prefix.empty() &&									
-// 		!(this->nick_available(clients, this->arguments[0])))				// ????????
-// 		return (ERR_NICKCOLLISION);
-
-// 	if (!(this->nick_available(clients, this->arguments[0])))
-// 		return (ERR_NICKNAMEINUSE);
-
-// 	if (this->prefix.empty() && (i = IRC::find_fd(clients, fd)) >= 0) 		// если префикс пуст и если есть клиент с таким fd
-// 	{
-// 		if (!(this->check_password(*clients[i])))							// если он уже установил верный пароль
-// 			return 0;
-// 		utils::print_line("Nickname for client " + this->arguments[0] + " set");
-// 		if ((j = IRC::find_fd(users, fd)) >= 0)
-// 			utils::print_line("New nickname for user" + this->arguments[0] + " set");
-// 	}
-
-// 	else if (this->prefix.empty() &&										// если префикс пуст
-// 			IRC::find_fd(clients, fd) < 0 &&								// и нет клиента с таким fd
-// 			(i = IRC::find_fd(servers, fd)) >= 0)							// и есть сервер с таким fd
-// 	{
-// 		Client* new_client = new Client(fd, this->arguments[0], std::atoi(this->arguments[1].c_str()));
-// 		clients.push_back(new_client);
-// 		servers[i]->addClient(new_client);
-// 		utils::print_line("New client created");
-// 		i = -1;
-// 	}
-
-// 	else if (!(this->prefix.empty()) && (i = IRC::find_nickname(clients, this->prefix)) >= 0) // если есть префикс и если есть клиент с ником, который пришел в префикс
-// 	{
-// 		if (!(this->check_password(*clients[i])))												// если он уже установил верный пароль
-// 			return 0;
-// 		utils::print_line("Nickname for client changed from " + clients[i]->getNickname() + " to " + this->arguments[0]);
-// 		if ((j = IRC::find_nickname(users, this->prefix)) >= 0)
-// 			utils::print_line("Nickname for user changed from " + users[j]->getNickname() + " to " + this->arguments[0]);
-// 	}
-
-// 	if (i >= 0)
-// 		clients[i]->setNickname(this->arguments[0]);
-// 	if (j >= 0)
-// 		users[j]->setNickname(this->arguments[0]);
-// 	return 0;
-// }
-
 /*
 ** =============================================================
 ** Команда: USER 
@@ -270,10 +212,7 @@ getCommand() const
 bool Command::check_args_number(int n) const
 {
 	if ((int)this->arguments.size() < n)
-	{
-		utils::print_error(ERR_ARG_NUMBER, "Not enought parameters");
 		return false;
-	}
 	return true;
 }
 
@@ -316,19 +255,16 @@ cmd_server(IRC& irc, int fd)
 	vector<Client*>::iterator temp 	= this->find_fd(vec_client, fd);
 
 	if (!this->check_args_number(3))
-		return (0);
+		return (irc.send_client_status(fd, ERR_ARG_NUMBER, "Not enought parameters"));
 
 	if (IRC::find_fd(vec_server, fd) >= 0)
-		return (ERR_ALREADYREGISTRED);
+		return (irc.send_client_status(fd, ERR_ALREADYREGISTRED, "ERR_ALREADYREGISTRED"));
 
 	if (temp == vec_client.end())
-	{
-		utils::print_error(ERR_FINDFD, "FD don't find in vector!");
-		return 0;
-	}
+		return (irc.send_client_status(fd, ERR_FINDFD, "FD don't find in vector!"));
 
 	if (!this->check_password(**temp))
-		return 0;
+		return (irc.send_client_status(fd, ERR_PASSWORD, "ENTER PASS <password>"));
 
 	Server* new_server = new Server((*temp)->getSocketFd(), this->arguments[0], atoi(this->arguments[1].c_str()), this->arguments[2]);
 	vec_server.push_back(new_server);
@@ -339,7 +275,6 @@ cmd_server(IRC& irc, int fd)
 		string temp_str = "NICK " + vec_users[i]->getNickname() + " " + utils::int_to_str(vec_users[i]->getHopcount()) + "\r\nUSER " + vec_users[i]->getUsername() + " " + vec_users[i]->getHostname() + " " + vec_users[i]->getServername() + " " + vec_users[i]->getRealname() + "\r\n";
 		// irc.push_cmd_queue(new_server->getFdSocket(), temp_str);
 	}
-	
 
-	return 0;
+	return (irc.send_client_status(fd, 0, "cmd_server correct"));
 }
