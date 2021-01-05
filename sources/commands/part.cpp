@@ -1,15 +1,11 @@
 #include "main.hpp"
 #include "Class.Command.hpp"
 
-using std::string;
-using std::vector;
-using std::map;
-
 /*
 ** ====================================================================
 ** Команда: PART <channel>{,<channel>} 
 ** ====================================================================
-** Сообщение PART удаляет клиента, пославшего эту команду из списка 
+** Команда PART удаляет клиента, пославшего эту команду из списка 
 ** активных пользователей для всех каналов, указанных в параметре.
 **
 ** PART #twilight_zone		; покинуть канал "#twilight_zone"
@@ -49,7 +45,7 @@ int Command::cmd_part(IRC& irc, int fd)
 	{
 		if (channels[i][0] == '&')
 		{
-			map<std::string, Channel>::iterator it = local_channels.find(channels[i].substr(1));
+			map<string, Channel>::iterator it = local_channels.find(channels[i].substr(1));
 			if (it != local_channels.end())
 				leave_channel(irc, it->second, '&', fd, exit_message);
 			else
@@ -57,7 +53,7 @@ int Command::cmd_part(IRC& irc, int fd)
 		}
 		else if (channels[i][0] == '#')
 		{
-			map<std::string, Channel>::iterator it = shared_channels.find(channels[i].substr(1));
+			map<string, Channel>::iterator it = shared_channels.find(channels[i].substr(1));
 			if (it != shared_channels.end())
 				leave_channel(irc, it->second, '#', fd, exit_message);
 			else

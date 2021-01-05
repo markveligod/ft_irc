@@ -38,7 +38,11 @@ COMMS		= nick.cpp \
 			join.cpp \
 			oper.cpp \
 			quit.cpp \
-			part.cpp
+			part.cpp \
+			user.cpp \
+			pass.cpp \
+			server.cpp
+
 
 SRC			= $(addprefix $(SRC_DIR), $(SRCS))
 COMM		= $(addprefix $(COMM_DIR), $(COMMS))

@@ -6,7 +6,7 @@
 # define FD_CLIENT_SSL 3
 # define FD_SERVER_SSL 4
 
-# define COMM_COUNT 8
+# define COMM_COUNT 9
 
 # define CERTIFICATE "cert/cert.pem"
 # define PRIVATE_KEY "cert/key.pem"
@@ -113,7 +113,8 @@ do_command(Command* command, int socket_fd)
 									"JOIN",
 									"OPER",
 									"QUIT",
-									"PART"};
+									"PART",
+									"NAMES"};
 	doCommand	cmd_func[COMM_COUNT] = {&Command::cmd_nick,
 										&Command::cmd_pass,
 										&Command::cmd_user,
@@ -121,7 +122,8 @@ do_command(Command* command, int socket_fd)
 										&Command::cmd_join,
 										&Command::cmd_oper,
 										&Command::cmd_quit,
-										&Command::cmd_part};
+										&Command::cmd_part,
+										&Command::cmd_names};
 
 	for (int i = 0; i < COMM_COUNT; i++)
 	{
@@ -464,6 +466,7 @@ join_channel(const string& channel_name,
 		map<string, Channel>::iterator it = channels.find(channel_name);
 		it->second.add_operator(new_user);
 		it->second.add_user(new_user);
+		push_cmd_queue(fd, full_name(new_user) + " JOIN :#" + channel_name + "\r\n");
 		// отправить всем серверам, что создан канал	TODO
 	}
 	else												// channel already exist
@@ -559,6 +562,16 @@ response_to_client(int response_code, int client_fd, string message_prefix, stri
 						  << "RESPONSE " << response << "\n";
 	return response;
 }
+
+string IRC::
+full_name(const User* user) const
+{
+	string fullname = ":" + user->getNickname() + "!~" + user->getUsername() + "@" + user->getServername();
+	return fullname;
+}
+
+
+// Функция для дебага, удалить
 
 void IRC::print_channels() const {
 			std::cout << "Shared channels: \n";

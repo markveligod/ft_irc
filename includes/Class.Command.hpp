@@ -15,6 +15,7 @@
 
 using std::string;
 using std::vector;
+using std::map;
 
 class IRC;
 class Server;
@@ -48,10 +49,12 @@ public:
 	int					cmd_oper(IRC& irc, int fd);
 	int					cmd_quit(IRC& irc, int fd);
 	int					cmd_part(IRC& irc, int fd);
+	int					cmd_names(IRC& irc, int fd);
 
 	const string&		getCommand() const;
 	bool				check_args_number(int n) const;
 	bool				check_password(const Client& client) const;
 	bool				check_nickname(const Client& client) const;
 	void				leave_channel(IRC& irc, Channel& channels, char type, int fd, string message);
+	void				send_channel_users(IRC& irc, int fd, char type, string cnannel_name);
 };

@@ -1,10 +1,6 @@
 #include "main.hpp"
 #include "Class.Command.hpp"
 
-using std::string;
-using std::vector;
-using std::map;
-
 /*
 ** ====================================================================
 ** Команда: JOIN <channel>{,<channel>} [<key>{,<key>}] 

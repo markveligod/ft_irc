@@ -22,7 +22,7 @@
 
 int Command::cmd_quit(IRC& irc, int fd)
 {
-    std::vector<User*>& vec_users = irc.get_users();
+    vector<User*>& vec_users = irc.get_users();
     
     if (irc.find_fd(vec_users, fd) == -1)
         return (ERR_USERSDISABLED);
