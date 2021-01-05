@@ -133,7 +133,7 @@ do_command(Command* command, int socket_fd)
 			return (result);
 		}
 	}
-	this->push_cmd_queue(socket_fd, this->response_to_client(result, socket_fd, "", "Command not found"));
+	this->push_cmd_queue(socket_fd, this->response_to_client(result, socket_fd, "client", "Command not found"));
 	return (0);
 }
 
