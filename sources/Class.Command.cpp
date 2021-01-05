@@ -81,10 +81,7 @@ getCommand() const
 bool Command::check_args_number(int n) const
 {
 	if ((int)this->arguments.size() < n)
-	{
-		utils::print_error(ERR_ARG_NUMBER, "Not enought parameters");
 		return false;
-	}
 	return true;
 }
 

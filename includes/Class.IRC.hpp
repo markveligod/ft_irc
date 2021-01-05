@@ -113,6 +113,7 @@ class IRC
 		string						response_to_client(int response_code, int client_fd, string message_prefix, string message);
 
 		void print_channels() const;
+		int send_client_status(int fd, int err_code, string mess);
 };
 
 #include "../Class.IRC.templates.cpp"

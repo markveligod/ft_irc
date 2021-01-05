@@ -28,12 +28,11 @@ cmd_oper(IRC& irc, int fd)
     int pos;
 
     if (!this->check_args_number(2))
-		return (ERR_NEEDMOREPARAMS);
+		return (irc.send_client_status(fd, ERR_NEEDMOREPARAMS, "Not enought parameters"));
     if ((pos = irc.find_fd(vec_users, fd)) == -1)
-        return (ERR_ALREADYREGISTRED);
+        return (irc.send_client_status(fd, ERR_ALREADYREGISTRED, "ERR_ALREADYREGISTRED"));
     if (this->arguments[0] == irc.get_operator_user() && this->arguments[1] == irc.get_operator_pass())
     {
-        utils::print_line("cmd_oper is correct");
         this->command = "MODE";
         this->arguments.clear();
         this->arguments.push_back(vec_users[pos]->getNickname());
@@ -42,6 +41,6 @@ cmd_oper(IRC& irc, int fd)
         //this->cmd_mode(irc, fd);
     }
     else
-        return (ERR_PASSWDMISMATCH);
-    return (0);
+        return (irc.send_client_status(fd, ERR_PASSWDMISMATCH, "ERR_PASSWDMISMATCH"));
+    return (irc.send_client_status(fd, 0, "cmd_oper is correct"));
 }

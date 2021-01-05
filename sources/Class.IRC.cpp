@@ -105,7 +105,7 @@ typedef int (Command::*doCommand)(IRC& irc, int fd);
 int IRC::
 do_command(Command* command, int socket_fd)
 {
-	int			result;
+	int			result = 123;
 	string cmd_name[COMM_COUNT] =  {"NICK",
 									"PASS",
 									"USER",
@@ -133,7 +133,8 @@ do_command(Command* command, int socket_fd)
 			return (result);
 		}
 	}
-	utils::print_error(123, "Command not found");
+	this->send_client_status(socket_fd, result, "Command not found");
+	// utils::print_error(123, "Command not found");
 	return (0);
 }
 
@@ -436,6 +437,20 @@ push_cmd_queue(int fd, const string& str)
 
 /*
 ** ----------------------------------------------------------
+** send_client_status - отправляет статус клиенту и печатает на сервере
+** ----------------------------------------------------------
+*/
+
+int IRC::send_client_status(int fd, int err_code, string mess)
+{
+	(err_code != 0) ? utils::print_error(err_code, mess) : utils::print_line(mess);
+	std::string temp = "[SERVER]: STATUS: " + utils::int_to_str(err_code) + " MESS: " + mess;
+	this->push_cmd_queue(fd, temp);
+	return (err_code);
+}
+
+/*
+** ----------------------------------------------------------
 ** Channel
 ** ----------------------------------------------------------
 */
@@ -585,3 +600,4 @@ void IRC::print_channels() const {
 				it->second.print_users();
 			}
 }
+

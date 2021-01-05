@@ -25,7 +25,7 @@ int Command::cmd_quit(IRC& irc, int fd)
     vector<User*>& vec_users = irc.get_users();
     
     if (irc.find_fd(vec_users, fd) == -1)
-        return (ERR_USERSDISABLED);
+        return (irc.send_client_status(fd, ERR_USERSDISABLED, "ERR_USERSDISABLED"));
     irc.close_connect(fd, 0);
-    return (0);
+    return (irc.send_client_status(fd, 0, "cmd_quit is correct"));
 }
