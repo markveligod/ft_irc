@@ -26,7 +26,7 @@ int Command::cmd_quit(IRC& irc, int fd)
     
     if (irc.find_fd(vec_users, fd) == -1)
     {
-        irc.push_cmd_queue(fd, irc.response_to_client(ERR_USERSDISABLED, fd, "ERR_USERSDISABLED", "user not found!"));
+        irc.push_cmd_queue(fd, irc.response_to_client(ERR_USERSDISABLED, fd, "ERR_USERSDISABLED", ERR_USERSDISABLED_MESS));
         return (ERR_USERSDISABLED);
     }
     irc.close_connect(fd, 0);
