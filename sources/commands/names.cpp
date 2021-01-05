@@ -25,6 +25,8 @@
 int Command::
 cmd_names(IRC& irc, int fd)
 {
+	(void)irc; (void)fd;
+
 	vector<string> args = utils::split(arguments[0], ',');
 
 	if (arguments.empty() || args[0] == "0")
@@ -35,7 +37,8 @@ cmd_names(IRC& irc, int fd)
 	
 	for (size_t i = 0; i < args.size(); i++)
 	{
-		if (args[i][0] == '&' || args[i][0] == '#')
-			send_channel_users(irc, fd, args[i][0], args[i].substr(1));
+		// if (args[i][0] == '&' || args[i][0] == '#')
+		// 	send_channel_users(irc, fd, args[i][0], args[i].substr(1));
 	}
+	return 0;
 }
