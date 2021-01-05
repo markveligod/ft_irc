@@ -41,7 +41,8 @@ COMMS		= nick.cpp \
 			part.cpp \
 			user.cpp \
 			pass.cpp \
-			server.cpp
+			server.cpp \
+			names.cpp
 
 
 SRC			= $(addprefix $(SRC_DIR), $(SRCS))
