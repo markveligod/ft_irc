@@ -133,8 +133,7 @@ do_command(Command* command, int socket_fd)
 			return (result);
 		}
 	}
-	this->send_client_status(socket_fd, result, "Command not found");
-	// utils::print_error(123, "Command not found");
+	this->push_cmd_queue(socket_fd, this->response_to_client(result, socket_fd, "", "Command not found"));
 	return (0);
 }
 
@@ -433,20 +432,6 @@ void IRC::
 push_cmd_queue(int fd, const string& str)
 {
 	this->_command_queue.push(std::make_pair(fd, str));
-}
-
-/*
-** ----------------------------------------------------------
-** send_client_status - отправляет статус клиенту и печатает на сервере
-** ----------------------------------------------------------
-*/
-
-int IRC::send_client_status(int fd, int err_code, string mess)
-{
-	(err_code != 0) ? utils::print_error(err_code, mess) : utils::print_line(mess);
-	std::string temp = "[SERVER]: STATUS: " + utils::int_to_str(err_code) + " MESS: " + mess;
-	this->push_cmd_queue(fd, temp);
-	return (err_code);
 }
 
 /*

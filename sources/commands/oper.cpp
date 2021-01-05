@@ -28,9 +28,15 @@ cmd_oper(IRC& irc, int fd)
     int pos;
 
     if (!this->check_args_number(2))
-		return (irc.send_client_status(fd, ERR_NEEDMOREPARAMS, "Not enought parameters"));
+    {
+        irc.push_cmd_queue(fd, irc.response_to_client(ERR_NEEDMOREPARAMS, fd, "ERR_NEEDMOREPARAMS", "Not enought parameters"));
+		return (ERR_NEEDMOREPARAMS);
+    }
     if ((pos = irc.find_fd(vec_users, fd)) == -1)
-        return (irc.send_client_status(fd, ERR_ALREADYREGISTRED, "ERR_ALREADYREGISTRED"));
+    {
+        irc.push_cmd_queue(fd, irc.response_to_client(ERR_ALREADYREGISTRED, fd, "ERR_ALREADYREGISTRED", "Dont found user"));
+        return (ERR_ALREADYREGISTRED);
+    }
     if (this->arguments[0] == irc.get_operator_user() && this->arguments[1] == irc.get_operator_pass())
     {
         this->command = "MODE";
@@ -41,6 +47,10 @@ cmd_oper(IRC& irc, int fd)
         //this->cmd_mode(irc, fd);
     }
     else
-        return (irc.send_client_status(fd, ERR_PASSWDMISMATCH, "ERR_PASSWDMISMATCH"));
-    return (irc.send_client_status(fd, 0, "cmd_oper is correct"));
+    {
+        irc.push_cmd_queue(fd, irc.response_to_client(ERR_PASSWDMISMATCH, fd, "ERR_PASSWDMISMATCH", "Dont match with user and pass"));
+        return (ERR_PASSWDMISMATCH);
+    }
+    irc.push_cmd_queue(fd, irc.response_to_client(0, fd, "0", "cmd_oper is done!"));
+    return (0);
 }
