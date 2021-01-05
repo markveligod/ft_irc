@@ -6,7 +6,7 @@
 # define FD_CLIENT_SSL 3
 # define FD_SERVER_SSL 4
 
-# define COMM_COUNT 9
+# define COMM_COUNT 10
 
 # define CERTIFICATE "cert/cert.pem"
 # define PRIVATE_KEY "cert/key.pem"
@@ -101,6 +101,7 @@ create_socket_network()
 */
 
 typedef int (Command::*doCommand)(IRC& irc, int fd);
+typedef void (IRC::*SignalHandlerPointer)(int);
 
 int IRC::
 do_command(Command* command, int socket_fd)
@@ -114,7 +115,8 @@ do_command(Command* command, int socket_fd)
 									"OPER",
 									"QUIT",
 									"PART",
-									"NAMES"};
+									"NAMES",
+									"SQUIT"};
 	doCommand	cmd_func[COMM_COUNT] = {&Command::cmd_nick,
 										&Command::cmd_pass,
 										&Command::cmd_user,
@@ -123,7 +125,8 @@ do_command(Command* command, int socket_fd)
 										&Command::cmd_oper,
 										&Command::cmd_quit,
 										&Command::cmd_part,
-										&Command::cmd_names};
+										&Command::cmd_names,
+										&Command::cmd_squit};
 
 	for (int i = 0; i < COMM_COUNT; i++)
 	{

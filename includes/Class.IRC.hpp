@@ -56,6 +56,7 @@ class IRC
 		SSL*						_ssl;
 		SSL_CTX*					_ctx;
 
+
 	public:
 		IRC();
 		IRC(string network_ip,

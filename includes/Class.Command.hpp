@@ -50,6 +50,7 @@ public:
 	int					cmd_quit(IRC& irc, int fd);
 	int					cmd_part(IRC& irc, int fd);
 	int					cmd_names(IRC& irc, int fd);
+	int					cmd_squit(IRC& irc, int fd);
 
 	const string&		getCommand() const;
 	bool				check_args_number(int n) const;
