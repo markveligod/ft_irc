@@ -110,10 +110,14 @@ check_nickname(const Client& client) const
 bool Command::
 is_channel_visible(IRC& irc, int fd, char channel_type, const string& channel_name)
 {
-	Channel& channel = (channel_type == '&')
-							? irc.get_local_channels().find(channel_name)->second
-							: irc.get_shared_channels().find(channel_name)->second;
+	map<string, Channel>& channels = (channel_type == '&')
+									? irc.get_local_channels()
+									: irc.get_shared_channels();
 	
-	size_t i = IRC::find_fd(channel.get_users(), fd);
-	return i >=0 || channel.is_visible();
+	map<string, Channel>::iterator it = channels.find(channel_name);
+	if (it == channels.end())								// проверяем, что канал существует
+		return false;
+
+	size_t i = IRC::find_fd(it->second.get_users(), fd);	// it->second - канал
+	return i >=0 || it->second.is_visible();
 }

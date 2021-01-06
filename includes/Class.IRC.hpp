@@ -88,7 +88,6 @@ class IRC
 		void						delete_channel(string channel_name, char type);
 
 		vector<string> 				check_buffer(int fd, const char* buffer);
-		void						join_channel(const string& name, const string& key, char type, const string& nickname, int fd);
 
 		User*						get_user(string nickname);
 		User*						get_user(int fd);

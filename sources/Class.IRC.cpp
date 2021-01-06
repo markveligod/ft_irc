@@ -6,7 +6,7 @@
 # define FD_CLIENT_SSL 3
 # define FD_SERVER_SSL 4
 
-# define COMM_COUNT 10
+# define COMM_COUNT 11
 
 # define CERTIFICATE "cert/cert.pem"
 # define PRIVATE_KEY "cert/key.pem"
@@ -116,7 +116,8 @@ do_command(Command* command, int socket_fd)
 									"QUIT",
 									"PART",
 									"NAMES",
-									"SQUIT"};
+									"SQUIT",
+									"WHO"};
 	doCommand	cmd_func[COMM_COUNT] = {&Command::cmd_nick,
 										&Command::cmd_pass,
 										&Command::cmd_user,
@@ -126,7 +127,8 @@ do_command(Command* command, int socket_fd)
 										&Command::cmd_quit,
 										&Command::cmd_part,
 										&Command::cmd_names,
-										&Command::cmd_squit};
+										&Command::cmd_squit,
+										&Command::cmd_who};
 
 	for (int i = 0; i < COMM_COUNT; i++)
 	{
@@ -437,70 +439,6 @@ void IRC::
 push_cmd_queue(int fd, const string& str)
 {
 	this->_command_queue.push(std::make_pair(fd, str));
-}
-
-/*
-** ----------------------------------------------------------
-** Channel
-** ----------------------------------------------------------
-*/
-
-void IRC::
-join_channel(const string& channel_name,
-			const string& channel_key,
-			char channel_type,
-			const string& nickname,
-			int fd)
-{
-	if (!Channel::is_valid_channel_name(channel_name))	// check channel name
-	{
-		push_cmd_queue(fd, response_to_client(ERR_NOSUCHCHANNEL, fd, channel_name, ERR_NOSUCHCHANNEL_MESS));
-		return;
-	}
-
-	map<string, Channel>& channels = (channel_type == '&')
-									? _local_channels
-									: _shared_channels;
-
-	User* new_user = _users[find_nickname(_users, nickname)];
-	map<string, Channel>::iterator it = channels.find(channel_name);
-	
-	if (it == channels.end())							// add new channel
-	{
-		channels.insert(make_pair(channel_name, Channel(channel_name, channel_key, new_user, *this)));
-		map<string, Channel>::iterator it = channels.find(channel_name);
-		it->second.add_operator(new_user);
-		it->second.add_user(new_user);
-		// отправить всем серверам, что создан канал	TODO
-	}
-	else												// channel already exist
-	{
-		if (it->second.is_user_in_channel(nickname))	// check if user already in channel
-			return;
-
-		if (it->second.is_banned(nickname))				// check if user is banned 
-		{
-			push_cmd_queue(fd, response_to_client(ERR_BANNEDFROMCHAN, fd, "#" + channel_name, ERR_BANNEDFROMCHAN_MESS));
-			return;
-		}
-
-		if (!it->second.is_valid_key(channel_key))		// check channel password
-		{
-			push_cmd_queue(fd, response_to_client(ERR_BADCHANNELKEY, fd, "#" + channel_name, ERR_BADCHANNELKEY_MESS));
-			return;
-		}
-
-		if (it->second.is_invite_only())				// check if invite only channel
-		{
-			push_cmd_queue(fd, response_to_client(ERR_INVITEONLYCHAN, fd, "#" + channel_name, ERR_INVITEONLYCHAN_MESS));
-			return;
-		}
-
-		map<string, Channel>::iterator it = channels.find(channel_name);
-		it->second.add_user(new_user);
-	}
-	push_cmd_queue(fd, full_name(new_user) + " JOIN :" + channel_type + channel_name + "\r\n");
-	print_channels();
 }
 
 User* IRC::

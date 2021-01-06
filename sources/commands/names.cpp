@@ -3,30 +3,27 @@
 
 /*
 ** ====================================================================
-** Команда: WHO 
-** Параметры: [<mask> ["o"]]
+** Команда: NAMES 
+** Параметры: [<channel>{,<channel>}]
 ** ====================================================================
-** Сообщение WHO используется клиентом для создания запроса, который 
-** возвращает список информации, которая совпадает с параметром <mask>. 
-** В отсутствии параметра <mask>, все видимые 
-** (пользователи, которых не видно (пользовательский режим +i) и те, кто 
-** находятся на других каналах, нежели запрашивающий клиент) попадают в 
-** список. Результат может быть достигнут использованием вместо <name> "0" 
-** или других масок, которые будут подставлять все возможные окончания. 
-**
-** <name> обратиться к WHO, подставленному против пользовательского 
-** хоста, сервера, реального имени или никнейма, если канал <name> не найден. 
-**
-** Если параметр "o" прошел только операторам, обеспечивается возврат 
-** только маски имени.  
+** Используя команду NAMES, пользователь может получитт список всех 
+** никнеймов, которые он видит на любом канале, на которых они находятся. 
+** Имена каналов, которые они могут видеть это те, которые не приватные 
+** (+p) или секретные (+s), или те, на которых сидит пользователь. 
+** Параметр <channel> указывает, с какого канала(ов) собрать информацию. 
+** Эта команда не возвращает кода ошибки из-за неправильных названий 
+** каналов. 
+
+** Если параметр <channel> не задан, выводится список всех каналов и имен 
+** тех, кто на них находится. И к концу списка - список пользователей, 
+** которые видимые, но не находятся ни на одной канале, или не на одном 
+** видимом канале, которые начинаюся как 'channel' "*".
 ** ====================================================================
 */
 
 int Command::
 cmd_names(IRC& irc, int fd)
 {
-	(void)irc; (void)fd;
-
 	vector<string> args = utils::split(arguments[0], ',');
 
 	if (arguments.empty() || args[0] == "0")
@@ -47,13 +44,13 @@ cmd_names(IRC& irc, int fd)
 }
 
 void Command::
-send_channel_users(IRC& irc, int fd, char channel_type, string cnannel_name)
+send_channel_users(IRC& irc, int fd, char channel_type, string channel_name)
 {
 	if ((channel_type == '&'
-					? irc.get_local_channels().count(cnannel_name)
-					: irc.get_shared_channels().count(cnannel_name)) == 0)
+					? irc.get_local_channels().count(channel_name)
+					: irc.get_shared_channels().count(channel_name)) == 0)
 	{
-		irc.push_cmd_queue(fd, irc.response_to_client(RPL_ENDOFNAMES, fd, channel_type + cnannel_name, RPL_ENDOFNAMES_MESS));
+		irc.push_cmd_queue(fd, irc.response_to_client(RPL_ENDOFNAMES, fd, channel_type + channel_name, RPL_ENDOFNAMES_MESS));
 		return;
 	}
 
@@ -61,8 +58,8 @@ send_channel_users(IRC& irc, int fd, char channel_type, string cnannel_name)
 	User* user = irc.get_users()[i];				// ????? МОЖЕТ НУЖНА ПРОВЕРКА
 	
 	Channel& channel = (channel_type == '&'
-						? irc.get_local_channels().find(cnannel_name)->second
-						: irc.get_shared_channels().find(cnannel_name)->second);
+						? irc.get_local_channels().find(channel_name)->second
+						: irc.get_shared_channels().find(channel_name)->second);
 
 	string prefix = ":"
 					+ irc.get_server_name() + " "
@@ -70,7 +67,7 @@ send_channel_users(IRC& irc, int fd, char channel_type, string cnannel_name)
 					+ user->getNickname()
 					+ " = "
 					+ channel_type
-					+ cnannel_name
+					+ channel_name
 					+ " :";
 	const vector<User*>& users = channel.get_users();
 
@@ -96,5 +93,5 @@ send_channel_users(IRC& irc, int fd, char channel_type, string cnannel_name)
 		}
 		irc.push_cmd_queue(fd, response + "\r\n");
 	}
-	irc.push_cmd_queue(fd, irc.response_to_client(RPL_ENDOFNAMES, fd, channel_type + cnannel_name, RPL_ENDOFNAMES_MESS));
+	irc.push_cmd_queue(fd, irc.response_to_client(RPL_ENDOFNAMES, fd, channel_type + channel_name, RPL_ENDOFNAMES_MESS));
 }

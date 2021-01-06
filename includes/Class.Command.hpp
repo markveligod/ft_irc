@@ -41,6 +41,7 @@ private:
 	void						leave_channel(IRC& irc, Channel& channels, char type, int fd, string message);
 	void						send_channel_users(IRC& irc, int fd, char type, string cnannel_name);
 	bool						is_channel_visible(IRC& irc, int fd, char channel_type, const string& channel_name);
+	void						join_channel(IRC& irc, const string& name, const string& key, char type, const string& nickname, int fd);
 
 public:
 	Command(const string& str);
@@ -56,6 +57,7 @@ public:
 	int					cmd_part(IRC& irc, int fd);
 	int					cmd_names(IRC& irc, int fd);
 	int					cmd_squit(IRC& irc, int fd);
+	int					cmd_who(IRC& irc, int fd);
 
 	const string&		getCommand() const;
 };

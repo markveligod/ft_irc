@@ -9,10 +9,7 @@ Server::Server(int fd, const std::string& servername, int hopcount, const std::s
 }
 
 int Server::
-getFdSocket() const				{ return(this->_fd_socket); }
-
-int Server::
-getSocketFd() const				{ return (this->_fd_socket); }
+getSocketFd() const				{ return(this->_fd_socket); }
 
 void Server::
 addUser(User* new_user)			{ this->_users.push_back(new_user); }
