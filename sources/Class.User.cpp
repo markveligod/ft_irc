@@ -22,11 +22,12 @@ operator=(const ModeUser& src)
 User::
 User(Client* src) : Client(*src)
 {
-	this->nickname	= src->getNickname();
-	this->password	= src->getPassword();
-	this->hopcount	= src->getHopcount();
-	this->socket_fd = src->getSocketFd();
-	this->client 	= src;
+	this->nickname		= src->getNickname();
+	this->password		= src->getPassword();
+	this->hopcount		= src->getHopcount();
+	this->socket_fd		= src->getSocketFd();
+	this->client		= src;
+	this->channel_count	= 0;
 }
 
 User::
@@ -41,6 +42,7 @@ operator=(const User& src)
 	realname = src.realname;
 	client = src.client;
 	mode = src.mode;
+	channel_count = src.channel_count;
 	return *this;
 }
 
@@ -71,14 +73,15 @@ void User::
 user_from_client(const string& username, const string& hostname, 
 				 const string& servername, const string& realname)
 {
-	this->username	 = username;
-	this->hostname	 = hostname;
-	this->servername = servername;
-	this->realname 	 = realname;
-	this->mode.i	 = 0;
-	this->mode.o	 = 0;
-	this->mode.s	 = 0;
-	this->mode.w	 = 0;
+	this->username		= username;
+	this->hostname		= hostname;
+	this->servername	= servername;
+	this->realname 		= realname;
+	this->mode.i		= 0;
+	this->mode.o		= 0;
+	this->mode.s		= 0;
+	this->mode.w	 	= 0;
+	this->channel_count	= 0;
 }
 
 void User::
@@ -86,11 +89,12 @@ user_from_client(const string& username, const string& hostname,
 				 const string& servername, const string& realname,
 				 const ModeUser& mode)
 {
-	this->username 	 = username;
-	this->hostname	 = hostname;
-	this->servername = servername;
-	this->realname	 = realname;
-	this->mode		 = mode;
+	this->username 		 = username;
+	this->hostname	 	= hostname;
+	this->servername 	= servername;
+	this->realname	 	= realname;
+	this->mode		 	= mode;
+	this->channel_count	= 0;
 }
 
 void User::
@@ -132,6 +136,12 @@ getServername() const					{ return(this->servername); }
 
 const string& User::
 getRealname() const						{ return (this->realname); }
+
+void User::
+inc_channel_count()						{ channel_count++; }
+
+void User::
+dec_channel_count()						{ channel_count--; }
 
 void User::
 print_user()

@@ -100,6 +100,7 @@ join_channel(IRC& irc,
 		it->second.add_user(new_user);
 	}
 	irc.push_cmd_queue(fd, irc.full_name(new_user) + " JOIN :" + channel_type + channel_name + "\r\n");
+	new_user->inc_channel_count();								// увеличиваем количество каналов, в которых состоит пользователь
 	send_channel_users(irc, fd, channel_type, channel_name);	// отсылаем подключившемуся список все пользователей канала
 	irc.print_channels(); //DEBUG
 	return;

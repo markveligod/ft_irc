@@ -79,6 +79,7 @@ leave_channel(IRC& irc, Channel& channel, char type, int fd, string message)
 	int i = IRC::find_fd(users, fd);
 	if (i >= 0)
 	{
+		users[i]->dec_channel_count();
 		users.erase(users.begin() + i);
 		irc.push_cmd_queue(fd, irc.full_name(users[i]) + " PART " + type + channel.get_name() + message + "\r\n");
 

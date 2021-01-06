@@ -25,6 +25,7 @@ private:
 	string 		realname;
 	Client*		client;
 	ModeUser	mode;
+	size_t		channel_count;
 
 public:
 	User(Client* src);
@@ -52,6 +53,9 @@ public:
 	const string&	getHostname() const;
 	const string&	getServername() const;
 	const string&	getRealname() const;
+
+	void			inc_channel_count();
+	void			dec_channel_count();
 };
 
 #endif
