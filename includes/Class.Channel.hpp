@@ -61,6 +61,7 @@ public:
 	const string&		get_name() const;
 	const ModeChannel&	get_mode() const;
 	const string&		get_key() const;
+	const string&		get_topic() const;
 	vector<User*>&		get_users();
 	vector<User*>&		get_operators();
 

@@ -53,6 +53,7 @@ public:
 	const string&	getHostname() const;
 	const string&	getServername() const;
 	const string&	getRealname() const;
+	size_t			getChannelCount() const;
 
 	void			inc_channel_count();
 	void			dec_channel_count();

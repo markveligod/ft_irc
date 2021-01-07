@@ -24,6 +24,9 @@ get_mode() const									{ return _mode; }
 const string& Channel::
 get_key() const										{ return _key; }
 
+const string& Channel::
+get_topic() const									{ return _topic; }
+
 vector<User*>& Channel::
 get_users()											{ return _users; }
 

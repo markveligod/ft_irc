@@ -272,7 +272,9 @@
 										// and end reply must be sent.
 
 #define RPL_CHANNELMODEIS		324		// "<channel> <mode> <mode params>"
+
 #define RPL_NOTOPIC				331		// "<channel> :No topic is set"
+#define RPL_NOTOPIC_MESS		" :No topic is set"
 
 #define RPL_TOPIC				332		// "<channel> :<topic>"
 										// - When sending a TOPIC message to determine the

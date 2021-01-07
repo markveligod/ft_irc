@@ -39,4 +39,5 @@ public:
 	int		_accept();
 	
 	int		get_fd() const;
+	int		get_port() const;
 };

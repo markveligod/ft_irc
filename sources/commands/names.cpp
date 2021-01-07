@@ -26,9 +26,26 @@ cmd_names(IRC& irc, int fd)
 {
 	vector<string> args = utils::split(arguments[0], ',');
 
-	if (arguments.empty() || args[0] == "0")
+	// if (arguments.empty() || args[0] == "0")
+	if (arguments.empty() || args[0] == "0" || atoi(args[0].c_str()) == irc.get_localhost_port())
 	{
-		// отправить всех видимых пользователей(?)
+		// if ()	// если fd принадлежит Серверу, то ему не надо отправлять списко локальных каналов 
+		map<string, Channel>& channels = irc.get_local_channels();
+		for (map<string, Channel>::iterator it = channels.begin(); it != channels.end(); it++)
+		{
+			if (is_channel_visible(irc, fd, '&', it->first))
+				send_channel_users(irc, fd, '&', it->first);
+		}
+
+		channels = irc.get_shared_channels();
+		for (map<string, Channel>::iterator it = channels.begin(); it != channels.end(); it++)
+		{
+			if (is_channel_visible(irc, fd, '#', it->first))
+				send_channel_users(irc, fd, '#', it->first);
+		}
+
+		send_users_without_channel(irc, fd);
+		irc.push_cmd_queue(fd, irc.response_to_client(RPL_ENDOFNAMES, fd, "*", RPL_ENDOFNAMES_MESS));
 		return 0;
 	}
 	
@@ -36,7 +53,10 @@ cmd_names(IRC& irc, int fd)
 	{
 		if ((args[i][0] == '&' || args[i][0] == '#')
 			&& is_channel_visible(irc, fd, args[i][0], args[i].substr(1)))
+		{
 			send_channel_users(irc, fd, args[i][0], args[i].substr(1));
+			irc.push_cmd_queue(fd, irc.response_to_client(RPL_ENDOFNAMES, fd, args[i][0] + args[i].substr(1), RPL_ENDOFNAMES_MESS));
+		}
 		else
 			irc.push_cmd_queue(fd, irc.response_to_client(RPL_ENDOFNAMES, fd, args[i], RPL_ENDOFNAMES_MESS));
 	}
@@ -46,30 +66,31 @@ cmd_names(IRC& irc, int fd)
 void Command::
 send_channel_users(IRC& irc, int fd, char channel_type, string channel_name)
 {
-	if ((channel_type == '&'
-					? irc.get_local_channels().count(channel_name)
-					: irc.get_shared_channels().count(channel_name)) == 0)
-	{
-		irc.push_cmd_queue(fd, irc.response_to_client(RPL_ENDOFNAMES, fd, channel_type + channel_name, RPL_ENDOFNAMES_MESS));
-		return;
-	}
+	// if ((channel_type == '&'
+	// 				? irc.get_local_channels().count(channel_name)
+	// 				: irc.get_shared_channels().count(channel_name)) == 0)
+	// {
+	// 	irc.push_cmd_queue(fd, irc.response_to_client(RPL_ENDOFNAMES, fd, channel_type + channel_name, RPL_ENDOFNAMES_MESS));
+	// 	return;
+	// }
 
-	int i = IRC::find_fd(irc.get_users(), fd);		// ищем никнейм пользователя по его fd
-	User* user = irc.get_users()[i];				// ????? МОЖЕТ НУЖНА ПРОВЕРКА
-	
 	Channel& channel = (channel_type == '&'
 						? irc.get_local_channels().find(channel_name)->second
 						: irc.get_shared_channels().find(channel_name)->second);
 
+	vector<User*>& users = channel.get_users();
+
+	int i = IRC::find_fd(irc.get_users(), fd);		// ищем никнейм пользователя (отправившего NAMES) по его fd
+
 	string prefix = ":"
 					+ irc.get_server_name() + " "
 					+ utils::int_to_str(RPL_NAMREPLY) + " "
-					+ user->getNickname()
+					+ irc.get_users()[i]->getNickname()
 					+ " = "
 					+ channel_type
 					+ channel_name
 					+ " :";
-	const vector<User*>& users = channel.get_users();
+	std::cout << "DEBUG: " << prefix << std::endl;
 
 	for (size_t i = 0; i < users.size(); )
 	{
@@ -93,5 +114,44 @@ send_channel_users(IRC& irc, int fd, char channel_type, string channel_name)
 		}
 		irc.push_cmd_queue(fd, response + "\r\n");
 	}
-	irc.push_cmd_queue(fd, irc.response_to_client(RPL_ENDOFNAMES, fd, channel_type + channel_name, RPL_ENDOFNAMES_MESS));
+}
+
+void Command::
+send_users_without_channel(IRC& irc, int fd)
+{
+	std::vector<User*>& users = irc.get_users();
+	int i = IRC::find_fd(users, fd);
+
+	string prefix = ":"
+					+ irc.get_server_name() + " "
+					+ utils::int_to_str(RPL_NAMREPLY) + " "
+					+ users[i]->getNickname()
+					+ " * * :";
+
+	for (size_t i = 0; i < users.size(); )
+	{
+		string response = prefix;
+	
+		bool first = true;
+		while (i < users.size())
+		{
+			if (!users[i]->getChannelCount())
+			{
+				string nickname = users[i]->getNickname();
+				if (!first)
+					nickname = " " + nickname;
+				first = false;
+				if (response.size() + nickname.size() < MAX_MESSAGE_LEN)
+				{
+					response += nickname;
+					i++;
+				} else
+					break;
+			}
+			else
+				i++;
+		}
+		if (response != prefix)
+			irc.push_cmd_queue(fd, response + "\r\n");
+	}
 }

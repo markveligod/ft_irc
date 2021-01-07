@@ -439,6 +439,7 @@ void IRC::
 push_cmd_queue(int fd, const string& str)
 {
 	this->_command_queue.push(std::make_pair(fd, str));
+	std::cout << "DEBUG : PUSH to CMD QUEUE: " << str << std::endl;
 }
 
 User* IRC::
@@ -468,6 +469,9 @@ get_servers()				{ return _servers; }
 
 const string& IRC::
 get_server_name()			{ return _server_name; }
+
+int IRC::
+get_localhost_port() const	{ return _localhost.get_port(); }
 
 const string& IRC::
 get_localhost_pass() const	{ return _localhost_pass; }
@@ -500,12 +504,6 @@ response_to_client(int response_code, int client_fd, string message_prefix, stri
 					+ message_prefix
 					+ message
 					+ "\r\n";
-
-	std::cout << "DEBUG " << "_server_name " << _server_name << "\n"
-						  << "response_code " << response_code << "\n"
-						  << "message_prefix " << message_prefix << "\n"
-						  << "message " << message << "\n"
-						  << "RESPONSE " << response << "\n";
 	return response;
 }
 

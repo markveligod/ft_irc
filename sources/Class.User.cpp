@@ -137,6 +137,9 @@ getServername() const					{ return(this->servername); }
 const string& User::
 getRealname() const						{ return (this->realname); }
 
+size_t User::
+getChannelCount() const					{ return (this->channel_count); }
+
 void User::
 inc_channel_count()						{ channel_count++; }
 

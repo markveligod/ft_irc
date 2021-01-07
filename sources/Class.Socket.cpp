@@ -92,7 +92,7 @@ _accept() {
 
 	if ((client = accept(_fd, reinterpret_cast<struct sockaddr*>(&_addr), &_addr_size)) < 0)
 		utils::exit_error(ERR_ACCEPT, "Accepting error");
-	// fcntl(client, F_SETFL, O_NONBLOCK);
+	// fcntl(client, F_SETFL, O_NONBLOCK); TODO
 	return client;
 }
 
@@ -102,4 +102,8 @@ Socket::
 		close(_fd);
 }
 
-int Socket::get_fd() const {return (this->_fd);}
+int Socket::
+get_fd() const		{ return _fd; }
+
+int Socket::
+get_port() const	{ return _port; }

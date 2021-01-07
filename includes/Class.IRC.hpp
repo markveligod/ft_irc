@@ -62,8 +62,8 @@ class IRC
 		IRC(string network_ip,
 			string network_port,
 			string network_pass,
-			string current_port,
-			string _current_pass,
+			string localhost_port,
+			string localhost_pass,
 			string operator_user = "foo",
 			string operator_pass = "bar");
 
@@ -95,6 +95,7 @@ class IRC
 		vector<Client*>& 			get_clients();
 		vector<Server*>& 			get_servers();
 		const string& 				get_server_name();
+		int							get_localhost_port() const;
 		const string&				get_localhost_pass() const;
 		const string&				get_operator_user() const;
 		const string&				get_operator_pass() const;
