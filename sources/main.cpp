@@ -20,11 +20,15 @@ int main(int ac, char **av)
 
 	if (ac != 3 && ac != 4)
 		utils::exit_error(ERR_COUNT, "ARG: ./ircserv [host:port_network:password_network] <port> <password>");
-	if (!utils::check_av(ac, av))
-		utils::exit_error(ERR_CHECKAV, "Incorrect enter to argv!");
+	// if (!utils::check_av(ac, av))
+	// 	utils::exit_error(ERR_CHECKAV, "Incorrect enter to argv!");
 
 	if (ac == 4)
+	{
 		network = utils::split(av[1], ':');
+		if (network.size() < 3)
+			network.push_back(string());
+	}
 	else
 	{
 		network.push_back(LOCALHOST);

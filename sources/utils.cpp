@@ -27,8 +27,8 @@ namespace utils
 			return false;
 		
 		size_t second_colon = network.find(':', first_colon + 1);									// ищем индекс второго ':'
-		if (second_colon == first_colon + 1 || second_colon == network.size() - 1)					// проверяем, что порт и пароль не пустые
-			return false;
+		// if (second_colon == first_colon + 1 || second_colon == network.size() - 1)				// проверяем, что порт и пароль не пустые
+		// 	return false;
 
 		std::string network_port = network.substr(first_colon + 1, second_colon - first_colon - 1);	// получаем порт сети
 		int port = atoi(network_port.c_str());														// проверяем, что порт не больше макс short
