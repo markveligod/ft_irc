@@ -1,22 +1,20 @@
 #include "./main.hpp"
 #include "Class.IRC.hpp"
 
-static IRC server;
+int g_exit;
 
 void terminate_server(int signal)
 {
 	if (signal == SIGINT)
 	{
-		for (size_t i = 0; i < server.get_servers().size(); i++)
-		{
-			server.push_cmd_queue(server.get_servers()[i]->getSocketFd(), "SQUIT <servername> :terminate\r\n");
-		}
+		g_exit = 1;
 	}
 }
 
 int main(int ac, char **av)
 {
 	std::vector<std::string> network;
+	g_exit = 0;
 
 	if (ac != 3 && ac != 4)
 		utils::exit_error(ERR_COUNT, "ARG: ./ircserv [host:port_network:password_network] <port> <password>");
@@ -36,16 +34,16 @@ int main(int ac, char **av)
 		network.push_back(DEF_PASS);
 	}
 
-	//test cout 
-	std::cout << network[0] << std::endl;
-	std::cout << network[1] << std::endl;
-	std::cout << network[2] << std::endl;
-	std::cout << ((ac == 4) ? av[2] : av[1]) << std::endl;
-	std::cout << ((ac == 4) ? av[3] : av[2]) << std::endl;
+	// //test cout 
+	// std::cout << network[0] << std::endl;
+	// std::cout << network[1] << std::endl;
+	// std::cout << network[2] << std::endl;
+	// std::cout << ((ac == 4) ? av[2] : av[1]) << std::endl;
+	// std::cout << ((ac == 4) ? av[3] : av[2]) << std::endl;
 
 	IRC server(network[0], network[1], network[2], (ac == 4) ? av[2] : av[1], (ac == 4) ? av[3] : av[2]);
 	IRC server_ssl(network[0], network[1], network[2], (ac == 4) ? av[2] : av[1]	, (ac == 4) ? av[3] : av[2]);
-	//signal(SIGINT, terminate_server);
+	signal(SIGINT, terminate_server);
 	if (ac == 4)
 		server.create_socket_network();
 
@@ -59,6 +57,17 @@ int main(int ac, char **av)
 		server.init_fd_select();
 		server.do_select();
 		server.check_fd_select();
+		if (g_exit == 1 && server.get_servers().size() == 0 && server.isEmptyQuene() == true)
+			exit(EXIT_SUCCESS);
+		if (g_exit == 1 && server.get_servers().size() != 0)
+		{
+			std::cout << "\nSIZE servers : " << server.get_servers().size() << std::endl;
+			for (size_t i = 0; i < server.get_servers().size(); i++)
+			{
+				server.push_cmd_queue(server.get_servers()[i]->getSocketFd(), "SQUIT <servername> :terminate\r\n");
+			}
+			server.get_servers().clear();
+		}
 	}
 
 	// SSL_CTX_free(_ctx);

@@ -493,6 +493,9 @@ get_local_channels()		{ return _local_channels; }
 map<string, Channel>& IRC::
 get_shared_channels()		{ return _shared_channels; }
 
+bool IRC::
+isEmptyQuene() const		{ return (this->_command_queue.empty());}
+
 string IRC::
 response_to_client(int response_code, int client_fd, string message_prefix, string message)
 {

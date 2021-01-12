@@ -102,6 +102,7 @@ class IRC
 		const Socket&				get_socket() const;
 		map<string, Channel>&		get_local_channels();
 		map<string, Channel>&		get_shared_channels();
+		bool						isEmptyQuene() const;
 
 		template <typename T>
 		static int					find_fd(T& container, int fd);
