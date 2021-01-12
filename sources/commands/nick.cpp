@@ -98,8 +98,13 @@ cmd_nick(IRC& irc, int fd)
 
 	else if (this->prefix.empty() && (i = IRC::find_fd(clients, fd)) >= 0) 		// если префикс пуст и если есть клиент с таким fd
 	{
-		if (!(this->check_password(*clients[i])) || !(clients[i]->getNickname().empty())) // если он уже установил верный пароль
+		if (!(this->check_password(*clients[i])))
 			return 0;
+		if (!(clients[i]->getNickname().empty()))
+		{
+			utils::print_error(0, "you are already registered");
+			return 0;
+		}
 		utils::print_line("Nickname for client " + this->arguments[0] + " set");
 		if ((j = IRC::find_fd(users, fd)) >= 0)
 			utils::print_line("New nickname for user" + this->arguments[0] + " set");
@@ -126,12 +131,7 @@ cmd_nick(IRC& irc, int fd)
 	for (i = 0; i < (int)servers.size(); i++)
 	{
 		if (i != j)
-		{
-			if (this->prefix.empty())
-				irc.push_cmd_queue(servers[i]->getSocketFd(), "NICK " + this->arguments[0] + "\r\n");
-			else
-				irc.push_cmd_queue(servers[i]->getSocketFd(), ":" + this->prefix + " NICK " + this->arguments[0] + "\r\n");
-		}
+			irc.push_cmd_queue(servers[i]->getSocketFd(), this->message + "\r\n");
 	}
 
 	return 0;

@@ -45,28 +45,14 @@ cmd_user(IRC& irc, int fd)
 
 	if (!(this->check_args_number(4)))
 		return (ERR_NEEDMOREPARAMS);
-	if (this->prefix.empty() &&										// если префикс пуст
-	   (i = IRC::find_fd(clients, fd)) >= 0)						// и сообщение от клиента
+
+	if (!(this->prefix.empty()) &&								// если префикс есть
+		(server_fd = IRC::find_fd(servers, fd)) >= 0 &&			// и сообщение пришло с сервера
+		(i = IRC::find_nickname(clients, this->prefix)) >= 0)	// и есть клиент с таким ником
 	{
-		if (!(check_password(*clients[i])) ||						// проверяем, ввел ли клиент пароль
-			!(check_nickname(*clients[i])))							// и ввел ли клиент ник
+		if (!(check_nickname(*clients[i])))							// и ввел ли клиент ник
 			return 0;
-		if (IRC::find_fd(users, fd) >= 0)
-		{
-			utils::print_error(ERR_ALREADYREGISTRED, "Already registered");
-			return (ERR_ALREADYREGISTRED);
-		}
-		else
-			this->user_create(clients[i], users, NULL);
-	}
-	else if (!(this->prefix.empty()) &&								// если префикс есть
-			(server_fd = IRC::find_fd(servers, fd)) >= 0 &&			// и сообщение пришло с сервера
-			(i = IRC::find_nickname(clients, this->prefix)) >= 0)	// и есть клиент с таким ником
-	{
-		if (!(check_password(*clients[i])) ||						// проверяем, ввел ли клиент пароль
-			!(check_nickname(*clients[i])))							// и ввел ли клиент ник
-			return 0;
-		if (IRC::find_nickname(users, this->prefix))				// если уже есть юзер с таким именем
+		if (IRC::find_nickname(users, this->prefix) >= 0)			// если уже есть юзер с таким никнеймом
 		{
 			utils::print_error(ERR_ALREADYREGISTRED, "Already registered");
 			return (ERR_ALREADYREGISTRED);
@@ -74,5 +60,37 @@ cmd_user(IRC& irc, int fd)
 		else
 			this->user_create(clients[i], users, servers[server_fd]);
 	}
+
+	else if (this->prefix.empty() &&									// если префикс пуст
+	   		(i = IRC::find_fd(clients, fd)) >= 0)						// и сообщение от клиента
+	{
+		if (!(check_password(*clients[i])) ||						// проверяем, ввел ли клиент пароль
+			!(check_nickname(*clients[i])))							// и ввел ли клиент ник
+			return 0;
+		if (IRC::find_nickname(users, clients[i]->getNickname()) >= 0)
+		{
+			utils::print_error(ERR_ALREADYREGISTRED, "Already registered");
+			return (ERR_ALREADYREGISTRED);
+		}
+		else
+			this->user_create(clients[i], users, NULL);
+	}
+	else
+		return 0;
+
+	int j = -1;
+	std::string nickname = clients[i]->getNickname();
+	j = IRC::find_fd(servers, fd);
+	for (i = 0; i < (int)servers.size(); i++)
+	{
+		if (i != j)
+		{
+			if (!this->prefix.empty())
+				irc.push_cmd_queue(servers[i]->getSocketFd(), this->message + "\r\n");
+			else
+				irc.push_cmd_queue(servers[i]->getSocketFd(), ":" + nickname + " " + this->message + "\r\n");
+		}
+	}
+
 	return 0;
 }

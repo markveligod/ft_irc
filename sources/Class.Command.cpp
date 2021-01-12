@@ -10,7 +10,7 @@ using std::string;
 ** ==========================================
 */
 
-Command::Command(const string& str)
+Command::Command(const string& str) : message(str)
 {
 	std::istringstream	ss(str);
 	string				word;

@@ -27,6 +27,7 @@ private:
 	string				prefix;
 	string				command;
 	vector<string> 		arguments;
+	string				message;
 
 
 	bool						nick_valid() const;
