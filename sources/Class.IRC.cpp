@@ -85,6 +85,7 @@ create_socket_network()
 
 	_array_fd_select[fd] = FD_CLIENT;
 	_clients.push_back(new Client(fd));
+	_servers.push_back(new Server(fd, _server_name, 1, "info"));
 	if (!_network_pass.empty())
 		push_cmd_queue(fd, "PASS " + _network_pass + " \r\n");
 	push_cmd_queue(fd, "SERVER " + _server_name + " 1 :info \r\n");

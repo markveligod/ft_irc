@@ -71,38 +71,38 @@ cmd_nick(IRC& irc, int fd)
 	int i = -1;
 	int j = -1;
 
-	if (!(this->check_args_number(1)))
+	if (!(this->check_args_number(1)))							// если количество аргументов не 1
 		return (ERR_NONICKNAMEGIVEN);
 
-	if (!(this->nick_valid()))
+	if (!(this->nick_valid()))									// если ник не валидный
 		return (ERR_ERRONEUSNICKNAME);
 
-	if (IRC::find_fd(servers, fd) >= 0 &&
-		this->prefix.empty() &&									
-		!(this->nick_available(clients, this->arguments[0])))				// ????????
+	if (IRC::find_fd(servers, fd) >= 0 &&						// если сообщение от сервера
+		this->prefix.empty() &&									// и нет префикса
+		!(this->nick_available(clients, this->arguments[0])))	// и такой ник уже занят
 		return (ERR_NICKCOLLISION);
 
-	if (!(this->nick_available(clients, this->arguments[0])))
+	if (!(this->nick_available(clients, this->arguments[0])))	// если сообщение от клиента и такой ник уже занят
 		return (ERR_NICKNAMEINUSE);
 
-	if (this->prefix.empty() && (i = IRC::find_fd(clients, fd)) >= 0) 		// если префикс пуст и если есть клиент с таким fd
-	{
-		if (!(this->check_password(*clients[i])))							// если он уже установил верный пароль
-			return 0;
-		utils::print_line("Nickname for client " + this->arguments[0] + " set");
-		if ((j = IRC::find_fd(users, fd)) >= 0)
-			utils::print_line("New nickname for user" + this->arguments[0] + " set");
-	}
-
-	else if (this->prefix.empty() &&										// если префикс пуст
-			IRC::find_fd(clients, fd) < 0 &&								// и нет клиента с таким fd
-			(i = IRC::find_fd(servers, fd)) >= 0)							// и есть сервер с таким fd
+	if (this->prefix.empty() &&											// если префикс пуст
+		// IRC::find_fd(clients, fd) < 0 &&								// и нет клиента с таким fd
+		(i = IRC::find_fd(servers, fd)) >= 0)							// и есть сервер с таким fd
 	{
 		Client* new_client = new Client(fd, this->arguments[0], std::atoi(this->arguments[1].c_str()));
 		clients.push_back(new_client);
 		servers[i]->addClient(new_client);
 		utils::print_line("New client created");
 		i = -1;
+	}
+
+	else if (this->prefix.empty() && (i = IRC::find_fd(clients, fd)) >= 0) 		// если префикс пуст и если есть клиент с таким fd
+	{
+		if (!(this->check_password(*clients[i])) || !(clients[i]->getNickname().empty())) // если он уже установил верный пароль
+			return 0;
+		utils::print_line("Nickname for client " + this->arguments[0] + " set");
+		if ((j = IRC::find_fd(users, fd)) >= 0)
+			utils::print_line("New nickname for user" + this->arguments[0] + " set");
 	}
 
 	else if (!(this->prefix.empty()) && (i = IRC::find_nickname(clients, this->prefix)) >= 0) // если есть префикс и если есть клиент с ником, который пришел в префикс
@@ -118,63 +118,21 @@ cmd_nick(IRC& irc, int fd)
 		clients[i]->setNickname(this->arguments[0]);
 	if (j >= 0)
 		users[j]->setNickname(this->arguments[0]);
+
+	
+	// отправка сообщения всем серверам
+	j = -1;
+	j = IRC::find_fd(servers, fd);
+	for (i = 0; i < (int)servers.size(); i++)
+	{
+		if (i != j)
+		{
+			if (this->prefix.empty())
+				irc.push_cmd_queue(servers[i]->getSocketFd(), "NICK " + this->arguments[0] + "\r\n");
+			else
+				irc.push_cmd_queue(servers[i]->getSocketFd(), ":" + this->prefix + " NICK " + this->arguments[0] + "\r\n");
+		}
+	}
+
 	return 0;
 }
-
-// int  Command::cmd_nick(IRC& irc, int fd)
-// {
-// 	vector<Client*>& clients 	= irc.get_clients();
-// 	vector<User*>& users 		= irc.get_users();
-// 	vector<Server*>& servers	= irc.get_servers();
-// 	int i = -1;
-// 	int j = -1;
-
-// 	if (!(this->check_args_number(1)))
-// 		return (ERR_NONICKNAMEGIVEN);
-
-// 	if (!(this->nick_valid()))
-// 		return (ERR_ERRONEUSNICKNAME);
-
-// 	if (IRC::find_fd(servers, fd) >= 0 &&
-// 		this->prefix.empty() &&									
-// 		!(this->nick_available(clients, this->arguments[0])))				// ????????
-// 		return (ERR_NICKCOLLISION);
-
-// 	if (!(this->nick_available(clients, this->arguments[0])))
-// 		return (ERR_NICKNAMEINUSE);
-
-// 	if (this->prefix.empty() && (i = IRC::find_fd(clients, fd)) >= 0) 		// если префикс пуст и если есть клиент с таким fd
-// 	{
-// 		if (!(this->check_password(*clients[i])))							// если он уже установил верный пароль
-// 			return 0;
-// 		utils::print_line("Nickname for client " + this->arguments[0] + " set");
-// 		if ((j = IRC::find_fd(users, fd)) >= 0)
-// 			utils::print_line("New nickname for user" + this->arguments[0] + " set");
-// 	}
-
-// 	else if (this->prefix.empty() &&										// если префикс пуст
-// 			IRC::find_fd(clients, fd) < 0 &&								// и нет клиента с таким fd
-// 			(i = IRC::find_fd(servers, fd)) >= 0)							// и есть сервер с таким fd
-// 	{
-// 		Client* new_client = new Client(fd, this->arguments[0], std::atoi(this->arguments[1].c_str()));
-// 		clients.push_back(new_client);
-// 		servers[i]->addClient(new_client);
-// 		utils::print_line("New client created");
-// 		i = -1;
-// 	}
-
-// 	else if (!(this->prefix.empty()) && (i = IRC::find_nickname(clients, this->prefix)) >= 0) // если есть префикс и если есть клиент с ником, который пришел в префикс
-// 	{
-// 		if (!(this->check_password(*clients[i])))												// если он уже установил верный пароль
-// 			return 0;
-// 		utils::print_line("Nickname for client changed from " + clients[i]->getNickname() + " to " + this->arguments[0]);
-// 		if ((j = IRC::find_nickname(users, this->prefix)) >= 0)
-// 			utils::print_line("Nickname for user changed from " + users[j]->getNickname() + " to " + this->arguments[0]);
-// 	}
-
-// 	if (i >= 0)
-// 		clients[i]->setNickname(this->arguments[0]);
-// 	if (j >= 0)
-// 		users[j]->setNickname(this->arguments[0]);
-// 	return 0;
-// }

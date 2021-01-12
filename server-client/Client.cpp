@@ -30,8 +30,9 @@ void	Client::connection()
 				  << this->port << "!!!" << std::endl;
 	else
 		Client::error("Connection error");
-	strcpy(this->buffer, ("PASS " + this->pass + "\r\nNICK nickname\r\nUSER test test localhost 1 :Test Test\r\n").c_str());
+	//strcpy(this->buffer, ("PASS " + this->pass + "\r\nNICK nickname\r\nUSER test test localhost 1 :Test Test\r\n").c_str());
 	//strcpy(this->buffer, this->pass.c_str());
+	strcpy(this->buffer, ("PASS " + this->pass + "\r\n").c_str());
 	//this->buffer[strlen(this->buffer)] = '\n';
 	std::cout << "Sending...\n";
 	send(this->client, this->buffer, BUFFER_SIZE, 0);
