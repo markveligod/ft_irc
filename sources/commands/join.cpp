@@ -63,18 +63,18 @@ join_channel(IRC& irc,
 									: irc.get_shared_channels();
 
 	User* new_user = irc.get_user(fd);
+	string message = irc.full_name(new_user) + " JOIN :" + channel_type + channel_name;
 	map<string, Channel>::iterator it = channels.find(channel_name);
 	
 	if (it == channels.end())									// add new channel
 	{
 		channels.insert(make_pair(channel_name, Channel(channel_name, channel_key, new_user, irc)));
 		map<string, Channel>::iterator it2 = channels.find(channel_name);
-		if (it2 == channels.end())
-			std::cout << "DEBUG: hzzzzzz\n";
-		std::cout << "DEBUG: channel name " << it2->first << std::endl;
+
 		it2->second.add_operator(new_user);
 		it2->second.add_user(new_user);
 		irc.push_cmd_queue(fd, irc.full_name(new_user) + " JOIN :" + channel_type + channel_name + "\r\n");
+		irc.forward_message_to_servers(fd, message, true);
 		// отправить всем серверам, что создан канал	TODO
 	}
 	else														// channel already exist
@@ -102,7 +102,10 @@ join_channel(IRC& irc,
 
 		map<string, Channel>::iterator it = channels.find(channel_name);
 		it->second.add_user(new_user);
-		irc.push_cmd_queue(fd, irc.full_name(new_user) + " JOIN :" + channel_type + channel_name + "\r\n");
+
+		irc.push_cmd_queue(fd, message + "\r\n");
+		irc.forward_message_to_servers(fd, message, true);
+		irc.forward_message_to_clients(fd, message);
 		send_topic(irc, fd, channel_type + channel_name, it->second.get_topic());			// отправляем Топик
 		// :irc.atw-inter.net 332 porrring #q1 ::New topic set
 	}

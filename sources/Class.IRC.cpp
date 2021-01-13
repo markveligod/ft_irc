@@ -215,6 +215,7 @@ check_fd_select()
 			string DEBUG = _command_queue.front().second;
 			size_t t = DEBUG.find("\r"); DEBUG[t] = 0; DEBUG[t+1] = 0;
 			std::cout << "DEBUG: Сообщение отправлено клиенту " << it->first << ": |" << DEBUG << "|\n";
+
 			_send(it->second, it->first, _command_queue.front().second.c_str(), strlen(_command_queue.front().second.c_str()), 0);
 			_command_queue.pop();
 		}
@@ -227,7 +228,7 @@ check_fd_select()
 				
 				char buffer[512 + 1];
 				int n = _recv(it->second, it->first, buffer, 512, 0);
-				
+				std::cout << "DEBUG char Buffer: " << buffer << std::endl;
 				if (n < 1)
 				{
 					it = _array_fd_select.begin();
@@ -237,11 +238,14 @@ check_fd_select()
 				//получаем распарсенный вектор команд если нашли \r\n
 				vector<string> buffer_cmd = this->check_buffer(it->first, buffer);
 
+				std::cout << "\nDEBUG: получен буфер команд размером: " << buffer_cmd.size() << std::endl;
+				std::cout << "\nDEBUG BUFFER:\n";
+				for (size_t i = 0; i < buffer_cmd.size(); i++)
+					std::cout << "Index: " << i << " STR: " << buffer_cmd[i] << std::endl;
+
 				for (size_t i = 0; i < buffer_cmd.size(); i++)
 				{
 					Command mess(buffer_cmd[i]);
-
-					std::cout << buffer_cmd[i] << std::endl;
 
 					// передаем в исполнение команды сообщение и сокет, из которого пришло сообщение
 					this->do_command(&mess, it->first);
@@ -430,10 +434,21 @@ delete_channel(string name, char type)
 vector<string> IRC::
 check_buffer(int fd, const char* buffer)
 {
-	Client* temp_ptr_client = this->_clients[IRC::find_fd(this->_clients, fd)];
+	Client* temp_ptr_client;
 	vector<string> temp_vec;
+	int pos;
 
+	if ((pos = IRC::find_fd(this->_clients, fd)) == -1)
+	{
+		utils::print_error(ERR_FINDFD, "In function check_buffer didn't find fd");
+		if (buffer[0] == 'S' && buffer[1] == 'Q' && buffer[2] == 'U' && buffer[3] == 'I' && buffer[4] == 'T')
+			temp_vec.push_back(buffer);
+		return (temp_vec);
+	}
+
+	temp_ptr_client = this->_clients[pos];
 	string temp = temp_ptr_client->getBuffer();
+	
 	temp_ptr_client->setBuffer(temp + static_cast<string>(buffer));
 	
 	while (temp_ptr_client->find_line_break())
@@ -456,7 +471,6 @@ void IRC::
 push_cmd_queue(int fd, const string& str)
 {
 	this->_command_queue.push(std::make_pair(fd, str));
-	std::cout << "DEBUG : PUSH to CMD QUEUE: " << str << std::endl;
 }
 
 User* IRC::
@@ -524,8 +538,11 @@ get_channel(string channel_name) {
 			: NULL;
 }
 
+string IRC::
+get_nickname(int fd)		{ return _users[find_fd(_users, fd)]->getNickname(); }
+
 bool IRC::
-isEmptyQuene() const		{ return (this->_command_queue.empty());}
+is_empty_queue() const		{ return (this->_command_queue.empty());}
 
 string IRC::
 response_to_client(int response_code, int client_fd, string message_prefix, string message)
@@ -541,6 +558,28 @@ response_to_client(int response_code, int client_fd, string message_prefix, stri
 					+ message
 					+ "\r\n";
 	return response;
+}
+
+void IRC::
+forward_message_to_servers(int fd, const string& message, bool prefix)
+{
+	string forward_mess = prefix ? message : (":" + get_nickname(fd) + " " + message);
+	
+	for (size_t i = 0; i < _servers.size(); i++)
+	{
+		if (_servers[i]->getSocketFd() != fd)
+			push_cmd_queue(_servers[i]->getSocketFd(), forward_mess + "\r\n");
+	}
+}
+
+void IRC::
+forward_message_to_clients(int fd, const string& message)
+{	
+	for (size_t i = 0; i < _clients.size(); i++)
+	{
+		if (_clients[i]->getSocketFd() != fd)
+			push_cmd_queue(_clients[i]->getSocketFd(), message + "\r\n");
+	}
 }
 
 string IRC::

@@ -35,7 +35,7 @@ public:
 	int		_socket();
 	int		_bind();
 	int		_connect();
-	int		_listen(int backlog = 5);
+	int		_listen(int backlog = 10);
 	int		_accept();
 	
 	int		get_fd() const;

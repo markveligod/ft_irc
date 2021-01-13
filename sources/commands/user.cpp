@@ -78,19 +78,20 @@ cmd_user(IRC& irc, int fd)
 	else
 		return 0;
 
-	int j = -1;
-	std::string nickname = clients[i]->getNickname();
-	j = IRC::find_fd(servers, fd);
-	for (i = 0; i < (int)servers.size(); i++)
-	{
-		if (i != j)
-		{
-			if (!this->prefix.empty())
-				irc.push_cmd_queue(servers[i]->getSocketFd(), this->message + "\r\n");
-			else
-				irc.push_cmd_queue(servers[i]->getSocketFd(), ":" + nickname + " " + this->message + "\r\n");
-		}
-	}
+	irc.forward_message_to_servers(fd, message, !prefix.empty());
+	// int j = -1;
+	// std::string nickname = clients[i]->getNickname();
+	// j = IRC::find_fd(servers, fd);
+	// for (i = 0; i < (int)servers.size(); i++)
+	// {
+	// 	if (i != j)
+	// 	{
+	// 		if (!this->prefix.empty())
+	// 			irc.push_cmd_queue(servers[i]->getSocketFd(), this->message + "\r\n");
+	// 		else
+	// 			irc.push_cmd_queue(servers[i]->getSocketFd(), ":" + nickname + " " + this->message + "\r\n");
+	// 	}
+	// }
 
 	return 0;
 }

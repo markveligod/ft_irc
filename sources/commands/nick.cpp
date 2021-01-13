@@ -72,18 +72,30 @@ cmd_nick(IRC& irc, int fd)
 	int j = -1;
 
 	if (!(this->check_args_number(1)))							// если количество аргументов не 1
+	{
+		irc.push_cmd_queue(fd, irc.response_to_client(ERR_NONICKNAMEGIVEN, fd, "*", ERR_NONICKNAMEGIVEN_MESS));
 		return (ERR_NONICKNAMEGIVEN);
+	}
 
 	if (!(this->nick_valid()))									// если ник не валидный
+	{
+		irc.push_cmd_queue(fd, irc.response_to_client(ERR_ERRONEUSNICKNAME, fd, arguments[0], ERR_ERRONEUSNICKNAME_MESS));
 		return (ERR_ERRONEUSNICKNAME);
+	}
 
 	if (IRC::find_fd(servers, fd) >= 0 &&						// если сообщение от сервера
 		this->prefix.empty() &&									// и нет префикса
 		!(this->nick_available(clients, this->arguments[0])))	// и такой ник уже занят
+	{
+		irc.push_cmd_queue(fd, irc.response_to_client(ERR_NICKCOLLISION, fd, arguments[0], ERR_NICKCOLLISION_MESS));
 		return (ERR_NICKCOLLISION);
+	}
 
 	if (!(this->nick_available(clients, this->arguments[0])))	// если сообщение от клиента и такой ник уже занят
+	{
+		irc.push_cmd_queue(fd, irc.response_to_client(ERR_NICKNAMEINUSE, fd, arguments[0], ERR_NICKNAMEINUSE_MESS));
 		return (ERR_NICKNAMEINUSE);
+	}
 
 	if (this->prefix.empty() &&											// если префикс пуст
 		// IRC::find_fd(clients, fd) < 0 &&								// и нет клиента с таким fd
@@ -126,13 +138,14 @@ cmd_nick(IRC& irc, int fd)
 
 	
 	// отправка сообщения всем серверам
-	j = -1;
-	j = IRC::find_fd(servers, fd);
-	for (i = 0; i < (int)servers.size(); i++)
-	{
-		if (i != j)
-			irc.push_cmd_queue(servers[i]->getSocketFd(), this->message + "\r\n");
-	}
+	irc.forward_message_to_servers(fd, message, true);
+	// j = -1;
+	// j = IRC::find_fd(servers, fd);
+	// for (i = 0; i < (int)servers.size(); i++)
+	// {
+	// 	if (i != j)
+	// 		irc.push_cmd_queue(servers[i]->getSocketFd(), this->message + "\r\n");
+	// }
 
 	return 0;
 }
