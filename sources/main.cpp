@@ -34,13 +34,6 @@ int main(int ac, char **av)
 		network.push_back(DEF_PASS);
 	}
 
-	// //test cout 
-	// std::cout << network[0] << std::endl;
-	// std::cout << network[1] << std::endl;
-	// std::cout << network[2] << std::endl;
-	// std::cout << ((ac == 4) ? av[2] : av[1]) << std::endl;
-	// std::cout << ((ac == 4) ? av[3] : av[2]) << std::endl;
-
 	IRC server(network[0], network[1], network[2], (ac == 4) ? av[2] : av[1], (ac == 4) ? av[3] : av[2]);
 	IRC server_ssl(network[0], network[1], network[2], (ac == 4) ? av[2] : av[1]	, (ac == 4) ? av[3] : av[2]);
 	signal(SIGINT, terminate_server);
@@ -55,16 +48,18 @@ int main(int ac, char **av)
 	// for (int i = 0; i < 3; i++)
 	{
 		server.init_fd_select();
+		// std::cout << "DEBUG: INIT DONE!\n";
 		server.do_select();
+		// std::cout << "DEBUG: DO_SELECT DONE!\n";
 		server.check_fd_select();
 		if (g_exit == 1 && server.get_servers().size() == 0 && server.is_empty_queue() == true)
 			exit(EXIT_SUCCESS);
 		if (g_exit == 1 && server.get_servers().size() != 0)
 		{
-			std::cout << "\nSIZE servers : " << server.get_servers().size() << std::endl;
+			std::cout << "DEBUG: CTRL + C DONE!\n";
 			for (size_t i = 0; i < server.get_servers().size(); i++)
 			{
-				server.push_cmd_queue(server.get_servers()[i]->getSocketFd(), "SQUIT <servername> :terminate\r\n");
+				server.push_cmd_queue(server.get_servers()[i]->getSocketFd(), "SQUIT " + server.get_servers()[i]->getServerName() + " :terminate\r\n");
 			}
 			server.get_servers().clear();
 		}

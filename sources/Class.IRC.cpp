@@ -225,7 +225,7 @@ check_fd_select()
 				
 				char buffer[512 + 1];
 				int n = _recv(it->second, it->first, buffer, 512, 0);
-				
+				std::cout << "DEBUG char Buffer: " << buffer << std::endl;
 				if (n < 1)
 				{
 					it = _array_fd_select.begin();
@@ -235,11 +235,14 @@ check_fd_select()
 				//получаем распарсенный вектор команд если нашли \r\n
 				vector<string> buffer_cmd = this->check_buffer(it->first, buffer);
 
+				std::cout << "\nDEBUG: получен буфер команд размером: " << buffer_cmd.size() << std::endl;
+				std::cout << "\nDEBUG BUFFER:\n";
+				for (size_t i = 0; i < buffer_cmd.size(); i++)
+					std::cout << "Index: " << i << " STR: " << buffer_cmd[i] << std::endl;
+
 				for (size_t i = 0; i < buffer_cmd.size(); i++)
 				{
 					Command mess(buffer_cmd[i]);
-
-					std::cout << buffer_cmd[i] << std::endl;
 
 					// передаем в исполнение команды сообщение и сокет, из которого пришло сообщение
 					this->do_command(&mess, it->first);
@@ -428,10 +431,21 @@ delete_channel(string name, char type)
 vector<string> IRC::
 check_buffer(int fd, const char* buffer)
 {
-	Client* temp_ptr_client = this->_clients[IRC::find_fd(this->_clients, fd)];
+	Client* temp_ptr_client;
 	vector<string> temp_vec;
+	int pos;
 
+	if ((pos = IRC::find_fd(this->_clients, fd)) == -1)
+	{
+		utils::print_error(ERR_FINDFD, "In function check_buffer didn't find fd");
+		if (buffer[0] == 'S' && buffer[1] == 'Q' && buffer[2] == 'U' && buffer[3] == 'I' && buffer[4] == 'T')
+			temp_vec.push_back(buffer);
+		return (temp_vec);
+	}
+
+	temp_ptr_client = this->_clients[pos];
 	string temp = temp_ptr_client->getBuffer();
+	
 	temp_ptr_client->setBuffer(temp + static_cast<string>(buffer));
 	
 	while (temp_ptr_client->find_line_break())
