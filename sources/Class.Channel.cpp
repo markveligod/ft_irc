@@ -79,6 +79,12 @@ bool Channel::
 is_operator(int fd) const							{ return IRC::find_fd(_operators, fd) >= 0; }
 
 bool Channel::
+is_have_voice(const string& nickname) const			{ return IRC::find_nickname(_users_have_voice, nickname) >= 0; }
+
+bool Channel::
+is_have_voice(int fd) const							{ return IRC::find_fd(_users_have_voice, fd) >= 0; }
+
+bool Channel::
 is_visible()										{ return !is_private() && !is_secret(); }
 
 bool Channel::

@@ -8,10 +8,14 @@ using std::string;
 
 struct ModeUser
 {
+	// https://tools.ietf.org/html/rfc2812#section-3.1.5
+
+	bool a;
 	bool i;
-	bool s;
 	bool w;
+	bool r;
 	bool o;
+	bool O;
 
 	ModeUser& operator=(const ModeUser&);
 };

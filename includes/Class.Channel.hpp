@@ -31,9 +31,12 @@ private:
 	string			_name;
 	string			_key;
 	User*			_creator;
+
 	vector<User*>	_users;
 	vector<User*>	_operators;
+	vector<User*>	_users_have_voice;		// users, who not operators, but can speak on a moderated channel. MODE +v
 	vector<User*>	_banned;
+
 	string			_topic;
 	ModeChannel		_mode;
 	// int				_limit_users;
@@ -60,6 +63,8 @@ public:
 	bool		is_user_in_channel(int fd) const;
 	bool		is_operator(const string&) const;
 	bool		is_operator(int fd) const;
+	bool		is_have_voice(const string&) const;
+	bool		is_have_voice(int fd) const;
 	bool		is_visible();
 	static bool is_valid_channel_name(const string&);
 

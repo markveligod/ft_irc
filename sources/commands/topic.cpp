@@ -58,7 +58,4 @@ send_topic(IRC& irc, int fd, const string& channel_name, const string& topic)
 	else
 		irc.push_cmd_queue(fd, irc.response_to_client(RPL_TOPIC, fd, channel_name, " :" + topic));
 }
-
-
-    //        RPL_NOTOPIC                     RPL_TOPIC
-    //        ERR_CHANOPRIVSNEEDED            ERR_NOCHANMODES
+       

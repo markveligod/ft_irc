@@ -12,10 +12,13 @@ using std::string;
 ModeUser& ModeUser::
 operator=(const ModeUser& src)
 {
+	a = src.a;
 	i = src.i;
-	s = src.s;
 	w = src.w;
+	r = src.r;
 	o = src.o;
+	o = src.O;
+
 	return* this;
 }
 
@@ -77,10 +80,12 @@ user_from_client(const string& username, const string& hostname,
 	this->hostname		= hostname;
 	this->servername	= servername;
 	this->realname 		= realname;
+	this->mode.a		= 0;
 	this->mode.i		= 0;
-	this->mode.o		= 0;
-	this->mode.s		= 0;
 	this->mode.w	 	= 0;
+	this->mode.r		= 0;
+	this->mode.o		= 0;
+	this->mode.O		= 0;
 	this->channel_count	= 0;
 }
 
