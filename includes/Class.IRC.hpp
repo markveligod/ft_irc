@@ -86,6 +86,7 @@ class IRC
 		void						delete_user(int fd);
 		void						delete_client(int fd);
 		void						delete_channel(string channel_name, char type);
+		void 						close_connect(int fd, int n);
 
 		vector<string> 				check_buffer(int fd, const char* buffer);
 
@@ -103,20 +104,21 @@ class IRC
 		map<string, Channel>&		get_local_channels();
 		map<string, Channel>&		get_shared_channels();
 		Channel*					get_channel(string channel_name);
-		bool						isEmptyQuene() const;
+		string						get_nickname(int fd);
+		bool						is_empty_queue() const;
 
 		template <typename T>
 		static int					find_fd(T& container, int fd);
 		template <typename T>
 		static int					find_nickname(T& container, const string& nickname);
-		string						full_name(const User*) const;
 
 		void 						push_cmd_queue(int fd, const string& str);
-		void 						close_connect(int fd, int n);
-		
+		string						full_name(const User*) const;
 		string						response_to_client(int response_code, int client_fd, string message_prefix, string message);
+		void						forward_message_to_servers(int fd, const string& message, bool prefix);
+		void						forward_message_to_clients(int fd, const string& message);
 
-		void print_channels() const;
+		void print_channels() const; //DEBUG
 };
 
 #include "../Class.IRC.templates.cpp"

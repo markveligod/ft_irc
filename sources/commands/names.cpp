@@ -90,7 +90,6 @@ send_channel_users(IRC& irc, int fd, char channel_type, string channel_name)
 					+ channel_type
 					+ channel_name
 					+ " :";
-	std::cout << "DEBUG: " << prefix << std::endl;
 
 	for (size_t i = 0; i < users.size(); )
 	{

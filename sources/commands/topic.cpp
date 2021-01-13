@@ -25,8 +25,6 @@ cmd_topic(IRC& irc, int fd)
 	}
 
 	vector<string> channels = utils::split(arguments[0], ',');
-	for (size_t i = 0; i < arguments.size(); i++)
-		std::cout << "DEBUG: arguments[" << i << "] " << arguments[i] << std::endl;
 
 	for (size_t i = 0; i < channels.size(); i++)		// channels[i] - (#/&)channel_name
 	{
@@ -58,4 +56,3 @@ send_topic(IRC& irc, int fd, const string& channel_name, const string& topic)
 	else
 		irc.push_cmd_queue(fd, irc.response_to_client(RPL_TOPIC, fd, channel_name, " :" + topic));
 }
-       

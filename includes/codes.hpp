@@ -72,21 +72,25 @@
 #define ERR_NONICKNAMEGIVEN			431		// ":No nickname given"
 										// - Returned when a nickname parameter expected for a
 										// command and isn't found.
+#define ERR_NONICKNAMEGIVEN_MESS	" :No nickname given"
 
 #define ERR_ERRONEUSNICKNAME		432		// "<nick> :Erroneus nickname"
 										// - Returned after receiving a NICK message which contains
 										// characters which do not fall in the defined set.  See
 										// section x.x.x for details on valid nicknames.
+#define ERR_ERRONEUSNICKNAME_MESS	" :Erroneus nickname"
 
 #define ERR_NICKNAMEINUSE			433		// "<nick> :Nickname is already in use"
 										// - Returned when a NICK message is processed that results
 										// in an attempt to change to a currently existing
 										// nickname.
+#define ERR_NICKNAMEINUSE_MESS		" :Nickname is already in use"
 
 #define ERR_NICKCOLLISION			436		// "<nick> :Nickname collision KILL"
 										// - Returned by a server to a client when it detects a
 										// nickname collision (registered of a NICK that
 										// already exists by another server).
+#define ERR_NICKCOLLISION_MESS		" :Nickname collision KILL"
 
 #define ERR_USERNOTINCHANNEL		441		// "<nick> <channel> :They aren't on that channel"
 										// - Returned by the server to indicate that the target

@@ -27,16 +27,6 @@ int Command::cmd_part(IRC& irc, int fd)
 	map<string, Channel>& shared_channels = irc.get_shared_channels();
 
 	string exit_message = (arguments.size() == 2) ? (" :" + arguments[1]) : " :Left the channel";
-	std::cout << "DEBUG EXIT MESSAGE" << exit_message << std::endl;
-
-	// (void)fd; (void)irc;
-	// std::cout << "PREFIX: " << prefix << "|\n";
-	// std::cout << "COMMAND: " << command << "|\n";
-	// for (size_t i = 0; i < arguments.size(); i++)
-	// 	std::cout << "ARG: " << arguments[i] << std::endl;
-	// if (arguments.empty())
-	// 	std::cout << "ARG: " << "NOTHING" << std::endl;
-
 
 	// channels - список каналов, которые были в arguments[0] перечислены через ','
 	// channels[i].substr(1) - название канала без первого символа '&' или '#'
@@ -76,12 +66,15 @@ leave_channel(IRC& irc, Channel& channel, char type, int fd, string message)
 	vector<User*>& users = channel.get_users();
 	vector<User*>& operators = channel.get_operators();
 
+
 	int i = IRC::find_fd(users, fd);
 	if (i >= 0)
 	{
 		users[i]->dec_channel_count();
 		users.erase(users.begin() + i);
-		irc.push_cmd_queue(fd, irc.full_name(users[i]) + " PART " + type + channel.get_name() + message + "\r\n");
+		
+		string full_message = irc.full_name(users[i]) + " PART " + type + channel.get_name() + message;
+		irc.push_cmd_queue(fd, full_message + "\r\n");
 
 		i = IRC::find_fd(operators, fd);
 		if (i >= 0)
@@ -89,6 +82,9 @@ leave_channel(IRC& irc, Channel& channel, char type, int fd, string message)
 		
 		if (users.empty())
 			irc.delete_channel(channel.get_name(), type);
+		
+		irc.forward_message_to_servers(fd, full_message, true);
+		irc.forward_message_to_clients(fd, full_message);
 	}
 	else
 		irc.push_cmd_queue(fd, irc.response_to_client(RPL_ENDOFNAMES, fd, type + channel.get_name(), RPL_ENDOFNAMES_MESS));

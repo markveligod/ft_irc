@@ -57,7 +57,7 @@ int main(int ac, char **av)
 		server.init_fd_select();
 		server.do_select();
 		server.check_fd_select();
-		if (g_exit == 1 && server.get_servers().size() == 0 && server.isEmptyQuene() == true)
+		if (g_exit == 1 && server.get_servers().size() == 0 && server.is_empty_queue() == true)
 			exit(EXIT_SUCCESS);
 		if (g_exit == 1 && server.get_servers().size() != 0)
 		{

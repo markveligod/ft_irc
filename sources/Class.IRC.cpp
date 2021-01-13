@@ -212,6 +212,7 @@ check_fd_select()
 			string DEBUG = _command_queue.front().second;
 			size_t t = DEBUG.find("\r"); DEBUG[t] = 0; DEBUG[t+1] = 0;
 			std::cout << "DEBUG: Сообщение отправлено клиенту " << it->first << ": |" << DEBUG << "|\n";
+
 			_send(it->second, it->first, _command_queue.front().second.c_str(), strlen(_command_queue.front().second.c_str()), 0);
 			_command_queue.pop();
 		}
@@ -453,7 +454,6 @@ void IRC::
 push_cmd_queue(int fd, const string& str)
 {
 	this->_command_queue.push(std::make_pair(fd, str));
-	std::cout << "DEBUG : PUSH to CMD QUEUE: " << str << std::endl;
 }
 
 User* IRC::
@@ -521,8 +521,11 @@ get_channel(string channel_name) {
 			: NULL;
 }
 
+string IRC::
+get_nickname(int fd)		{ return _users[find_fd(_users, fd)]->getNickname(); }
+
 bool IRC::
-isEmptyQuene() const		{ return (this->_command_queue.empty());}
+is_empty_queue() const		{ return (this->_command_queue.empty());}
 
 string IRC::
 response_to_client(int response_code, int client_fd, string message_prefix, string message)
@@ -538,6 +541,28 @@ response_to_client(int response_code, int client_fd, string message_prefix, stri
 					+ message
 					+ "\r\n";
 	return response;
+}
+
+void IRC::
+forward_message_to_servers(int fd, const string& message, bool prefix)
+{
+	string forward_mess = prefix ? message : (":" + get_nickname(fd) + " " + message);
+	
+	for (size_t i = 0; i < _servers.size(); i++)
+	{
+		if (_servers[i]->getSocketFd() != fd)
+			push_cmd_queue(_servers[i]->getSocketFd(), forward_mess + "\r\n");
+	}
+}
+
+void IRC::
+forward_message_to_clients(int fd, const string& message)
+{	
+	for (size_t i = 0; i < _clients.size(); i++)
+	{
+		if (_clients[i]->getSocketFd() != fd)
+			push_cmd_queue(_clients[i]->getSocketFd(), message + "\r\n");
+	}
 }
 
 string IRC::

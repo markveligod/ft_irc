@@ -92,7 +92,7 @@ _accept() {
 
 	if ((client = accept(_fd, reinterpret_cast<struct sockaddr*>(&_addr), &_addr_size)) < 0)
 		utils::exit_error(ERR_ACCEPT, "Accepting error");
-	// fcntl(client, F_SETFL, O_NONBLOCK); TODO
+	fcntl(client, F_SETFL, O_NONBLOCK); // TODO
 	return client;
 }
 
