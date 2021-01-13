@@ -567,7 +567,7 @@ forward_message_to_servers(int fd, const string& message, bool prefix)
 	
 	for (size_t i = 0; i < _servers.size(); i++)
 	{
-		if (_servers[i]->getSocketFd() != fd)
+		if (_servers[i]->getSocketFd() != fd && _servers[i]->getHopcount() == 1)
 			push_cmd_queue(_servers[i]->getSocketFd(), forward_mess + "\r\n");
 	}
 }
