@@ -31,9 +31,11 @@ class Server
     public:
         Server(int fd, const std::string& servername, int hopcount, const std::string& info);
 
-		int		getSocketFd() const;
-        const std::string &getServerName() const;
-		void	addUser(User* new_user);
-		void	addClient(Client* new_client);
+		int					getSocketFd() const;
+		int					getHopcount() const;
+		const std::string &	getInfo() const;
+        const std::string &	getServerName() const;
+		void				addUser(User* new_user);
+		void				addClient(Client* new_client);
 };
 

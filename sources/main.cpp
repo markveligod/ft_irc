@@ -45,7 +45,7 @@ int main(int ac, char **av)
 	IRC server_ssl(network[0], network[1], network[2], (ac == 4) ? av[2] : av[1]	, (ac == 4) ? av[3] : av[2]);
 	signal(SIGINT, terminate_server);
 	if (ac == 4)
-		server.create_socket_network();
+		server.create_socket_network(network);
 
 	server.init_ssl();
 	server.init_ctx();

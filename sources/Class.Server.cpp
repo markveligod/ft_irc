@@ -14,6 +14,12 @@ getSocketFd() const				{ return(this->_fd_socket); }
 const std::string &Server::
 getServerName() const           { return (this->_server_name);}
 
+int Server::
+getHopcount() const				{ return (this->_hopcount); }
+
+const std::string &Server::
+getInfo() const					{ return (this->_info); }
+
 void Server::
 addUser(User* new_user)			{ this->_users.push_back(new_user); }
 

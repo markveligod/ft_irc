@@ -69,7 +69,7 @@ class IRC
 
 		IRC&						operator=(const IRC& other);
 
-		void						create_socket_network();
+		void						create_socket_network(std::vector<std::string> network);
 		void						create_socket_local();
 		void						init_fd_select();
 		void						do_select();
