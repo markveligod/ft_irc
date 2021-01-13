@@ -55,6 +55,7 @@
 #define ERR_UNKNOWNCOMMAND			421		// "<command> :Unknown command"
 										// - Returned to a registered client to indicate that the
 										// command sent is unknown by the server.
+#define ERR_UNKNOWNCOMMAND_MESS		" :Unknown command"
 
 #define ERR_NOMOTD					422		// ":MOTD File is missing"
 										// - Server's MOTD file could not be opened by the server.

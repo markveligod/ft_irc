@@ -56,7 +56,6 @@ class IRC
 		SSL*						_ssl;
 		SSL_CTX*					_ctx;
 
-
 	public:
 		IRC();
 		IRC(string network_ip,
@@ -66,6 +65,7 @@ class IRC
 			string localhost_pass,
 			string operator_user = "foo",
 			string operator_pass = "bar");
+		~IRC();
 
 		IRC&						operator=(const IRC& other);
 

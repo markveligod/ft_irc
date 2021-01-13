@@ -43,6 +43,12 @@ IRC(string network_ip,
 	utils::print_line("Socket local done!");
 }
 
+IRC::
+~IRC()
+{
+	SSL_CTX_free(_ctx);
+}
+
 /*
 ** ----------------------------------------------------------
 ** Creating sockets
@@ -135,15 +141,18 @@ do_command(Command* command, int socket_fd)
 										&Command::cmd_who,
 										&Command::cmd_topic};
 
+	string comm = command->getCommand();
+	std::transform(comm.begin(), comm.end(), comm.begin(), toupper);
 	for (int i = 0; i < COMM_COUNT; i++)
 	{
-		if (cmd_name[i] == command->getCommand())
+		// if (cmd_name[i] == command->getCommand())
+		if (cmd_name[i] == comm)
 		{
 			result = (command->*(cmd_func[i]))(*this, socket_fd);
 			return (result);
 		}
 	}
-	// this->push_cmd_queue(socket_fd, this->response_to_client(result, socket_fd, "client", " :Command not found"));
+	this->push_cmd_queue(socket_fd, this->response_to_client(ERR_UNKNOWNCOMMAND, socket_fd, comm, ERR_UNKNOWNCOMMAND_MESS));
 	return (0);
 }
 
