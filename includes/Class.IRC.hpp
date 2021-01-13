@@ -56,7 +56,6 @@ class IRC
 		SSL*						_ssl;
 		SSL_CTX*					_ctx;
 
-
 	public:
 		IRC();
 		IRC(string network_ip,
@@ -66,6 +65,7 @@ class IRC
 			string localhost_pass,
 			string operator_user = "foo",
 			string operator_pass = "bar");
+		~IRC();
 
 		IRC&						operator=(const IRC& other);
 
@@ -102,6 +102,7 @@ class IRC
 		const Socket&				get_socket() const;
 		map<string, Channel>&		get_local_channels();
 		map<string, Channel>&		get_shared_channels();
+		Channel*					get_channel(string channel_name);
 		bool						isEmptyQuene() const;
 
 		template <typename T>

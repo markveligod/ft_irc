@@ -55,6 +55,7 @@
 #define ERR_UNKNOWNCOMMAND			421		// "<command> :Unknown command"
 										// - Returned to a registered client to indicate that the
 										// command sent is unknown by the server.
+#define ERR_UNKNOWNCOMMAND_MESS		" :Unknown command"
 
 #define ERR_NOMOTD					422		// ":MOTD File is missing"
 										// - Server's MOTD file could not be opened by the server.
@@ -172,6 +173,7 @@
 										// MODE messages) must return this error if the client
 										// making the attempt is not a chanop on the specified
 										// channel.
+#define ERR_CHANOPRIVSNEEDED_MESS	" :You're not channel operator"
 
 #define ERR_CANTKILLSERVER			483		// ":You cant kill a server!"
 										// - Any attempts to use the KILL command on a server

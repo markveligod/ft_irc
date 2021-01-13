@@ -102,6 +102,8 @@ send_channel_users(IRC& irc, int fd, char channel_type, string channel_name)
 			string nickname = users[i]->getNickname();
 			if (channel.is_operator(nickname))
 				nickname = "@" + nickname;
+			if (!channel.is_operator(nickname) && channel.is_have_voice(nickname))
+				nickname = "+" + nickname;
 			if (!first)
 				nickname = " " + nickname;
 			first = false;

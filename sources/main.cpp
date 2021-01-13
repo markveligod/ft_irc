@@ -69,7 +69,5 @@ int main(int ac, char **av)
 			server.get_servers().clear();
 		}
 	}
-
-	// SSL_CTX_free(_ctx);
 	return (0);
 }

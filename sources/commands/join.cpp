@@ -69,6 +69,9 @@ join_channel(IRC& irc,
 	{
 		channels.insert(make_pair(channel_name, Channel(channel_name, channel_key, new_user, irc)));
 		map<string, Channel>::iterator it2 = channels.find(channel_name);
+		if (it2 == channels.end())
+			std::cout << "DEBUG: hzzzzzz\n";
+		std::cout << "DEBUG: channel name " << it2->first << std::endl;
 		it2->second.add_operator(new_user);
 		it2->second.add_user(new_user);
 		irc.push_cmd_queue(fd, irc.full_name(new_user) + " JOIN :" + channel_type + channel_name + "\r\n");

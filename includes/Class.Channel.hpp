@@ -18,6 +18,7 @@ struct ModeChannel
 	bool	limit_users_mode;
 	bool	key_mode;
 	bool	ban_mode;
+	bool	topic_only_oper_mode;
 
 	ModeChannel() { bzero(this, sizeof(*this)); }
 };
@@ -30,9 +31,12 @@ private:
 	string			_name;
 	string			_key;
 	User*			_creator;
+
 	vector<User*>	_users;
 	vector<User*>	_operators;
+	vector<User*>	_users_have_voice;		// users, who not operators, but can speak on a moderated channel. MODE +v
 	vector<User*>	_banned;
+
 	string			_topic;
 	ModeChannel		_mode;
 	// int				_limit_users;
@@ -40,6 +44,7 @@ private:
 	IRC&			_irc;
 
 public:
+	Channel(IRC& irc);
 	Channel(const string& name, const string& key, User* creator, IRC& irc);
 	Channel(const Channel& x);
 	Channel& operator=(const Channel& x);
@@ -53,8 +58,13 @@ public:
 	bool		is_secret() const;
 	bool		is_invite_only() const;
 	bool		is_moderated() const;
+	bool		is_topic_only_oper() const;
 	bool		is_user_in_channel(const string&) const;
+	bool		is_user_in_channel(int fd) const;
 	bool		is_operator(const string&) const;
+	bool		is_operator(int fd) const;
+	bool		is_have_voice(const string&) const;
+	bool		is_have_voice(int fd) const;
 	bool		is_visible();
 	static bool is_valid_channel_name(const string&);
 
@@ -64,6 +74,8 @@ public:
 	const string&		get_topic() const;
 	vector<User*>&		get_users();
 	vector<User*>&		get_operators();
+
+	void				set_topic(const string& topic);
 
 	void print_users() const
 	{

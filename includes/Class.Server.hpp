@@ -1,4 +1,4 @@
-
+#pragma once
 /*
 **==========================
 ** Class Server -
@@ -11,6 +11,7 @@
 
 #include "main.hpp"
 #include "Class.User.hpp"
+#include "Class.Channel.hpp"
 
 class Server
 {
@@ -21,7 +22,7 @@ class Server
         std::string 			_info;
         std::vector<User*> 		_users;
 		std::vector<Client*>	_clients;
-		//std::vector<Channel*> _channels
+		std::vector<Channel*> 	_channels;
 
 		Server();
         Server(const Server& other);
