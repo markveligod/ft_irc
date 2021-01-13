@@ -102,6 +102,7 @@ class IRC
 		const Socket&				get_socket() const;
 		map<string, Channel>&		get_local_channels();
 		map<string, Channel>&		get_shared_channels();
+		Channel*					get_channel(string channel_name);
 		bool						isEmptyQuene() const;
 
 		template <typename T>

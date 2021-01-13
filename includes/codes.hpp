@@ -172,6 +172,7 @@
 										// MODE messages) must return this error if the client
 										// making the attempt is not a chanop on the specified
 										// channel.
+#define ERR_CHANOPRIVSNEEDED_MESS	" :You're not channel operator"
 
 #define ERR_CANTKILLSERVER			483		// ":You cant kill a server!"
 										// - Any attempts to use the KILL command on a server

@@ -6,7 +6,7 @@
 # define FD_CLIENT_SSL 3
 # define FD_SERVER_SSL 4
 
-# define COMM_COUNT 11
+# define COMM_COUNT 12
 
 # define CERTIFICATE "cert/cert.pem"
 # define PRIVATE_KEY "cert/key.pem"
@@ -120,7 +120,8 @@ do_command(Command* command, int socket_fd)
 									"PART",
 									"NAMES",
 									"SQUIT",
-									"WHO"};
+									"WHO",
+									"TOPIC"};
 	doCommand	cmd_func[COMM_COUNT] = {&Command::cmd_nick,
 										&Command::cmd_pass,
 										&Command::cmd_user,
@@ -131,7 +132,8 @@ do_command(Command* command, int socket_fd)
 										&Command::cmd_part,
 										&Command::cmd_names,
 										&Command::cmd_squit,
-										&Command::cmd_who};
+										&Command::cmd_who,
+										&Command::cmd_topic};
 
 	for (int i = 0; i < COMM_COUNT; i++)
 	{
@@ -141,7 +143,7 @@ do_command(Command* command, int socket_fd)
 			return (result);
 		}
 	}
-	this->push_cmd_queue(socket_fd, this->response_to_client(result, socket_fd, "client", " :Command not found"));
+	// this->push_cmd_queue(socket_fd, this->response_to_client(result, socket_fd, "client", " :Command not found"));
 	return (0);
 }
 
@@ -493,6 +495,22 @@ get_local_channels()		{ return _local_channels; }
 
 map<string, Channel>& IRC::
 get_shared_channels()		{ return _shared_channels; }
+
+Channel* IRC::
+get_channel(string channel_name) {
+
+	if (!(channel_name[0] == '&' || channel_name[0] == '#'))
+		return NULL;
+	
+	map<string, Channel>& channels = (channel_name[0] == '&')
+									? get_local_channels()
+									: get_shared_channels();
+
+	map<string, Channel>::iterator it = channels.find(channel_name.substr(1));
+	return (it != channels.end())
+			? &(it->second)
+			: NULL;
+}
 
 bool IRC::
 isEmptyQuene() const		{ return (this->_command_queue.empty());}

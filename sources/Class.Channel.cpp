@@ -1,6 +1,9 @@
 #include "Class.Channel.hpp"
 
 Channel::
+Channel(IRC& irc) : _irc(irc) {}
+
+Channel::
 Channel(const string& name, const string& key, User* creator, IRC& irc)
 			: _name(name), _key(key), _creator(creator), _irc(irc) {}
 
@@ -34,6 +37,9 @@ vector<User*>& Channel::
 get_operators()										{ return _operators; }
 
 void Channel::
+set_topic(const string& topic)						{ _topic = topic; }
+
+void Channel::
 add_user(User* user)								{ _users.push_back(user); }
 
 void Channel::
@@ -58,10 +64,19 @@ bool Channel::
 is_moderated() const 								{ return _mode.moderated_mode; }
 
 bool Channel::
+is_topic_only_oper() const 							{ return _mode.topic_only_oper_mode; }
+
+bool Channel::
 is_user_in_channel(const string& nickname) const	{ return IRC::find_nickname(_users, nickname) >= 0; }
 
 bool Channel::
+is_user_in_channel(int fd) const					{ return IRC::find_fd(_users, fd) >= 0; }
+
+bool Channel::
 is_operator(const string& nickname) const			{ return IRC::find_nickname(_operators, nickname) >= 0; }
+
+bool Channel::
+is_operator(int fd) const							{ return IRC::find_fd(_operators, fd) >= 0; }
 
 bool Channel::
 is_visible()										{ return !is_private() && !is_secret(); }

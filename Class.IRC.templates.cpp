@@ -29,7 +29,7 @@ int IRC::find_nickname(T& cont, const std::string& nickname)
 template <typename T>
 int IRC::find_fd(T& cont, int fd)
 {
-	typename T::iterator v_begin = cont.begin();
+	typename T::const_iterator v_begin = cont.begin();
 	int i = 0;
 
 	while (v_begin != cont.end())

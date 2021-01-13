@@ -61,6 +61,7 @@ public:
 	int					cmd_names(IRC& irc, int fd);
 	int					cmd_squit(IRC& irc, int fd);
 	int					cmd_who(IRC& irc, int fd);
+	int					cmd_topic(IRC& irc, int fd);
 
 	const string&		getCommand() const;
 };
