@@ -94,8 +94,8 @@ cmd_server(IRC& irc, int fd)
 
 	if (this->prefix.empty())
 	{
-		//irc.delete_client(fd);
-		//utils::print_line("DEGUB: Client deleted (as prefix is empty)");
+		irc.delete_client(fd);
+		utils::print_line("DEGUB: Client deleted (as prefix is empty)");
 	}
 	return (0);
 }

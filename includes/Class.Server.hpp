@@ -17,25 +17,30 @@ class Server
 {
     private:
         int						_fd_socket;
-        std::string 			_server_name;
+        string 			_server_name;
         int						_hopcount;
-        std::string 			_info;
-        std::vector<User*> 		_users;
-		std::vector<Client*>	_clients;
-		std::vector<Channel*> 	_channels;
+        string 			_info;
+        vector<User*> 		_users;
+		vector<Client*>	_clients;
+		vector<Channel*> 	_channels;
+		string				_buffer;
 
 		Server();
         Server(const Server& other);
         Server& operator=(const Server& other);
 
     public:
-        Server(int fd, const std::string& servername, int hopcount, const std::string& info);
+        Server(int fd, const string& servername, int hopcount, const string& info);
 
 		int					getSocketFd() const;
 		int					getHopcount() const;
-		const std::string &	getInfo() const;
-        const std::string &	getServerName() const;
+		const string &		getInfo() const;
+        const string &		getServerName() const;
+		const string &		getBuffer() const;
+		void				setBuffer(string const & buffer);
 		void				addUser(User* new_user);
 		void				addClient(Client* new_client);
+		string 				get_line_break();
+		bool				find_line_break();
 };
 

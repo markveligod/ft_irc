@@ -433,11 +433,15 @@ delete_channel(string name, char type)
 vector<string> IRC::
 check_buffer(int fd, const char* buffer)
 {
-	Client* temp_ptr_client;
+	Client* ptr_client;
+	Server* ptr_server;
 	vector<string> temp_vec;
-	int pos;
+	int pos_client = -1;
+	int pos_server = -1;
+	string full_buffer;
 
-	if ((pos = IRC::find_fd(this->_clients, fd)) == -1)
+	if ((pos_server = IRC::find_fd(this->_servers, fd)) == -1 &&
+		(pos_client = IRC::find_fd(this->_clients, fd)) == -1)
 	{
 		utils::print_error(ERR_FINDFD, "In function check_buffer didn't find fd");
 		if (buffer[0] == 'S' && buffer[1] == 'Q' && buffer[2] == 'U' && buffer[3] == 'I' && buffer[4] == 'T')
@@ -445,17 +449,31 @@ check_buffer(int fd, const char* buffer)
 		return (temp_vec);
 	}
 
-	temp_ptr_client = this->_clients[pos];
-	string temp = temp_ptr_client->getBuffer();
-	
-	temp_ptr_client->setBuffer(temp + static_cast<string>(buffer));
-	
-	while (temp_ptr_client->find_line_break())
+	if (pos_server != -1)
 	{
-		string temp_str = temp_ptr_client->get_line_break();
-		if (temp_str == "CAP LS")
-			continue ;
-		temp_vec.push_back(temp_str);
+		ptr_server = this->_servers[pos_server];
+		full_buffer = ptr_server->getBuffer() + static_cast<string>(buffer);
+		ptr_server->setBuffer(full_buffer);
+		while (ptr_server->find_line_break())
+		{
+			string temp_str = ptr_server->get_line_break();
+			if (temp_str == "CAP LS")
+				continue;
+			temp_vec.push_back(temp_str);
+		}
+	}
+	else
+	{
+		ptr_client = this->_clients[pos_client];
+		full_buffer = ptr_client->getBuffer() + static_cast<string>(buffer);
+		ptr_client->setBuffer(full_buffer);
+		while (ptr_client->find_line_break())
+		{
+			string temp_str = ptr_client->get_line_break();
+			if (temp_str == "CAP LS")
+				continue;
+			temp_vec.push_back(temp_str);
+		}
 	}
 	return (temp_vec);
 }
