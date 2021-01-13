@@ -37,16 +37,6 @@ cmd_server(IRC& irc, int fd)
 	if (!this->check_args_number(3))
 		return (ERR_NEEDMOREPARAMS);
 
-
-	// Проверка на префикс
-	/*if (!this->prefix.empty() &&						// если есть префикс
-		this->server_available(servers, this->prefix))	// и мы его не знаем
-	{
-		utils::print_error(0, "Unknown prefix!");
-		return (0);
-	}*/
-
-
 	// Проверка на то, что сервер уже зарегестрирован
 	if (!this->prefix.empty() &&								// если есть префикс
 		!this->server_available(servers, this->arguments[0])) 	// и есть сервер с именем, поданным аргументом
@@ -86,6 +76,10 @@ cmd_server(IRC& irc, int fd)
 				  " SERVER " + this->arguments[0] +
 				  " " + std::to_string(atoi(this->arguments[1].c_str()) + 1) +
 				  " " + this->arguments[2] + "\r\n";
+
+	//irc.push_cmd_queue(fd, ":our.server PONG :irc.example.net");
+	//irc.push_cmd_queue(fd, "NICK sss 1\r\n");
+	//irc.push_cmd_queue(fd, "NICK sss 1\r\n");
 	for (int i = 0; i < (int)servers.size(); i++)
 	{
 		if (i != server_el && servers[i]->getHopcount() == 1)					// отправляем только напрямую подключенным серверам

@@ -95,7 +95,7 @@ create_socket_network(std::vector<std::string> network)
 	utils::print_line("Connected to server!\nServer name: " +
 					  network[0] + "/" + network[1] +
 					  "\nHopcount: 1\nInfo: info");
-	push_cmd_queue(fd, "PASS 123 0210 IRC|\r\nSERVER " + _server_name + " 1 info\r\n");
+	push_cmd_queue(fd, "PASS 123\r\nSERVER " + _server_name + " 1 info\r\n");
 	//if (!_network_pass.empty())
 	//	push_cmd_queue(fd, "PASS " + _network_pass + " \r\n");
 	//push_cmd_queue(fd, "SERVER " + _server_name + " 1 " + "1234" + " :[" + _server_name + "] server\r\n");
@@ -213,10 +213,11 @@ check_fd_select()
 	{
 		if (FD_ISSET(it->first, &_fd_set_write))
 		{
-			string DEBUG = _command_queue.front().second;
+			/*string DEBUG = _command_queue.front().second;
 			size_t t = DEBUG.find("\r"); DEBUG[t] = 0; DEBUG[t+1] = 0;
-			std::cout << "DEBUG: Сообщение отправлено клиенту " << it->first << ": |" << DEBUG << "|\n";
-
+			std::cout << "DEBUG: Сообщение отправлено клиенту " << it->first << ": |" << DEBUG << "|\n";*/
+			// CHANGED
+			std::cout << "DEBUG: Сообщение отправлено клиенту: " << _command_queue.front().second.substr(0, _command_queue.front().second.size() - 1) << std::endl;
 			_send(it->second, it->first, _command_queue.front().second.c_str(), strlen(_command_queue.front().second.c_str()), 0);
 			_command_queue.pop();
 		}

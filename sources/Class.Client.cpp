@@ -102,7 +102,7 @@ setBuffer(const string& buff)
 bool Client::
 find_line_break()
 {
-	if (this->buffer.find("\r\n") != string::npos)
+	if (this->buffer.find("\n") != string::npos)
 		return (true);
 	return (false);
 }
@@ -114,14 +114,23 @@ get_line_break()
 	string temp_2;
 	size_t pos;
 
-	if ((pos = this->buffer.find("\r\n")) == string::npos)
+	if ((pos = this->buffer.find("\n")) == string::npos)
 	{
 			temp_1 = this->buffer;
 			this->buffer.clear();
 			return (temp_1);
 	}
-	temp_1 = string(this->buffer.begin(), (this->buffer.begin() + pos));
-	temp_2 = string(this->buffer.begin() + (pos + 2), this->buffer.end());
+	if ((pos = this->buffer.find("\r\n")) != string::npos)
+	{
+		temp_1 = string(this->buffer.begin(), (this->buffer.begin() + pos));
+		temp_2 = string(this->buffer.begin() + (pos + 2), this->buffer.end());
+	}
+	else if ((pos = this->buffer.find("\n")) != string::npos)
+	{
+		temp_1 = string(this->buffer.begin(), (this->buffer.begin() + pos));
+		temp_2 = string(this->buffer.begin() + (pos + 1), this->buffer.end());
+	}
+
 	this->buffer = temp_2;
 	return (temp_1);
 }

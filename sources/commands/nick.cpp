@@ -138,14 +138,19 @@ cmd_nick(IRC& irc, int fd)
 
 	
 	// отправка сообщения всем серверам
-	irc.forward_message_to_servers(fd, message, true);
+	//irc.forward_message_to_servers(fd, message, !this->prefix.empty());
 	// j = -1;
-	// j = IRC::find_fd(servers, fd);
-	// for (i = 0; i < (int)servers.size(); i++)
-	// {
-	// 	if (i != j)
-	// 		irc.push_cmd_queue(servers[i]->getSocketFd(), this->message + "\r\n");
-	// }
+	j = IRC::find_fd(servers, fd);
+	for (i = 0; i < (int)servers.size(); i++)
+	{
+		if (i != j && servers[i]->getHopcount() == 1)
+		{
+			if (this->prefix.empty())
+				irc.push_cmd_queue(servers[i]->getSocketFd(), ":" + this->arguments[0] + " " + this->message + " 1\r\n");
+			else
+				irc.push_cmd_queue(servers[i]->getSocketFd(), this->message + "\r\n");
+		}
+	}
 
 	return 0;
 }

@@ -11,7 +11,7 @@ Server::Server(int fd, const std::string& servername, int hopcount, const std::s
 bool Server::
 find_line_break()
 {
-	if (this->_buffer.find("\r\n") != string::npos)
+	if (this->_buffer.find("\n") != string::npos)
 		return (true);
 	return (false);
 }
@@ -23,14 +23,22 @@ get_line_break()
 	string temp_2;
 	size_t pos;
 
-	if ((pos = this->_buffer.find("\r\n")) == string::npos)
+	if ((pos = this->_buffer.find("\n")) == string::npos)
 	{
 		temp_1 = this->_buffer;
 		this->_buffer.clear();
 		return (temp_1);
 	}
-	temp_1 = string(this->_buffer.begin(), (this->_buffer.begin() + pos));
-	temp_2 = string(this->_buffer.begin() + (pos + 2), this->_buffer.end());
+	if ((pos = this->_buffer.find("\r\n")) != string::npos)
+	{
+		temp_1 = string(this->_buffer.begin(), (this->_buffer.begin() + pos));
+		temp_2 = string(this->_buffer.begin() + (pos + 2), this->_buffer.end());
+	}
+	else if ((pos = this->_buffer.find("\n")) != string::npos)
+	{
+		temp_1 = string(this->_buffer.begin(), (this->_buffer.begin() + pos));
+		temp_2 = string(this->_buffer.begin() + (pos + 1), this->_buffer.end());
+	}
 	this->_buffer = temp_2;
 	return (temp_1);
 }
