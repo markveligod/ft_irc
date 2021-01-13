@@ -39,12 +39,12 @@ cmd_server(IRC& irc, int fd)
 
 
 	// Проверка на префикс
-	if (!this->prefix.empty() &&						// если есть префикс
+	/*if (!this->prefix.empty() &&						// если есть префикс
 		this->server_available(servers, this->prefix))	// и мы его не знаем
 	{
 		utils::print_error(0, "Unknown prefix!");
 		return (0);
-	}
+	}*/
 
 
 	// Проверка на то, что сервер уже зарегестрирован
