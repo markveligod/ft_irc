@@ -95,9 +95,10 @@ create_socket_network(std::vector<std::string> network)
 	utils::print_line("Connected to server!\nServer name: " +
 					  network[0] + "/" + network[1] +
 					  "\nHopcount: 1\nInfo: info");
-	if (!_network_pass.empty())
-		push_cmd_queue(fd, "PASS " + _network_pass + " \r\n");
-	push_cmd_queue(fd, "SERVER " + _server_name + " 1 :info \r\n");
+	push_cmd_queue(fd, "PASS 123 0210 IRC|\r\nSERVER " + _server_name + " 1 info\r\n");
+	//if (!_network_pass.empty())
+	//	push_cmd_queue(fd, "PASS " + _network_pass + " \r\n");
+	//push_cmd_queue(fd, "SERVER " + _server_name + " 1 " + "1234" + " :[" + _server_name + "] server\r\n");
 	// отправить список пользователей и каналов TODO
 }
 
@@ -224,17 +225,15 @@ check_fd_select()
 		{
 			if (it->second == FD_CLIENT || it->second == FD_CLIENT_SSL)
 			{
-				std::cout << "Client#" << it->first << ": ";
-				
 				char buffer[512 + 1];
 				int n = _recv(it->second, it->first, buffer, 512, 0);
-				std::cout << "DEBUG char Buffer: " << buffer << std::endl;
 				if (n < 1)
 				{
 					it = _array_fd_select.begin();
 					continue;
 				}
 				buffer[n] = '\0';
+				utils::print_client(it->first, buffer);
 				//получаем распарсенный вектор команд если нашли \r\n
 				vector<string> buffer_cmd = this->check_buffer(it->first, buffer);
 

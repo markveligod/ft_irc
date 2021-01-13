@@ -92,6 +92,12 @@ namespace utils
 	}
 
 	void
+	print_client(int n, std::string msg)
+	{
+		std::cout << PURPLE << "[CLIENT #" << n << "]: " << YELLOW << msg << std::endl << RESET;
+	}
+
+	void
 	print_error(int num_error, std::string fail_msg)
 	{
 		std::cerr << CYAN << "[SERVER]: " << RED << "ERROR: " << RESET << "code: " << num_error << " " << YELLOW << fail_msg << std::endl << RESET;
