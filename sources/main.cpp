@@ -64,7 +64,7 @@ int main(int ac, char **av)
 			std::cout << "\nSIZE servers : " << server.get_servers().size() << std::endl;
 			for (size_t i = 0; i < server.get_servers().size(); i++)
 			{
-				server.push_cmd_queue(server.get_servers()[i]->getSocketFd(), "SQUIT <servername> :terminate\r\n");
+				server.push_cmd_queue(server.get_servers()[i]->getSocketFd(), "SQUIT " + server.get_servers()[i]->getServerName() + " :terminate\r\n");
 			}
 			server.get_servers().clear();
 		}

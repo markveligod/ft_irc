@@ -11,6 +11,9 @@ Server::Server(int fd, const std::string& servername, int hopcount, const std::s
 int Server::
 getSocketFd() const				{ return(this->_fd_socket); }
 
+const std::string &Server::
+getServerName() const           { return (this->_server_name);}
+
 void Server::
 addUser(User* new_user)			{ this->_users.push_back(new_user); }
 
