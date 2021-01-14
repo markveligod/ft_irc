@@ -33,17 +33,28 @@
 ** =====================================================================
 */
 
+template<typename T>
+void del_vec(IRC& irc, std::vector<T*>& vec, int fd)
+{
+	int pos;
+	while((pos = irc.find_fd(vec, fd)) != -1)
+    {
+        T* out = vec[pos];
+        delete out;
+        vec.erase(vec.begin() + pos);
+    }
+}
+
 int Command::cmd_squit(IRC& irc, int fd)
 {
     std::vector<Server*>& vec_servers = irc.get_servers();
-    int pos;
+    std::vector<Client*>& vec_clients = irc.get_clients();
+    std::vector<User*>& vec_users = irc.get_users();
 
     if (!this->check_args_number(2))
 		return (irc.push_mess_client(fd, ERR_NEEDMOREPARAMS));
-    if ((pos = irc.find_fd(vec_servers, fd)) == -1)
-        return (irc.push_mess_client(fd, ERR_ALREADYREGISTRED));
-    Server* out_server = vec_servers[pos];
-    delete out_server;
-    vec_servers.erase(vec_servers.begin() + pos);
+    del_vec(irc, vec_servers, fd);
+	del_vec(irc, vec_clients, fd);
+	del_vec(irc, vec_users, fd);
     return (0);
 }
