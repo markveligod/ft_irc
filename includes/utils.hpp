@@ -16,6 +16,6 @@ namespace utils
 	void print_line(std::string msg);
 	void print_message(int fd, std::vector<std::string> &buffer_cmd);
 	void print_client(int n, std::string msg);
-	void print_command(std::string msg);
+	void print_command(int fd, std::string msg);
 	std::string int_to_str(int num);
 }

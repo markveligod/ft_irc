@@ -97,9 +97,9 @@ cmd_nick(IRC& irc, int fd)
 		return (ERR_NICKNAMEINUSE);
 	}
 
-	if (//this->prefix.empty() &&											// если префикс пуст
-		// IRC::find_fd(clients, fd) < 0 &&								// и нет клиента с таким fd
-		(i = IRC::find_fd(servers, fd)) >= 0)							// и есть сервер с таким fd
+	if ((this->prefix.empty() ||
+		(!this->prefix.empty() && IRC::find_nickname(clients, this->prefix) < 0)) &&
+		(i = IRC::find_fd(servers, fd)) >= 0)										// и есть сервер с таким fd
 	{
 		Client* new_client = new Client(fd, this->arguments[0], std::atoi(this->arguments[1].c_str()));
 		clients.push_back(new_client);

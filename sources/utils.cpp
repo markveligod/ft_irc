@@ -108,9 +108,9 @@ namespace utils
 	}
 
 	void
-	print_command(std::string msg)
+	print_command(int fd, std::string msg)
 	{
-		std::cout << BLUE << "\n[COMM]:   " << YELLOW << msg << std::endl << RESET;
+		std::cout << BLUE << "\n[COMM " << fd << "]: " << YELLOW << msg << std::endl << RESET;
 	}
 
 	void

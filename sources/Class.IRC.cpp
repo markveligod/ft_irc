@@ -152,7 +152,7 @@ do_command(Command* command, int socket_fd)
 	{
 		if (cmd_name[i] == comm)
 		{
-			utils::print_command(command->getMessage());
+			utils::print_command(socket_fd, command->getMessage());
 			result = (command->*(cmd_func[i]))(*this, socket_fd);
 			return (result);
 		}
