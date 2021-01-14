@@ -94,7 +94,23 @@ namespace utils
 	void
 	print_client(int n, std::string msg)
 	{
-		std::cout << PURPLE << "[CLIENT #" << n << "]: " << YELLOW << msg << std::endl << RESET;
+		std::cout << PURPLE << "\n[CLIENT " << n << "]: " << YELLOW << msg << std::endl << RESET;
+	}
+
+	void
+	print_message(int fd, std::vector<std::string> &buffer_cmd)
+	{
+		std::stringstream ss;
+		ss << "Recieved commands(" << buffer_cmd.size() << "):";
+		utils::print_client(fd, ss.str());
+		for (size_t i = 0; i < buffer_cmd.size(); i++)
+			std::cout << "\t " << PURPLE << i << ": " << YELLOW << buffer_cmd[i] << std::endl << RESET;
+	}
+
+	void
+	print_command(std::string msg)
+	{
+		std::cout << BLUE << "\n[COMM]:   " << YELLOW << msg << std::endl << RESET;
 	}
 
 	void

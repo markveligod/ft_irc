@@ -64,17 +64,19 @@ cmd_server(IRC& irc, int fd)
 	servers.push_back(new_server);
 	std::stringstream ss;
 	ss << new_server->getHopcount();
-	utils::print_line("New server registered!\nServer name: " +
+	utils::print_line("New server registered!\n\t  Server name: " +
 					  new_server->getServerName() +
-					  "\nHopcount: " + ss.str() +
-					  "\nInfo: " + new_server->getInfo());
+					  "\n\t  Hopcount: " + ss.str() +
+					  "\n\t  Info: " + new_server->getInfo());
 
 	// отправка сообщения SERVER всем серверам
 	server_el = IRC::find_fd(servers, fd);
+	std::stringstream ss2;
+	ss2 << atoi(this->arguments[1].c_str()) + 1;
 	string out_message;
 	out_message = ":" + irc.get_server_name() +
 				  " SERVER " + this->arguments[0] +
-				  " " + std::to_string(atoi(this->arguments[1].c_str()) + 1) +
+				  " " + ss2.str() + 
 				  " " + this->arguments[2] + "\r\n";
 
 	//irc.push_cmd_queue(fd, ":our.server PONG :irc.example.net");

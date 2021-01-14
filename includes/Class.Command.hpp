@@ -65,4 +65,5 @@ public:
 	int					cmd_topic(IRC& irc, int fd);
 
 	const string&		getCommand() const;
+	const string&		getMessage() const;
 };
