@@ -41,7 +41,7 @@ cmd_oper(IRC& irc, int fd)
     {
         this->command = "MODE";
         this->arguments.clear();
-        this->arguments.push_back(vec_users[pos]->getNickname());
+        this->arguments.push_back(vec_users[pos]->getName());
         this->arguments.push_back("+o");
         utils::print_line("Mode run!");
         //this->cmd_mode(irc, fd);

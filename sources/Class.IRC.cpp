@@ -496,7 +496,7 @@ push_cmd_queue(int fd, const string& str)
 User* IRC::
 get_user(string nickname)
 {
-	int index = find_nickname(_users, nickname);
+	int index = find_name(_users, nickname);
 
 	return (index >= 0) ? _users[index] : NULL;
 }
@@ -559,7 +559,7 @@ get_channel(string channel_name) {
 }
 
 string IRC::
-get_nickname(int fd)		{ return _users[find_fd(_users, fd)]->getNickname(); }
+get_nickname(int fd)		{ return _users[find_fd(_users, fd)]->getName(); }
 
 bool IRC::
 is_empty_queue() const		{ return (this->_command_queue.empty());}
@@ -568,7 +568,7 @@ string IRC::
 response_to_client(int response_code, int client_fd, string message_prefix, string message)
 {
 	string code = utils::int_to_str(response_code);
-	string client_name = _clients[find_fd(_clients, client_fd)]->getNickname();
+	string client_name = _clients[find_fd(_clients, client_fd)]->getName();
 
 	string response = ":"
 					+ _server_name + " "
@@ -605,7 +605,7 @@ forward_message_to_clients(int fd, const string& message)
 string IRC::
 full_name(const User* user) const
 {
-	string fullname = ":" + user->getNickname() + "!~" + user->getUsername() + "@" + user->getServername();
+	string fullname = ":" + user->getName() + "!~" + user->getUsername() + "@" + user->getServername();
 	return fullname;
 }
 
@@ -750,17 +750,18 @@ generate_map_codes()
 }
 
 
-// Функция для дебага, удалить
+// DEBUG
+// выводит список существующих на сервере каналов и пользователей на них
 
 void IRC::print_channels() const {
 			std::cout << "Shared channels: \n";
 			for (map<string, Channel>::const_iterator it = _shared_channels.begin(); it != _shared_channels.end(); it++) {
-				std::cout << "DEBUG\t" << it->first << std::endl;
+				std::cout << "\tChannel: " << '#' << it->first << std::endl;
 				it->second.print_users();
 			}
 			std::cout << "Local channels: \n";
 			for (map<string, Channel>::const_iterator it = _local_channels.begin(); it != _local_channels.end(); it++) {
-				std::cout << "DEBUG\t" << it->first << std::endl;
+				std::cout << "\tChannel: " << '&' << it->first << std::endl;
 				it->second.print_users();
 			}
 }

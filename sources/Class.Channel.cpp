@@ -19,7 +19,7 @@ Channel& Channel::operator=(const Channel& x)
 }
 
 const string& Channel::
-get_name() const									{ return _name; }
+getName() const										{ return _name; }
 
 const ModeChannel& Channel::
 get_mode() const									{ return _mode; }
@@ -46,7 +46,7 @@ void Channel::
 add_operator(User* user)							{ _operators.push_back(user); }
 
 bool Channel::
-is_banned(const string& nickname) const				{ return IRC::find_nickname(_banned, nickname) >= 0; }
+is_banned(const string& nickname) const				{ return IRC::find_name(_banned, nickname) >= 0; }
 
 bool Channel::
 is_valid_key(const string& key) const				{ return key == _key; }
@@ -67,19 +67,19 @@ bool Channel::
 is_topic_only_oper() const 							{ return _mode.topic_only_oper_mode; }
 
 bool Channel::
-is_user_in_channel(const string& nickname) const	{ return IRC::find_nickname(_users, nickname) >= 0; }
+is_user_in_channel(const string& nickname) const	{ return IRC::find_name(_users, nickname) >= 0; }
 
 bool Channel::
 is_user_in_channel(int fd) const					{ return IRC::find_fd(_users, fd) >= 0; }
 
 bool Channel::
-is_operator(const string& nickname) const			{ return IRC::find_nickname(_operators, nickname) >= 0; }
+is_operator(const string& nickname) const			{ return IRC::find_name(_operators, nickname) >= 0; }
 
 bool Channel::
 is_operator(int fd) const							{ return IRC::find_fd(_operators, fd) >= 0; }
 
 bool Channel::
-is_have_voice(const string& nickname) const			{ return IRC::find_nickname(_users_have_voice, nickname) >= 0; }
+is_have_voice(const string& nickname) const			{ return IRC::find_name(_users_have_voice, nickname) >= 0; }
 
 bool Channel::
 is_have_voice(int fd) const							{ return IRC::find_fd(_users_have_voice, fd) >= 0; }

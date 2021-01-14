@@ -85,7 +85,7 @@ send_channel_users(IRC& irc, int fd, char channel_type, string channel_name)
 	string prefix = ":"
 					+ irc.get_server_name() + " "
 					+ utils::int_to_str(RPL_NAMREPLY) + " "
-					+ irc.get_users()[i]->getNickname()
+					+ irc.get_users()[i]->getName()
 					+ " = "
 					+ channel_type
 					+ channel_name
@@ -98,7 +98,7 @@ send_channel_users(IRC& irc, int fd, char channel_type, string channel_name)
 		bool first = true;
 		while (i < users.size())
 		{
-			string nickname = users[i]->getNickname();
+			string nickname = users[i]->getName();
 			if (channel.is_operator(nickname))
 				nickname = "@" + nickname;
 			if (!channel.is_operator(nickname) && channel.is_have_voice(nickname))
@@ -126,7 +126,7 @@ send_users_without_channel(IRC& irc, int fd)
 	string prefix = ":"
 					+ irc.get_server_name() + " "
 					+ utils::int_to_str(RPL_NAMREPLY) + " "
-					+ users[i]->getNickname()
+					+ users[i]->getName()
 					+ " * * :";
 
 	for (size_t i = 0; i < users.size(); )
@@ -138,7 +138,7 @@ send_users_without_channel(IRC& irc, int fd)
 		{
 			if (!users[i]->getChannelCount())
 			{
-				string nickname = users[i]->getNickname();
+				string nickname = users[i]->getName();
 				if (!first)
 					nickname = " " + nickname;
 				first = false;

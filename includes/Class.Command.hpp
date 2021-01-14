@@ -24,10 +24,10 @@ class Channel;
 class Command
 {
 private:
-	string				prefix;
-	string				command;
-	vector<string> 		arguments;
-	string				message;
+	string			prefix;
+	string			command;
+	vector<string>	arguments;
+	string			message;
 
 
 	bool						nick_valid() const;
@@ -44,8 +44,11 @@ private:
 	void						leave_channel(IRC& irc, Channel& channels, char type, int fd, string message);
 	void						send_channel_users(IRC& irc, int fd, char type, string cnannel_name);
 	bool						is_channel_visible(IRC& irc, int fd, char channel_type, const string& channel_name);
+	bool						is_channel_exist(vector<Channel*>& servers, const string& channel_name);
+	bool						is_channel_exist(vector<Server*>& servers, const string& channel_name);
 	void						send_users_without_channel(IRC& irc, int fd);
 	void						join_channel(IRC& irc, const string& name, const string& key, char type, const string& nickname, int fd);
+	int							join_from_server(Server& server, const string& channel_name, const string& nickname);
 	void						send_topic(IRC& irc, int fd, const string& channel_name, const string& topic);
 
 public:

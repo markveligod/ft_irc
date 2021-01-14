@@ -73,7 +73,7 @@ leave_channel(IRC& irc, Channel& channel, char type, int fd, string message)
 		users[i]->dec_channel_count();
 		users.erase(users.begin() + i);
 		
-		string full_message = irc.full_name(users[i]) + " PART " + type + channel.get_name() + message;
+		string full_message = irc.full_name(users[i]) + " PART " + type + channel.getName() + message;
 		irc.push_cmd_queue(fd, full_message + "\r\n");
 
 		i = IRC::find_fd(operators, fd);
@@ -81,11 +81,11 @@ leave_channel(IRC& irc, Channel& channel, char type, int fd, string message)
 			operators.erase(operators.begin() + i);
 		
 		if (users.empty())
-			irc.delete_channel(channel.get_name(), type);
+			irc.delete_channel(channel.getName(), type);
 		
 		irc.forward_message_to_servers(fd, full_message, true);
 		irc.forward_message_to_clients(fd, full_message);
 	}
 	else
-		irc.push_cmd_queue(fd, irc.response_to_client(RPL_ENDOFNAMES, fd, type + channel.get_name(), RPL_ENDOFNAMES_MESS));
+		irc.push_cmd_queue(fd, irc.response_to_client(RPL_ENDOFNAMES, fd, type + channel.getName(), RPL_ENDOFNAMES_MESS));
 }

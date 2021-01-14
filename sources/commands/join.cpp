@@ -37,7 +37,7 @@ int Command::cmd_join(IRC& irc, int fd)
 		}
 		
 		string key = (i < keys.size()) ? keys[i] : string();
-		string nickname = (prefix.size()) ? prefix : irc.get_user(fd)->getNickname();
+		string nickname = (prefix.size()) ? prefix : irc.get_user(fd)->getName();
 
 		join_channel(irc, channels[i].substr(1), key, channels[i][0], nickname, fd); // channels[i].substr(1) - channel name, channels[i][0] - '&' or '#', prefix - user nickname
 	}
@@ -52,13 +52,27 @@ join_channel(IRC& irc,
 			const string& nickname,
 			int fd)
 {
+	int i;
+	if ((i = IRC::find_fd(irc.get_servers(), fd)) >= 0)			// check if join recieved by server 
+	{
+		Server& server = *(irc.get_servers()[i]);
+
+		if (join_from_server(server, channel_name, nickname))
+			return;
+		
+		User* new_user = server.getUsers()[IRC::find_name(server.getUsers(), nickname)];
+		string message = irc.full_name(new_user) + " JOIN :" + channel_type + channel_name;
+
+		irc.forward_message_to_servers(fd, message, true);
+		irc.forward_message_to_clients(fd, message);
+		return;
+	}
+
 	if (!Channel::is_valid_channel_name(channel_name))			// check channel name
 	{
 		irc.push_cmd_queue(fd, irc.response_to_client(ERR_NOSUCHCHANNEL, fd, channel_name, ERR_NOSUCHCHANNEL_MESS));
 		return;
 	}
-
-	// bool is_server = ((IRC::find_fd(irc.get_servers(), fd)) >= 0) ? true : false;
 
 	map<string, Channel>& channels = (channel_type == '&')
 									? irc.get_local_channels()
@@ -73,7 +87,8 @@ join_channel(IRC& irc,
 		channels.insert(make_pair(channel_name, Channel(channel_name, channel_key, new_user, irc)));
 		map<string, Channel>::iterator it2 = channels.find(channel_name);
 
-		it2->second.add_operator(new_user);
+		if (!is_channel_exist(irc.get_servers(), channel_name))	// check if the channel exists on other servers
+			it2->second.add_operator(new_user);
 		it2->second.add_user(new_user);
 		irc.push_cmd_queue(fd, irc.full_name(new_user) + " JOIN :" + channel_type + channel_name + "\r\n");
 		irc.forward_message_to_servers(fd, message, true);
@@ -113,10 +128,57 @@ join_channel(IRC& irc,
 	}
 	new_user->inc_channel_count();								// увеличиваем количество каналов, в которых состоит пользователь
 	
-	send_channel_users(irc, fd, channel_type, channel_name);	// отсылаем подключившемуся список все пользователей канала
+	send_channel_users(irc, fd, channel_type, channel_name);	// отсылаем подключившемуся список всех пользователей канала
 	irc.push_cmd_queue(fd, irc.response_to_client(RPL_ENDOFNAMES, fd, channel_type + channel_name, RPL_ENDOFNAMES_MESS));
 	
 	irc.print_channels(); //DEBUG
 	
 	return;
+}
+
+int Command::
+join_from_server(Server& server, const string& channel_name, const string& nickname)
+{
+	int i = IRC::find_name(server.getUsers(), nickname);
+	User* user = (i >= 0) ? server.getUsers()[i] : NULL;
+
+	if ((IRC::find_name(server.getChannels(), channel_name)) < 0)
+		server.getChannels().insert();
+
+	// i = IRC::find_name(server.getChannels(), channel_name);
+	// Channel* channel = (i >= 0) ? server.getChannels()[i] : NULL;
+
+	if (!user || !channel)
+		return 1;
+
+	channel->add_user(user);
+	return 0;
+}
+
+bool Command::
+is_channel_exist(vector<Channel*>& channels, const string& channel_name)
+{
+	vector<Channel*>::iterator it = channels.begin();
+
+	while (it != channels.end())
+	{
+		if ((*it)->getName() == channel_name)
+			return true;
+		it++;
+	}
+	return false;
+}
+
+bool Command::
+is_channel_exist(vector<Server*>& servers, const string& channel_name)
+{
+	vector<Server*>::iterator it = servers.begin();
+
+	while (it != servers.end())
+	{
+		if (is_channel_exist((*it)->getChannels(), channel_name))
+			return true;
+		it++;
+	}
+	return false;
 }

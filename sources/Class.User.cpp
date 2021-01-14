@@ -25,7 +25,7 @@ operator=(const ModeUser& src)
 User::
 User(Client* src) : Client(*src)
 {
-	this->nickname		= src->getNickname();
+	this->nickname		= src->getName();
 	this->password		= src->getPassword();
 	this->hopcount		= src->getHopcount();
 	this->socket_fd		= src->getSocketFd();
@@ -51,7 +51,7 @@ operator=(const User& src)
 
 /*User::User(const Client& src) : Client(src)
 {
-	this->nickname	= src.getNickname();
+	this->nickname	= src.getName();
 	this->password	= src.getPassword();
 	this->hopcount	= src.getHopcount();
 	this->socket_fd = src.getSocketFd();
@@ -131,7 +131,7 @@ const string& User::
 getUsername() const						{ return (this->username); }
 
 const string& User::
-getNickname() const						{ return client->getNickname(); }
+getName() const						{ return client->getName(); }
 
 const string& User::
 getHostname() const						{ return (this->hostname); }

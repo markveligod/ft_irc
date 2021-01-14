@@ -46,17 +46,23 @@ get_line_break()
 int Server::
 getSocketFd() const				{ return(this->_fd_socket); }
 
-const std::string &Server::
+const std::string& Server::
 getServerName() const           { return (this->_server_name);}
 
 int Server::
 getHopcount() const				{ return (this->_hopcount); }
 
-const std::string &Server::
+const std::string& Server::
 getInfo() const					{ return (this->_info); }
 
-const string &Server::
+const string& Server::
 getBuffer() const				{ return (this->_buffer); }
+
+vector<Channel*>& Server::
+getChannels() 					{ return (this->_channels); }
+
+vector<User*>& Server::
+getUsers()						{ return (this->_users); }
 
 void Server::
 setBuffer(string const &buffer) { this->_buffer = buffer; }

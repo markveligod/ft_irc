@@ -99,7 +99,7 @@ check_password(const Client& client) const
 bool Command::
 check_nickname(const Client& client) const
 {
-	if (client.getNickname().empty())
+	if (client.getName().empty())
 	{
 		utils::print_error(ERR_NICKNAME, "ENTER NICK <nickname>");
 		return false;

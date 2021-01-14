@@ -113,10 +113,10 @@ cmd_server(IRC& irc, int fd)
 		{
 			if (users[i]->getSocketFd() != fd)
 			{
-				out_message << ":" << users[i]->getNickname() << " NICK "
-							<< users[i]->getNickname() << " "
+				out_message << ":" << users[i]->getName() << " NICK "
+							<< users[i]->getName() << " "
 							<< (users[i]->getHopcount() + 1) << "\r\n";
-				out_message << ":" << users[i]->getNickname() << " USER "
+				out_message << ":" << users[i]->getName() << " USER "
 							<< users[i]->getUsername() << " "
 							<< users[i]->getHostname() << " "
 							<< users[i]->getServername() << " :"

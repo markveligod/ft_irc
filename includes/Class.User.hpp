@@ -53,7 +53,7 @@ public:
 	void			print_user();
 
 	const string&	getUsername() const;
-	const string&	getNickname() const;
+	const string&	getName() const;
 	const string&	getHostname() const;
 	const string&	getServername() const;
 	const string&	getRealname() const;

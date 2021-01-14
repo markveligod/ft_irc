@@ -112,7 +112,7 @@ class IRC
 		template <typename T>
 		static int					find_fd(T& container, int fd);
 		template <typename T>
-		static int					find_nickname(T& container, const string& nickname);
+		static int					find_name(T& container, const string& nickname);
 
 		void 						push_cmd_queue(int fd, const string& str);
 		string						full_name(const User*) const;

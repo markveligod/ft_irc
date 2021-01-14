@@ -28,7 +28,7 @@ public:
 	void			setIsServer(bool state);
 
 	int				getHopcount() const;
-	const string&	getNickname() const;
+	const string&	getName() const;
 	bool			getPassword() const;
 	int				getSocketFd() const;
 	const string&	getBuffer() const;

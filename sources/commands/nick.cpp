@@ -53,7 +53,7 @@ nick_available(std::vector<T> vect, const std::string& nick)
 {
 	for (size_t i = 0; i < vect.size(); i++)
 	{
-		if (vect[i]->getNickname() == nick)
+		if (vect[i]->getName() == nick)
 		{
 			utils::print_error(ERR_NICKNAME, "Nickname is already in use");
 			return false;
@@ -98,7 +98,7 @@ cmd_nick(IRC& irc, int fd)
 	}
 
 	if ((this->prefix.empty() ||
-		(!this->prefix.empty() && IRC::find_nickname(clients, this->prefix) < 0)) &&
+		(!this->prefix.empty() && IRC::find_name(clients, this->prefix) < 0)) &&
 		(i = IRC::find_fd(servers, fd)) >= 0)										// и есть сервер с таким fd
 	{
 		Client* new_client = new Client(fd, this->arguments[0], std::atoi(this->arguments[1].c_str()));
@@ -112,7 +112,7 @@ cmd_nick(IRC& irc, int fd)
 	{
 		if (!(this->check_password(*clients[i])))
 			return 0;
-		if (!(clients[i]->getNickname().empty()))
+		if (!(clients[i]->getName().empty()))
 		{
 			utils::print_error(0, "you are already registered");
 			return 0;
@@ -122,13 +122,13 @@ cmd_nick(IRC& irc, int fd)
 			utils::print_line("New nickname for user" + this->arguments[0] + " set");
 	}
 
-	else if (!(this->prefix.empty()) && (i = IRC::find_nickname(clients, this->prefix)) >= 0) // если есть префикс и если есть клиент с ником, который пришел в префикс
+	else if (!(this->prefix.empty()) && (i = IRC::find_name(clients, this->prefix)) >= 0) // если есть префикс и если есть клиент с ником, который пришел в префикс
 	{
 		if (!(this->check_password(*clients[i])))												// если он уже установил верный пароль
 			return 0;
-		utils::print_line("Nickname for client changed from " + clients[i]->getNickname() + " to " + this->arguments[0]);
-		if ((j = IRC::find_nickname(users, this->prefix)) >= 0)
-			utils::print_line("Nickname for user changed from " + users[j]->getNickname() + " to " + this->arguments[0]);
+		utils::print_line("Nickname for client changed from " + clients[i]->getName() + " to " + this->arguments[0]);
+		if ((j = IRC::find_name(users, this->prefix)) >= 0)
+			utils::print_line("Nickname for user changed from " + users[j]->getName() + " to " + this->arguments[0]);
 	}
 
 	if (i >= 0)

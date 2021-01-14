@@ -68,7 +68,7 @@ public:
 	bool		is_visible();
 	static bool is_valid_channel_name(const string&);
 
-	const string&		get_name() const;
+	const string&		getName() const;
 	const ModeChannel&	get_mode() const;
 	const string&		get_key() const;
 	const string&		get_topic() const;
@@ -79,10 +79,14 @@ public:
 
 	void print_users() const
 	{
+		std::cout << std::setw(8) << "\t  Users: ";
 		for (size_t i = 0; i < _users.size(); i++)
 		{
 			User u = *(_users[i]);
-			std::cout << "DEBUG\t\t" << u.getNickname() << std::endl;
+			if (i != 0)
+				std::cout << ", ";
+			std::cout << u.getName();
 		}
+		std::cout << std::endl;
 	}
 };

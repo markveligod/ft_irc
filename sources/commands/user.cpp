@@ -48,11 +48,11 @@ cmd_user(IRC& irc, int fd)
 
 	if (!(this->prefix.empty()) &&								// если префикс есть
 		(server_fd = IRC::find_fd(servers, fd)) >= 0 &&			// и сообщение пришло с сервера
-		(i = IRC::find_nickname(clients, this->prefix)) >= 0)	// и есть клиент с таким ником
+		(i = IRC::find_name(clients, this->prefix)) >= 0)	// и есть клиент с таким ником
 	{
 		if (!(check_nickname(*clients[i])))							// и ввел ли клиент ник
 			return 0;
-		if (IRC::find_nickname(users, this->prefix) >= 0)			// если уже есть юзер с таким никнеймом
+		if (IRC::find_name(users, this->prefix) >= 0)			// если уже есть юзер с таким никнеймом
 		{
 			utils::print_error(ERR_ALREADYREGISTRED, "Already registered");
 			return (ERR_ALREADYREGISTRED);
@@ -67,7 +67,7 @@ cmd_user(IRC& irc, int fd)
 		if (!(check_password(*clients[i])) ||						// проверяем, ввел ли клиент пароль
 			!(check_nickname(*clients[i])))							// и ввел ли клиент ник
 			return 0;
-		if (IRC::find_nickname(users, clients[i]->getNickname()) >= 0)
+		if (IRC::find_name(users, clients[i]->getName()) >= 0)
 		{
 			utils::print_error(ERR_ALREADYREGISTRED, "Already registered");
 			return (ERR_ALREADYREGISTRED);
@@ -80,7 +80,7 @@ cmd_user(IRC& irc, int fd)
 
 	irc.forward_message_to_servers(fd, message, !prefix.empty());
 	// int j = -1;
-	// std::string nickname = clients[i]->getNickname();
+	// std::string nickname = clients[i]->getName();
 	// j = IRC::find_fd(servers, fd);
 	// for (i = 0; i < (int)servers.size(); i++)
 	// {
