@@ -145,6 +145,12 @@ getRealname() const						{ return (this->realname); }
 size_t User::
 getChannelCount() const					{ return (this->channel_count); }
 
+int User::
+getFd() const							{ return (this->client->getSocketFd()); }
+
+int User::
+getHopcount() const						{ return (this->client->getHopcount()); }
+
 void User::
 inc_channel_count()						{ channel_count++; }
 

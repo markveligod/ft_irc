@@ -92,10 +92,11 @@ create_socket_network(std::vector<std::string> network)
 	_array_fd_select[fd] = FD_CLIENT;
 	_clients.push_back(new Client(fd));
 	//_servers.push_back(new Server(fd, network[0] + "/" + network[1], 1, "info"));
-	utils::print_line("Connected to server!\nServer name: " +
+	utils::print_line("Trying to connect to server!\nServer name: " +
 					  network[0] + "/" + network[1] +
 					  "\nHopcount: 1\nInfo: info");
 	push_cmd_queue(fd, "PASS 123\r\nSERVER " + _server_name + " 1 info\r\n");
+	_clients[0]->setIsServer(true);
 	//if (!_network_pass.empty())
 	//	push_cmd_queue(fd, "PASS " + _network_pass + " \r\n");
 	//push_cmd_queue(fd, "SERVER " + _server_name + " 1 " + "1234" + " :[" + _server_name + "] server\r\n");
@@ -149,9 +150,9 @@ do_command(Command* command, int socket_fd)
 	std::transform(comm.begin(), comm.end(), comm.begin(), toupper);
 	for (int i = 0; i < COMM_COUNT; i++)
 	{
-		// if (cmd_name[i] == command->getCommand())
 		if (cmd_name[i] == comm)
 		{
+			utils::print_command(socket_fd, command->getMessage());
 			result = (command->*(cmd_func[i]))(*this, socket_fd);
 			return (result);
 		}
@@ -234,14 +235,15 @@ check_fd_select()
 					continue;
 				}
 				buffer[n] = '\0';
-				utils::print_client(it->first, buffer);
+				//utils::print_client(it->first, buffer);
 				//получаем распарсенный вектор команд если нашли \r\n
 				vector<string> buffer_cmd = this->check_buffer(it->first, buffer);
 
-				std::cout << "\nDEBUG: получен буфер команд размером: " << buffer_cmd.size() << std::endl;
+				utils::print_message(it->first, buffer_cmd);
+				/*std::cout << "\nDEBUG: получен буфер команд размером: " << buffer_cmd.size() << std::endl;
 				std::cout << "\nDEBUG BUFFER:\n";
 				for (size_t i = 0; i < buffer_cmd.size(); i++)
-					std::cout << "Index: " << i << " STR: " << buffer_cmd[i] << std::endl;
+					std::cout << "Index: " << i << " STR: " << buffer_cmd[i] << std::endl;*/
 
 				for (size_t i = 0; i < buffer_cmd.size(); i++)
 				{
@@ -269,8 +271,9 @@ check_fd_select()
 																: FD_CLIENT_SSL;
 				if (it->second == FD_SERVER_SSL)
 					ssl_connection(client_socket);
-											
-				std::cout << "New client#" << client_socket << " joined server\n";
+
+				utils::print_client(client_socket, "New client joined server!");
+				//std::cout << "New client#" << client_socket << " joined server\n";
 				// char response[] = "Accepted\n";
 				// _send(it->second, client_socket, response, 10, 0);
 				// push_cmd_queue(client_socket, string(response));
@@ -317,7 +320,7 @@ void IRC::close_connect(int fd, int n)
 	this->delete_client(fd);
 	this->delete_user(fd);
 
-	std::cout << (n == 0 ? "connection closed\n" : "message receiving failed\n");
+	utils::print_line((n == 0 ? "connection closed" : "message receiving failed"));
 	_array_fd_select.erase(fd);
 }
 
@@ -486,6 +489,7 @@ check_buffer(int fd, const char* buffer)
 void IRC::
 push_cmd_queue(int fd, const string& str)
 {
+	std::cout << CYAN << "QUEUE #" << fd << ": " << YELLOW << str.substr(0, str.size() - 2) << RESET << std::endl;
 	this->_command_queue.push(std::make_pair(fd, str));
 }
 

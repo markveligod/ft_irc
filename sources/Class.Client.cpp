@@ -12,21 +12,24 @@ Client::
 Client(int socket_fd, int hopcount) 		
 					  : socket_fd(socket_fd),
 						hopcount(hopcount),
-						password(false) {}
+						password(false),
+						is_server(false) {}
 
 Client::
 Client(int socket_fd, const string&  nickname, int hopcount)
 									: nickname(nickname),
 									  socket_fd(socket_fd),
 									  hopcount(hopcount),
-									  password(true) {}
+									  password(true),
+									  is_server(false) {}
 
 Client::
 Client(const Client& src)
 					  : nickname(src.nickname),
 						socket_fd(src.socket_fd),
 						hopcount(src.hopcount),
-						password(src.password) {}
+						password(src.password),
+						is_server(src.is_server) {}
 
 Client& Client::
 operator=(const Client& src)
@@ -36,6 +39,7 @@ operator=(const Client& src)
 	hopcount = src.hopcount;
 	password = src.password;
 	buffer = src.buffer;
+	is_server = src.is_server;
 	return *this;
 }
 
@@ -62,6 +66,9 @@ setHopcount(int hopcount)
 void Client::
 setPassword(bool password)		{ this->password = password; }
 
+void Client::
+setIsServer(bool state)			{ this->is_server = state; }
+
 /*
 ** ----------------------------------------------------------
 ** Getters
@@ -82,6 +89,9 @@ getNickname() const				{ return (this->nickname); }
 
 const string&	Client::
 getBuffer() const				{ return (this->buffer); }
+
+bool			Client::
+getIsServer() const				{ return  (this->is_server); }
 
 /*
 ** ----------------------------------------------------------
