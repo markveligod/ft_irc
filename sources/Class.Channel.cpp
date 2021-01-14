@@ -1,14 +1,15 @@
 #include "Class.Channel.hpp"
 
 Channel::
-Channel(IRC& irc) : _irc(irc) {}
+Channel(const string& name)
+			: _name(name), _key(string()) {}
 
 Channel::
-Channel(const string& name, const string& key, User* creator, IRC& irc)
-			: _name(name), _key(key), _creator(creator), _irc(irc) {}
+Channel(const string& name, const string& key, User* creator)
+			: _name(name), _key(key), _creator(creator) {}
 
 Channel::
-Channel(const Channel& x): _irc(x._irc) {*this = x; }
+Channel(const Channel& x) { *this = x; }
 
 Channel& Channel::operator=(const Channel& x)
 {

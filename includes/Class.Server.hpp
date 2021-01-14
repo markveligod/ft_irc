@@ -22,7 +22,7 @@ class Server
 		string				_info;
 		vector<User*>		_users;
 		vector<Client*>		_clients;
-		vector<Channel*>	_channels;
+		// vector<Channel>		_channels;
 		string				_buffer;
 
 		Server();
@@ -37,8 +37,8 @@ class Server
 		const string &		getInfo() const;
 		const string &		getServerName() const;
 		const string &		getBuffer() const;
-		vector<Channel*>&	getChannels();
-		vector<User*>&		getUsers();
+		// vector<User*>&		getUsers();
+		// vector<Channel>&	getChannels();
 		void				setBuffer(const string& buffer);
 		void				addUser(User* new_user);
 		void				addClient(Client* new_client);

@@ -41,11 +41,10 @@ private:
 	ModeChannel		_mode;
 	// int				_limit_users;
 	// string			_ban;
-	IRC&			_irc;
 
 public:
-	Channel(IRC& irc);
-	Channel(const string& name, const string& key, User* creator, IRC& irc);
+	Channel(const string& name = string());
+	Channel(const string& name, const string& key, User* creator);
 	Channel(const Channel& x);
 	Channel& operator=(const Channel& x);
 

@@ -94,11 +94,11 @@ user_from_client(const string& username, const string& hostname,
 				 const string& servername, const string& realname,
 				 const ModeUser& mode)
 {
-	this->username 		 = username;
-	this->hostname	 	= hostname;
-	this->servername 	= servername;
-	this->realname	 	= realname;
-	this->mode		 	= mode;
+	this->username		= username;
+	this->hostname		= hostname;
+	this->servername	= servername;
+	this->realname		= realname;
+	this->mode			= mode;
 	this->channel_count	= 0;
 }
 
@@ -131,7 +131,7 @@ const string& User::
 getUsername() const						{ return (this->username); }
 
 const string& User::
-getName() const						{ return client->getName(); }
+getName() const							{ return client->getName(); }
 
 const string& User::
 getHostname() const						{ return (this->hostname); }

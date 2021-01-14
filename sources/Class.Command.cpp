@@ -121,3 +121,20 @@ is_channel_visible(IRC& irc, int fd, char channel_type, const string& channel_na
 	size_t i = IRC::find_fd(it->second.get_users(), fd);	// it->second - канал
 	return i >=0 || it->second.is_visible();
 }
+
+int Command::
+find_name(vector<Channel>& cont, const std::string& name)
+{
+	vector<Channel>::const_iterator v_begin = cont.begin();
+	int i = 0;
+
+	while (v_begin != cont.end())
+	{
+		if ((*v_begin).getName() == name)
+			return (i);
+		v_begin++;
+		i++;
+	}
+	return (-1);
+}
+

@@ -29,15 +29,17 @@ cmd_names(IRC& irc, int fd)
 	// if (arguments.empty() || args[0] == "0")
 	if (arguments.empty() || args[0] == "0" || atoi(args[0].c_str()) == irc.get_localhost_port())
 	{
-		// if ()	// если fd принадлежит Серверу, то ему не надо отправлять списко локальных каналов 
-		map<string, Channel>& channels = irc.get_local_channels();
-		for (map<string, Channel>::iterator it = channels.begin(); it != channels.end(); it++)
+		if ((IRC::find_fd(irc.get_servers(), fd)) < 0)		// если fd принадлежит Серверу, то ему не надо отправлять список локальных каналов 
 		{
-			if (is_channel_visible(irc, fd, '&', it->first))
-				send_channel_users(irc, fd, '&', it->first);
+			map<string, Channel>& channels = irc.get_local_channels();
+			for (map<string, Channel>::iterator it = channels.begin(); it != channels.end(); it++)
+			{
+				if (is_channel_visible(irc, fd, '&', it->first))
+					send_channel_users(irc, fd, '&', it->first);
+			}
 		}
 
-		channels = irc.get_shared_channels();
+		map<string, Channel>& channels = irc.get_shared_channels();
 		for (map<string, Channel>::iterator it = channels.begin(); it != channels.end(); it++)
 		{
 			if (is_channel_visible(irc, fd, '#', it->first))

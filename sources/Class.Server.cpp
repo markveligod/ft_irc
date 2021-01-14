@@ -58,11 +58,11 @@ getInfo() const					{ return (this->_info); }
 const string& Server::
 getBuffer() const				{ return (this->_buffer); }
 
-vector<Channel*>& Server::
-getChannels() 					{ return (this->_channels); }
+// vector<Channel>& Server::
+// getChannels() 					{ return (this->_channels); }
 
-vector<User*>& Server::
-getUsers()						{ return (this->_users); }
+// vector<User*>& Server::
+// getUsers()						{ return (this->_users); }
 
 void Server::
 setBuffer(string const &buffer) { this->_buffer = buffer; }
