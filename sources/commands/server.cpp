@@ -30,8 +30,12 @@ cmd_server(IRC& irc, int fd)
 {
 	vector<Client *>& clients	= irc.get_clients();
 	vector<Server*>&  servers 	= irc.get_servers();
+	vector<User *>&   users		= irc.get_users();
 	int				  server_el	= IRC::find_fd(servers, fd);
 	int				  client_el	= IRC::find_fd(clients, fd);
+
+
+// ПРОВЕРКИ
 
 	// Проверка на количство аргументов
 	if (!this->check_args_number(3))
@@ -53,46 +57,84 @@ cmd_server(IRC& irc, int fd)
 		return (ERR_ALREADYREGISTRED);
 	}
 
-
 	// Проверка на ввод пароля
 	if (this->prefix.empty() && 					// если префикс пуст
 		client_el >= 0 && 							// и есть клиент с таким fd
 		!this->check_password(*clients[client_el]))	// и он не ввел пароль
 		return 0;
 
+// КОНЕЦ ПРОВЕРОК
+
+
+// Создаем новый сервер
 	Server *new_server = new Server(fd, this->arguments[0], atoi(this->arguments[1].c_str()), this->arguments[2]);
 	servers.push_back(new_server);
-	std::stringstream ss;
-	ss << new_server->getHopcount();
+
+	std::stringstream out_message;
+	out_message << new_server->getHopcount();
 	utils::print_line("New server registered!\n\t  Server name: " +
 					  new_server->getServerName() +
-					  "\n\t  Hopcount: " + ss.str() +
+					  "\n\t  Hopcount: " + out_message.str() +
 					  "\n\t  Info: " + new_server->getInfo());
+	out_message.str("");
 
-	// отправка сообщения SERVER всем серверам
-	server_el = IRC::find_fd(servers, fd);
-	std::stringstream ss2;
-	ss2 << atoi(this->arguments[1].c_str()) + 1;
-	string out_message;
-	out_message = ":" + irc.get_server_name() +
-				  " SERVER " + this->arguments[0] +
-				  " " + ss2.str() + 
+// ОТПРАВКИ СООБЩЕНИЙ
+
+	// Если мы еще не общались с сервером, то отправляем ему свои PASS и SERVER
+	if (this->prefix.empty() && clients[client_el]->getIsServer() == false)
+		irc.push_cmd_queue(fd, "PASS 123\r\nSERVER " + irc.get_server_name() + " 1 info\r\n");
+
+	// Отправка этому серверу всех наших среверов, клиентов и тд
+	if (this->prefix.empty())
+	{
+		//irc.delete_client(fd);
+		//utils::print_line("DEGUB: Client deleted (as prefix is empty)");
+		for (int i = 0; i < (int)servers.size() - 1; i++)
+		{
+			out_message << ":" << irc.get_server_name() << " SERVER "
+						<< servers[i]->getServerName() << " "
+						<< (servers[i]->getHopcount() + 1) << " :"
+						<< servers[i]->getInfo() << "\r\n";
+			irc.push_cmd_queue(fd, out_message.str());
+			out_message.str("");
+		}
+		for (int i = 0; i < (int)users.size(); i++)
+		{
+			if (users[i]->getSocketFd() != fd)
+			{
+				out_message << ":" << users[i]->getNickname() << " NICK "
+							<< users[i]->getNickname() << " "
+							<< (users[i]->getHopcount() + 1) << "\r\n";
+				out_message << ":" << users[i]->getNickname() << " USER "
+							<< users[i]->getUsername() << " "
+							<< users[i]->getHostname() << " "
+							<< users[i]->getServername() << " :"
+							<< users[i]->getRealname() << "\r\n";
+				irc.push_cmd_queue(fd, out_message.str());
+				out_message.str("");
+			}
+		}
+	}
+
+	// Отправка сообщения SERVER всем серверам
+	out_message << ":" << irc.get_server_name() <<
+				  " SERVER " + this->arguments[0] <<
+				  " " << (atoi(this->arguments[1].c_str()) + 1) <<
 				  " " + this->arguments[2] + "\r\n";
-
-	//irc.push_cmd_queue(fd, ":our.server PONG :irc.example.net");
-	//irc.push_cmd_queue(fd, "NICK sss 1\r\n");
-	//irc.push_cmd_queue(fd, "NICK sss 1\r\n");
 	for (int i = 0; i < (int)servers.size(); i++)
 	{
-		if (i != server_el && servers[i]->getHopcount() == 1)					// отправляем только напрямую подключенным серверам
-			irc.push_cmd_queue(servers[i]->getSocketFd(), out_message);
+		if (i != IRC::find_fd(servers, fd) && servers[i]->getHopcount() == 1) // отправляем только напрямую подключенным серверам
+			irc.push_cmd_queue(servers[i]->getSocketFd(), out_message.str());
 	}
+
+// КОНЕЦ ОТПРАВОК СООБЩЕНИЙ
 
 	if (this->prefix.empty())
 	{
 		irc.delete_client(fd);
 		utils::print_line("DEGUB: Client deleted (as prefix is empty)");
 	}
+
 	return (0);
 }
 

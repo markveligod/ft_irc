@@ -13,6 +13,7 @@ protected:
 	int		hopcount;
 	bool	password;
 	string	buffer;
+	bool	is_server;
 
 public:
 	Client(int socket_fd = 0, int hopcount = 0);
@@ -24,12 +25,14 @@ public:
 	void			setHopcount(int hopcount);
 	void			setPassword(bool password = true);
 	void			setBuffer(const string& buff);
+	void			setIsServer(bool state);
 
 	int				getHopcount() const;
 	const string&	getNickname() const;
 	bool			getPassword() const;
 	int				getSocketFd() const;
 	const string&	getBuffer() const;
+	bool			getIsServer() const;
 
 	bool			find_line_break();
 	string			get_line_break();

@@ -97,7 +97,7 @@ cmd_nick(IRC& irc, int fd)
 		return (ERR_NICKNAMEINUSE);
 	}
 
-	if (this->prefix.empty() &&											// если префикс пуст
+	if (//this->prefix.empty() &&											// если префикс пуст
 		// IRC::find_fd(clients, fd) < 0 &&								// и нет клиента с таким fd
 		(i = IRC::find_fd(servers, fd)) >= 0)							// и есть сервер с таким fd
 	{
