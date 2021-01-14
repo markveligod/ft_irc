@@ -56,6 +56,8 @@ class IRC
 		SSL*						_ssl;
 		SSL_CTX*					_ctx;
 
+		std::map<int, std::string> map_codes;
+
 	public:
 		IRC();
 		IRC(string network_ip,
@@ -115,10 +117,11 @@ class IRC
 		void 						push_cmd_queue(int fd, const string& str);
 		string						full_name(const User*) const;
 		string						response_to_client(int response_code, int client_fd, string message_prefix, string message);
-		int							push_mess_client(int code);
+		int							push_mess_client(int fd, int code);
 		void						forward_message_to_servers(int fd, const string& message, bool prefix);
 		void						forward_message_to_clients(int fd, const string& message);
 
+		void generate_map_codes();
 		void print_channels() const; //DEBUG
 };
 

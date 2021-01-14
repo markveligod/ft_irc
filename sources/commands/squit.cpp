@@ -39,15 +39,9 @@ int Command::cmd_squit(IRC& irc, int fd)
     int pos;
 
     if (!this->check_args_number(2))
-    {
-        irc.push_cmd_queue(fd, irc.response_to_client(ERR_NEEDMOREPARAMS, fd, "ERR_NEEDMOREPARAMS", "Not enought parameters"));
-		return (ERR_NEEDMOREPARAMS);
-    }
+		return (irc.push_mess_client(fd, ERR_NEEDMOREPARAMS));
     if ((pos = irc.find_fd(vec_servers, fd)) == -1)
-    {
-        irc.push_cmd_queue(fd, irc.response_to_client(ERR_ALREADYREGISTRED, fd, "ERR_ALREADYREGISTRED", "Dont found server"));
-        return (ERR_ALREADYREGISTRED);
-    }
+        return (irc.push_mess_client(fd, ERR_ALREADYREGISTRED));
     Server* out_server = vec_servers[pos];
     delete out_server;
     vec_servers.erase(vec_servers.begin() + pos);
