@@ -98,6 +98,6 @@ server: all
 	./$(NAME) 1080 123
 
 client: all
-	./$(NAME) localhost:1080:111 1280 123
+	./$(NAME) localhost:6667:123 1080 123
 
 .PHONY: all clean fclean re server client

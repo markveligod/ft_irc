@@ -104,7 +104,7 @@ namespace utils
 		ss << "Recieved commands(" << buffer_cmd.size() << "):";
 		utils::print_client(fd, ss.str());
 		for (size_t i = 0; i < buffer_cmd.size(); i++)
-			std::cout << "\t " << PURPLE << i << ": " << YELLOW << buffer_cmd[i] << std::endl << RESET;
+			std::cout << "\t " << PURPLE << std::setw(2) << i << ": " << YELLOW << buffer_cmd[i] << std::endl << RESET;
 	}
 
 	void

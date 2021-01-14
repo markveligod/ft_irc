@@ -58,6 +58,8 @@ join_channel(IRC& irc,
 		return;
 	}
 
+	// bool is_server = ((IRC::find_fd(irc.get_servers(), fd)) >= 0) ? true : false;
+
 	map<string, Channel>& channels = (channel_type == '&')
 									? irc.get_local_channels()
 									: irc.get_shared_channels();
