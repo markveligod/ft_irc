@@ -445,8 +445,6 @@ check_buffer(int fd, const char* buffer)
 		(pos_client = IRC::find_fd(this->_clients, fd)) == -1)
 	{
 		utils::print_error(ERR_FINDFD, "In function check_buffer didn't find fd");
-		if (buffer[0] == 'S' && buffer[1] == 'Q' && buffer[2] == 'U' && buffer[3] == 'I' && buffer[4] == 'T')
-			temp_vec.push_back(buffer);
 		return (temp_vec);
 	}
 
