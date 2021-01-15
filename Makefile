@@ -47,7 +47,8 @@ COMMS		= nick.cpp \
 			who.cpp \
 			topic.cpp \
 			ping.cpp \
-			pong.cpp
+			pong.cpp \
+			mode.cpp
 
 
 SRC			= $(addprefix $(SRC_DIR), $(SRCS))
