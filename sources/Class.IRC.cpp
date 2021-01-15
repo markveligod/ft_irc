@@ -6,7 +6,7 @@
 # define FD_CLIENT_SSL 3
 # define FD_SERVER_SSL 4
 
-# define COMM_COUNT 14
+# define COMM_COUNT 15
 
 # define CERTIFICATE "cert/cert.pem"
 # define PRIVATE_KEY "cert/key.pem"
@@ -39,6 +39,7 @@ IRC(string network_ip,
 	int port = std::atoi(localhost_port.c_str());
 	_localhost = Socket(LOCALHOST, port);
 	_localhost_ssl = Socket(LOCALHOST, port + 1);
+	this->generate_map_codes();
 	utils::print_line("Constructor IRC done!");
 	utils::print_line("Socket local done!");
 }
@@ -134,7 +135,8 @@ do_command(Command* command, int socket_fd)
 									"WHO",
 									"TOPIC",
 									"PING",
-									"PONG"};
+									"PONG",
+									"MODE"};
 	doCommand	cmd_func[COMM_COUNT] = {&Command::cmd_nick,
 										&Command::cmd_pass,
 										&Command::cmd_user,
@@ -148,7 +150,8 @@ do_command(Command* command, int socket_fd)
 										&Command::cmd_who,
 										&Command::cmd_topic,
 										&Command::cmd_ping,
-										&Command::cmd_pong};
+										&Command::cmd_pong,
+										&Command::cmd_mode};
 
 	string comm = command->getCommand();
 	std::transform(comm.begin(), comm.end(), comm.begin(), toupper);
@@ -244,10 +247,10 @@ check_fd_select()
 				vector<string> buffer_cmd = this->check_buffer(it->first, buffer);
 
 				utils::print_message(it->first, buffer_cmd);
-				/*std::cout << "\nDEBUG: получен буфер команд размером: " << buffer_cmd.size() << std::endl;
-				std::cout << "\nDEBUG BUFFER:\n";
-				for (size_t i = 0; i < buffer_cmd.size(); i++)
-					std::cout << "Index: " << i << " STR: " << buffer_cmd[i] << std::endl;*/
+				// std::cout << "\nDEBUG: получен буфер команд размером: " << buffer_cmd.size() << std::endl;
+				// std::cout << "\nDEBUG BUFFER:\n";
+				// for (size_t i = 0; i < buffer_cmd.size(); i++)
+				// 	std::cout << "Index: " << i << " STR: " << buffer_cmd[i] << std::endl;
 
 				for (size_t i = 0; i < buffer_cmd.size(); i++)
 				{
@@ -575,6 +578,22 @@ bool IRC::
 is_server(int fd) const		{ return (IRC::find_fd(_servers, fd)) >= 0; }
 
 string IRC::
+response_2(int response_code, int fd, string command, string message)
+{
+	string code 		= utils::int_to_str(response_code);
+	string server_name	= _servers[find_fd(_servers, fd)]->getName();
+
+	string response = ":"
+					+ _server_name + " "
+					+ code + " "
+					+ server_name + " "
+					+ command + " "
+					+ message
+					+ "\r\n";
+	return response;
+}
+
+string IRC::
 response(int response_code, int client_fd, string message_prefix, string message)
 {
 	string code = utils::int_to_str(response_code);
@@ -588,6 +607,19 @@ response(int response_code, int client_fd, string message_prefix, string message
 					+ message
 					+ "\r\n";
 	return response;
+}
+
+void IRC::
+forward_message_to_servers_2(int fd, const string& prefix, const string& message)
+{
+	string forward_mess = prefix.empty() ? (message)
+										 : (":" + prefix + " " + message);
+	
+	for (size_t i = 0; i < _servers.size(); i++)
+	{
+		if (_servers[i]->getSocketFd() != fd && _servers[i]->getHopcount() == 1)
+			push_cmd_queue(_servers[i]->getSocketFd(), forward_mess + "\r\n");
+	}
 }
 
 void IRC::

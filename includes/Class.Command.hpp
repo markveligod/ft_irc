@@ -32,7 +32,8 @@ private:
 
 	bool						nick_valid() const;
 	template <typename T> bool	nick_available(vector<T> vect, const string& nick);
-	int							server_available(vector<Server*> &servers, string const & server_name) const;
+	int							nick_check_errors(int fd, int serv_client, IRC& irc);
+	int							server_available(vector<Server *> &servers, string const &server_name) const;
 	int							server_check_errors(vector<Server *> &servers,vector<Client *> &clients, int fd) const;
 	bool						pass(string password, string local_pass);
 	void						user_change(User* curr_user);
@@ -70,6 +71,7 @@ public:
 	int					cmd_topic(IRC& irc, int fd);
 	int					cmd_ping(IRC& irc, int fd);
 	int					cmd_pong(IRC& irc, int fd);
+	int					cmd_mode(IRC& irc, int fd);
 
 	const string&		getCommand() const;
 	const string&		getMessage() const;

@@ -63,94 +63,138 @@ nick_available(std::vector<T> vect, const std::string& nick)
 }
 
 int Command::
-cmd_nick(IRC& irc, int fd)
+nick_check_errors(int fd, int serv_client, IRC& irc)
 {
-	std::vector<Client*>& clients 	= irc.get_clients();
-	std::vector<User*>& users 		= irc.get_users();
-	std::vector<Server*>& servers	= irc.get_servers();
-	int i = -1;
-	int j = -1;
+	std::vector<Client *> &clients = irc.get_clients();
+	// Если слишком много аргументов
 
-	if (!(this->check_args_number(1)))							// если количество аргументов не 1
+	if (arguments.size() > 2)
 	{
+		utils::print_error(ERR_NEEDMOREPARAMS, "Too much arguments");
+		irc.push_cmd_queue(fd, irc.response_2(ERR_NEEDMOREPARAMS, fd, "NICK", ":Syntax error"));
+		return (ERR_NEEDMOREPARAMS);
+	}
+
+	// Если слишком мало аргументов
+	if (arguments.size() == 0)
+	{
+		utils::print_error(ERR_NONICKNAMEGIVEN, "No nickname");
 		irc.push_cmd_queue(fd, irc.response(ERR_NONICKNAMEGIVEN, fd, "*", ERR_NONICKNAMEGIVEN_MESS));
 		return (ERR_NONICKNAMEGIVEN);
 	}
 
-	if (!(this->nick_valid()))									// если ник не валидный
+	// Если 2 аргумента от клиента
+	if (arguments.size() == 2 && serv_client < 0)
+	{
+		utils::print_error(ERR_NEEDMOREPARAMS, "Too much arguments");
+		irc.push_cmd_queue(fd, irc.response_2(ERR_NEEDMOREPARAMS, fd, "NICK", ":Syntax error"));
+		return (ERR_NEEDMOREPARAMS);
+	}
+
+	// Если 1 аргумент от сервера (и нет префикса)
+	if (serv_client >= 0 && arguments.size() == 1 && prefix.empty())
+	{
+		utils::print_error(ERR_NEEDMOREPARAMS, "Too few arguments");
+		irc.push_cmd_queue(fd, irc.response_2(ERR_NEEDMOREPARAMS, fd, "NICK", ERR_NEEDMOREPARAMS_MESS));
+		return (ERR_NEEDMOREPARAMS);
+	}
+
+	// Если ник невалидный
+	if (!this->nick_valid())
 	{
 		irc.push_cmd_queue(fd, irc.response(ERR_ERRONEUSNICKNAME, fd, arguments[0], ERR_ERRONEUSNICKNAME_MESS));
 		return (ERR_ERRONEUSNICKNAME);
 	}
 
-	if (IRC::find_fd(servers, fd) >= 0 &&						// если сообщение от сервера
-		this->prefix.empty() &&									// и нет префикса
-		!(this->nick_available(clients, this->arguments[0])))	// и такой ник уже занят
+	// Если этот ник уже использован и сообщение от сервера
+	if (IRC::find_name(clients, this->arguments[0]) >= 0 && serv_client >= 0)
 	{
+		utils::print_error(ERR_NICKCOLLISION, "Nick collision (this nickname already in use)");
 		irc.push_cmd_queue(fd, irc.response(ERR_NICKCOLLISION, fd, arguments[0], ERR_NICKCOLLISION_MESS));
 		return (ERR_NICKCOLLISION);
 	}
 
-	if (!(this->nick_available(clients, this->arguments[0])))	// если сообщение от клиента и такой ник уже занят
+	// Если этот ник уже использован и сообщение от клиента
+	if (IRC::find_name(clients, this->arguments[0]) >= 0 && serv_client < 0)
 	{
+		utils::print_error(ERR_NICKNAMEINUSE, "Nickname is already in use");
 		irc.push_cmd_queue(fd, irc.response(ERR_NICKNAMEINUSE, fd, arguments[0], ERR_NICKNAMEINUSE_MESS));
 		return (ERR_NICKNAMEINUSE);
 	}
 
-	if ((this->prefix.empty() ||
-		(!this->prefix.empty() && IRC::find_name(clients, this->prefix) < 0)) &&
-		(i = IRC::find_fd(servers, fd)) >= 0)										// и есть сервер с таким fd
+	// Если префикс не соответствует ни одному нику
+	if (!prefix.empty() && (IRC::find_name(clients, this->prefix) < 0))
 	{
-		Client* new_client = new Client(fd, this->arguments[0], std::atoi(this->arguments[1].c_str()));
-		clients.push_back(new_client);
-		servers[i]->addClient(new_client);
-		utils::print_line("New client created");
-		i = -1;
+		utils::print_error(0, "Invalid prefix \"" + prefix + "\"\r\n");
+		irc.push_cmd_queue(fd, "ERROR :Invalid prefix \"" + prefix + "\"\r\n");
+		return (1);
 	}
 
-	else if (this->prefix.empty() && (i = IRC::find_fd(clients, fd)) >= 0) 		// если префикс пуст и если есть клиент с таким fd
+	return (0);
+}
+
+int Command::
+cmd_nick(IRC& irc, int fd)
+{
+	std::vector<Client*>&	clients 	= irc.get_clients();
+	std::vector<User*>&		users 		= irc.get_users();
+	std::vector<Server*>&	servers		= irc.get_servers();
+	int						client_el	= IRC::find_fd(clients, fd);
+	int						server_el	= IRC::find_fd(servers, fd);
+	int						curr_client = -1;
+	int						curr_user	= -1;
+	int						error;
+
+	if ((error = nick_check_errors(fd, server_el, irc)) != 0)
+		return (error);
+
+	// Если это от сервера
+	if (server_el >= 0)
 	{
-		if (!(this->check_password(*clients[i])))
-			return 0;
-		if (!(clients[i]->getName().empty()))
+		if (arguments.size() == 1)			// Изменение никнейма существующего клиента
 		{
-			utils::print_error(0, "you are already registered");
-			return 0;
+			curr_client = IRC::find_name(clients, prefix);
+			clients[curr_client]->setNickname(arguments[0]);
+
+			if ((curr_user = IRC::find_name(users, prefix)) >= 0)
+				users[curr_user]->setNickname(arguments[0]);
+
+			utils::print_line("Nickname for client changed from " + clients[curr_client]->getName() + " to " + this->arguments[0]);
 		}
-		utils::print_line("Nickname for client " + this->arguments[0] + " set");
-		if ((j = IRC::find_fd(users, fd)) >= 0)
-			utils::print_line("New nickname for user" + this->arguments[0] + " set");
+		else if (arguments.size() == 2)		// Создание нового клиента
+		{
+			if (!prefix.empty())
+				utils::print_error(0, "DEBUG Ignoring prefix (message from server with both prefix and hopcount).");
+
+			Client *new_client = new Client(fd, this->arguments[0], std::atoi(this->arguments[1].c_str()));
+			clients.push_back(new_client);
+			servers[server_el]->addClient(new_client);
+			utils::print_line("New client created");
+			curr_client = clients.size() - 1;
+		}
 	}
 
-	else if (!(this->prefix.empty()) && (i = IRC::find_name(clients, this->prefix)) >= 0) // если есть префикс и если есть клиент с ником, который пришел в префикс
+	// Если это от клиента
+	else if (client_el >= 0)
 	{
-		if (!(this->check_password(*clients[i])))												// если он уже установил верный пароль
-			return 0;
-		utils::print_line("Nickname for client changed from " + clients[i]->getName() + " to " + this->arguments[0]);
-		if ((j = IRC::find_name(users, this->prefix)) >= 0)
-			utils::print_line("Nickname for user changed from " + users[j]->getName() + " to " + this->arguments[0]);
+		if (clients[client_el]->getName().empty())
+			utils::print_line("Nickname for client set -> " + this->arguments[0]);
+		else
+			utils::print_line("Nickname changed " + clients[curr_client]->getName() + " -> " + this->arguments[0]);
+			
+		curr_client = client_el;
+		if (!this->prefix.empty())
+			curr_client = IRC::find_name(clients, this->prefix);
+		clients[curr_client]->setNickname(this->arguments[0]);
+
+		if ((curr_user = IRC::find_name(users, prefix)) >= 0)
+			users[curr_user]->setNickname(arguments[0]);
 	}
-
-	if (i >= 0)
-		clients[i]->setNickname(this->arguments[0]);
-	if (j >= 0)
-		users[j]->setNickname(this->arguments[0]);
-
 	
-	// отправка сообщения всем серверам
-	//irc.forward_message_to_servers(fd, message, !this->prefix.empty());
-	// j = -1;
-	j = IRC::find_fd(servers, fd);
-	for (i = 0; i < (int)servers.size(); i++)
-	{
-		if (i != j && servers[i]->getHopcount() == 1)
-		{
-			if (this->prefix.empty())
-				irc.push_cmd_queue(servers[i]->getSocketFd(), ":" + this->arguments[0] + " " + this->message + " 1\r\n");
-			else
-				irc.push_cmd_queue(servers[i]->getSocketFd(), this->message + "\r\n");
-		}
-	}
+	// Отправка сообщения о новом или измененном юзере всем серверам
+	std::stringstream out_mess;
+	out_mess << "NICK " << arguments[0] << " " << (clients[curr_client]->getHopcount() + 1) << "\r\n";
+	irc.forward_message_to_servers_2(fd, prefix, out_mess.str());
 
 	return 0;
 }
