@@ -55,9 +55,9 @@ cmd_user(IRC& irc, int fd)
 
 	if (!(this->prefix.empty()) &&								// если префикс есть
 		(server_fd = IRC::find_fd(servers, fd)) >= 0 &&			// и сообщение пришло с сервера
-		(i = IRC::find_name(clients, this->prefix)) >= 0)	// и есть клиент с таким ником
+		(i = IRC::find_name(clients, this->prefix)) >= 0)		// и есть клиент с таким ником
 	{
-		if (!(check_nickname(*clients[i])))							// и ввел ли клиент ник
+		if (!(check_nickname(*clients[i])))						// и ввел ли клиент ник
 			return 0;
 		if (IRC::find_name(users, this->prefix) >= 0)			// если уже есть юзер с таким никнеймом
 		{
@@ -85,20 +85,11 @@ cmd_user(IRC& irc, int fd)
 	else
 		return 0;
 
+	User *curr_user = users[users.size() - 1];
+	std::stringstream ss;
+	ss << "NICK " << curr_user->getNickname() << " " << (curr_user->getHopcount() + 1);
+	irc.forward_message_to_servers_2(fd, "", ss.str());
 	irc.forward_message_to_servers(fd, message, !prefix.empty());
-	// int j = -1;
-	// std::string nickname = clients[i]->getName();
-	// j = IRC::find_fd(servers, fd);
-	// for (i = 0; i < (int)servers.size(); i++)
-	// {
-	// 	if (i != j)
-	// 	{
-	// 		if (!this->prefix.empty())
-	// 			irc.push_cmd_queue(servers[i]->getSocketFd(), this->message + "\r\n");
-	// 		else
-	// 			irc.push_cmd_queue(servers[i]->getSocketFd(), ":" + nickname + " " + this->message + "\r\n");
-	// 	}
-	// }
 
 	return 0;
 }

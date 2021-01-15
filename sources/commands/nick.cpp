@@ -161,18 +161,24 @@ cmd_nick(IRC& irc, int fd)
 				users[curr_user]->setNickname(arguments[0]);
 
 			utils::print_line("Nickname for client changed from " + clients[curr_client]->getName() + " to " + this->arguments[0]);
+			out_mess << "NICK " << arguments[0] << "\r\n";
 		}
 		else if (arguments.size() == 2)		// Создание нового клиента
 		{
 			if (!prefix.empty())
+			{
+				prefix = "";
 				utils::print_error(0, "DEBUG Ignoring prefix (message from server with both prefix and hopcount).");
+			}
 
 			Client *new_client = new Client(fd, this->arguments[0], std::atoi(this->arguments[1].c_str()));
 			clients.push_back(new_client);
 			servers[server_el]->addClient(new_client);
 			utils::print_line("New client created");
 			curr_client = clients.size() - 1;
+			out_mess << "NICK " << arguments[0] << " " << (clients[curr_client]->getHopcount() + 1) << "\r\n";
 		}
+		irc.forward_message_to_servers_2(fd, prefix, out_mess.str());
 	}
 
 	// Если это от клиента
@@ -182,23 +188,30 @@ cmd_nick(IRC& irc, int fd)
 		if (!this->prefix.empty())
 			curr_client = IRC::find_name(clients, this->prefix);
 
+		// этот клиент еще не зарегестрирован
 		if (clients[curr_client]->getName().empty())
 			utils::print_line("Nickname for client set -> " + this->arguments[0]);
+		// уже зарегестрирован
 		else
 		{
 			if (prefix.empty())
-				out_mess << ":" + clients[curr_client]->getName() + " ";
+				prefix = clients[curr_client]->getName();
+			if ((curr_user = IRC::find_name(users, prefix)) >= 0)
+			{
+				users[curr_user]->setNickname(arguments[0]);
+				irc.push_cmd_queue(fd, irc.full_name(users[curr_user]) + " NICK :" + this->arguments[0] + "\r\n");
+			}
+			out_mess << "NICK " << arguments[0] << "\r\n";
+			irc.forward_message_to_servers_2(fd, prefix, out_mess.str());
+
 			utils::print_line("Nickname changed " + clients[curr_client]->getName() + " -> " + this->arguments[0]);
 		}
 		
 		clients[curr_client]->setNickname(this->arguments[0]);
-		if ((curr_user = IRC::find_name(users, prefix)) >= 0)
-			users[curr_user]->setNickname(arguments[0]);
 	}
-	
-	// Отправка сообщения о новом или измененном юзере всем серверам
-	out_mess << "NICK " << arguments[0] << " " << (clients[curr_client]->getHopcount() + 1) << "\r\n";
-	irc.forward_message_to_servers_2(fd, prefix, out_mess.str());
 
 	return 0;
 }
+
+//User *user = irc.get_user_by_client(clients[curr_client]);
+//irc.push_cmd_queue(fd, irc.full_name(user) + " NICK :" + this->arguments[0] + "\r\n");

@@ -568,6 +568,13 @@ get_channel(string channel_name) {
 			: NULL;
 }
 
+User* IRC::
+get_user_by_client(Client *client)
+{
+	int i = IRC::find_name(_users, client->getName());
+	return (i >=0) ? _users[i] : NULL;
+}
+
 const string& IRC::
 get_nickname(int fd)		{ return _users[find_fd(_users, fd)]->getName(); }
 
