@@ -61,6 +61,8 @@ public:
 	// int				getFd() const;
 	// int				getHopcount() const;
 	const ModeUser& getModeUser() const;
+	bool			is_i_mode() const;
+	bool			is_o_mode() const;
 
 	void			inc_channel_count();
 	void			dec_channel_count();
