@@ -123,7 +123,4 @@ is_channel_visible(IRC& irc, int fd, char channel_type, const string& channel_na
 }
 
 bool Command::
-is_server(IRC& irc, int fd)
-{
-	return (IRC::find_fd(irc.get_servers(), fd)) >= 0;
-}
+is_server(IRC& irc, int fd)			{ return irc.is_server(fd); }

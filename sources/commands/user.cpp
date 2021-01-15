@@ -24,6 +24,10 @@ user_create(Client* curr_client, vector<User*>& users, Server* curr_server)
 	User* curr_user = new User(curr_client);
 	curr_user->user_from_client(this->arguments[0], this->arguments[1],
 								this->arguments[2], this->arguments[3]);
+	std::cout << "1 " << this->arguments[0] << std::endl;
+	std::cout << "2 " << this->arguments[1] << std::endl;
+	std::cout << "3 " << this->arguments[2] << std::endl;
+	std::cout << "4 " << this->arguments[3] << std::endl;
 	users.push_back(curr_user);
 	utils::print_line("USER created");
 

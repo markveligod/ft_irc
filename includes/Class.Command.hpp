@@ -49,6 +49,7 @@ private:
 	void						join_channel(IRC& irc, const string& name, const string& key, char type, const string& nickname, int fd);
 	int							join_from_server(IRC& irc, const string& channel_name, const string& nickname);
 	void						send_topic(IRC& irc, int fd, const string& channel_name, const string& topic);
+	string						who_message(const User& user);
 
 
 public:

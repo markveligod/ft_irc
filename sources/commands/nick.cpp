@@ -73,13 +73,13 @@ cmd_nick(IRC& irc, int fd)
 
 	if (!(this->check_args_number(1)))							// если количество аргументов не 1
 	{
-		irc.push_cmd_queue(fd, irc.response_to_client(ERR_NONICKNAMEGIVEN, fd, "*", ERR_NONICKNAMEGIVEN_MESS));
+		irc.push_cmd_queue(fd, irc.response(ERR_NONICKNAMEGIVEN, fd, "*", ERR_NONICKNAMEGIVEN_MESS));
 		return (ERR_NONICKNAMEGIVEN);
 	}
 
 	if (!(this->nick_valid()))									// если ник не валидный
 	{
-		irc.push_cmd_queue(fd, irc.response_to_client(ERR_ERRONEUSNICKNAME, fd, arguments[0], ERR_ERRONEUSNICKNAME_MESS));
+		irc.push_cmd_queue(fd, irc.response(ERR_ERRONEUSNICKNAME, fd, arguments[0], ERR_ERRONEUSNICKNAME_MESS));
 		return (ERR_ERRONEUSNICKNAME);
 	}
 
@@ -87,13 +87,13 @@ cmd_nick(IRC& irc, int fd)
 		this->prefix.empty() &&									// и нет префикса
 		!(this->nick_available(clients, this->arguments[0])))	// и такой ник уже занят
 	{
-		irc.push_cmd_queue(fd, irc.response_to_client(ERR_NICKCOLLISION, fd, arguments[0], ERR_NICKCOLLISION_MESS));
+		irc.push_cmd_queue(fd, irc.response(ERR_NICKCOLLISION, fd, arguments[0], ERR_NICKCOLLISION_MESS));
 		return (ERR_NICKCOLLISION);
 	}
 
 	if (!(this->nick_available(clients, this->arguments[0])))	// если сообщение от клиента и такой ник уже занят
 	{
-		irc.push_cmd_queue(fd, irc.response_to_client(ERR_NICKNAMEINUSE, fd, arguments[0], ERR_NICKNAMEINUSE_MESS));
+		irc.push_cmd_queue(fd, irc.response(ERR_NICKNAMEINUSE, fd, arguments[0], ERR_NICKNAMEINUSE_MESS));
 		return (ERR_NICKNAMEINUSE);
 	}
 

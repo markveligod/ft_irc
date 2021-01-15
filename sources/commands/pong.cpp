@@ -22,7 +22,7 @@ cmd_pong(IRC& irc, int fd)
 	
 	if (arguments.empty())
 	{
-		irc.push_cmd_queue(fd, irc.response_to_client(ERR_NOORIGIN, fd, sender_name, ERR_NOORIGIN_MESS));
+		irc.push_cmd_queue(fd, irc.response(ERR_NOORIGIN, fd, sender_name, ERR_NOORIGIN_MESS));
 		return 1;
 	}
 
@@ -46,7 +46,7 @@ cmd_pong(IRC& irc, int fd)
 	}
 	if (i < 0)
 	{
-		irc.push_cmd_queue(fd, irc.response_to_client(ERR_NOSUCHSERVER, fd, sender_name, ERR_NOSUCHSERVER_MESS));
+		irc.push_cmd_queue(fd, irc.response(ERR_NOSUCHSERVER, fd, sender_name, ERR_NOSUCHSERVER_MESS));
 		return 1;
 	}
 	else

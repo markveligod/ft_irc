@@ -320,6 +320,7 @@
 										// with a WHO message, a RPL_ENDOFWHO must be sent
 										// after processing each list item with <name> being
 										// the item.
+#define RPL_ENDOFWHO_MESS		" :End of WHO list"
 
 #define RPL_NAMREPLY			353		// "<channel> :[[@|+]<nick> [[@|+]<nick> [...]]]"
 

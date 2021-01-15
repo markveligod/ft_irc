@@ -130,8 +130,8 @@ setMode(const ModeUser& mode)			{ this->mode = mode; }
 const string& User::
 getUsername() const						{ return (this->username); }
 
-// const string& User::
-// getName() const							{ return client->getName(); }
+const string& User::
+getNickname() const						{ return this->nickname; }
 
 const string& User::
 getHostname() const						{ return (this->hostname); }
@@ -153,6 +153,12 @@ getModeUser() const						{ return (this->mode);}
 
 // int User::
 // getHopcount() const						{ return (this->client->getHopcount()); }
+
+bool User::
+is_i_mode() const						{ return mode.i; }
+
+bool User::
+is_o_mode() const						{ return mode.o; }
 
 void User::
 inc_channel_count()						{ channel_count++; }
