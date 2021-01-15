@@ -70,11 +70,11 @@ cmd_server(IRC& irc, int fd)
 	vector<Server*>&  servers 	= irc.get_servers();
 	vector<User *>&   users		= irc.get_users();
 	int				  client_el	= IRC::find_fd(clients, fd);
-	int				  check_result;
+	int				  error;
 
 
-	if ((check_result = this->server_check_errors(servers, clients, fd)) != 1)
-		return (check_result);
+	if ((error = this->server_check_errors(servers, clients, fd)) != 1)
+		return (error);
 
 
 // Создаем новый сервер
@@ -113,7 +113,7 @@ cmd_server(IRC& irc, int fd)
 		{
 			if (users[i]->getSocketFd() != fd)
 			{
-				out_message << ":" << users[i]->getName() << " NICK "
+				out_message << "NICK "
 							<< users[i]->getName() << " "
 							<< (users[i]->getHopcount() + 1) << "\r\n";
 				out_message << ":" << users[i]->getName() << " USER "
