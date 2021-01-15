@@ -17,6 +17,8 @@ struct ModeUser
 	bool o;
 	bool O;
 
+	ModeUser();
+	ModeUser(const ModeUser&);
 	ModeUser& operator=(const ModeUser&);
 };
 

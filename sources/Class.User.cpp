@@ -9,6 +9,12 @@ using std::string;
 ** ----------------------------------------------------------
 */
 
+ModeUser::
+ModeUser() {}
+
+ModeUser::
+ModeUser(const ModeUser& src) { *this = src; }
+
 ModeUser& ModeUser::
 operator=(const ModeUser& src)
 {
