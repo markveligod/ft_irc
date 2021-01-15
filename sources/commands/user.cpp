@@ -24,12 +24,15 @@ user_create(Client* curr_client, vector<User*>& users, Server* curr_server)
 	User* curr_user = new User(curr_client);
 	curr_user->user_from_client(this->arguments[0], this->arguments[1],
 								this->arguments[2], this->arguments[3]);
-	std::cout << "1 " << this->arguments[0] << std::endl;
-	std::cout << "2 " << this->arguments[1] << std::endl;
-	std::cout << "3 " << this->arguments[2] << std::endl;
-	std::cout << "4 " << this->arguments[3] << std::endl;
 	users.push_back(curr_user);
 	utils::print_line("USER created");
+	std::cout << "DEBUG   users size = " << users.size() << std::endl;
+	std::cout << "UserName: " << curr_user->getUsername() << std::endl;
+	std::cout << "HostName: " << curr_user->getHostname() << std::endl;
+	std::cout << "ServerName: " << curr_user->getServername() << std::endl;
+	std::cout << "RealName: " << curr_user->getRealname() << std::endl;
+	std::cout << "NickName: " << curr_user->getNickname() << std::endl;
+	std::cout << "HopCount: " << curr_user->getHopcount() << std::endl;
 
 	if (curr_server != NULL)
 	{

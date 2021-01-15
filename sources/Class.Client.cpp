@@ -10,7 +10,8 @@ using std::string;
 
 Client::
 Client(int socket_fd, int hopcount) 		
-					  : socket_fd(socket_fd),
+					  : nickname(""),
+					  	socket_fd(socket_fd),
 						hopcount(hopcount),
 						password(false),
 						is_server(false) {}

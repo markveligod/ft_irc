@@ -80,7 +80,7 @@ getMessage() const { return (this->message); }
 
 bool Command::check_args_number(int n) const
 {
-	if ((int)this->arguments.size() < n)
+	if ((int)this->arguments.size() != n)
 		return false;
 	return true;
 }
