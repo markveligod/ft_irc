@@ -17,7 +17,6 @@
 int Command::
 cmd_topic(IRC& irc, int fd)
 {
-	(void)irc; (void)fd;
 	if (arguments.empty())
 	{
 		irc.push_cmd_queue(fd, irc.response_to_client(ERR_NEEDMOREPARAMS, fd, command, ERR_NEEDMOREPARAMS_MESS));

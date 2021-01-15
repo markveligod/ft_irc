@@ -29,7 +29,7 @@ User(Client* src) : Client(*src)
 	this->password		= src->getPassword();
 	this->hopcount		= src->getHopcount();
 	this->socket_fd		= src->getSocketFd();
-	this->client		= src;
+	// this->client		= src;
 	this->channel_count	= 0;
 }
 
@@ -43,7 +43,7 @@ operator=(const User& src)
 	hostname = src.hostname;
 	servername = src.servername;
 	realname = src.realname;
-	client = src.client;
+	// client = src.client;
 	mode = src.mode;
 	channel_count = src.channel_count;
 	return *this;
@@ -130,8 +130,8 @@ setMode(const ModeUser& mode)			{ this->mode = mode; }
 const string& User::
 getUsername() const						{ return (this->username); }
 
-const string& User::
-getName() const							{ return client->getName(); }
+// const string& User::
+// getName() const							{ return client->getName(); }
 
 const string& User::
 getHostname() const						{ return (this->hostname); }
@@ -145,11 +145,11 @@ getRealname() const						{ return (this->realname); }
 size_t User::
 getChannelCount() const					{ return (this->channel_count); }
 
-int User::
-getFd() const							{ return (this->client->getSocketFd()); }
+// int User::
+// getFd() const							{ return (this->client->getSocketFd()); }
 
-int User::
-getHopcount() const						{ return (this->client->getHopcount()); }
+// int User::
+// getHopcount() const						{ return (this->client->getHopcount()); }
 
 void User::
 inc_channel_count()						{ channel_count++; }

@@ -26,10 +26,10 @@ int Command::cmd_part(IRC& irc, int fd)
 	map<string, Channel>& local_channels = irc.get_local_channels();
 	map<string, Channel>& shared_channels = irc.get_shared_channels();
 
-	string exit_message = (arguments.size() == 2) ? (" :" + arguments[1]) : " :Left the channel";
+	string exit_message = " :" + ((arguments.size() == 2) ? arguments[1] : string());
 
 	// channels - список каналов, которые были в arguments[0] перечислены через ','
-	// channels[i].substr(1) - название канала без первого символа '&' или '#'
+	// channels[i].substr(1) - название канала без первого символа ('&' или '#')
 
 	for (size_t i = 0; i < channels.size(); i++)
 	{
@@ -66,14 +66,16 @@ leave_channel(IRC& irc, Channel& channel, char type, int fd, string message)
 	vector<User*>& users = channel.get_users();
 	vector<User*>& operators = channel.get_operators();
 
-
 	int i = IRC::find_fd(users, fd);
 	if (i >= 0)
 	{
 		users[i]->dec_channel_count();
 		users.erase(users.begin() + i);
 		
-		string full_message = irc.full_name(users[i]) + " PART " + type + channel.getName() + message;
+		string full_message = ((is_server(irc, fd)) 
+									? prefix
+									: irc.full_name(users[i]))
+								+ " PART " + type + channel.getName() + message;
 		irc.push_cmd_queue(fd, full_message + "\r\n");
 
 		i = IRC::find_fd(operators, fd);

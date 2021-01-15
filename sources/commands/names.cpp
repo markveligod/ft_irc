@@ -24,9 +24,8 @@
 int Command::
 cmd_names(IRC& irc, int fd)
 {
-	vector<string> args = utils::split(arguments[0], ',');
+	vector<string> args = (!arguments.empty()) ? utils::split(arguments[0], ',') : vector<string>();
 
-	// if (arguments.empty() || args[0] == "0")
 	if (arguments.empty() || args[0] == "0" || atoi(args[0].c_str()) == irc.get_localhost_port())
 	{
 		if ((IRC::find_fd(irc.get_servers(), fd)) < 0)		// если fd принадлежит Серверу, то ему не надо отправлять список локальных каналов 

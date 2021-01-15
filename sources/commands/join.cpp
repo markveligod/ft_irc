@@ -52,8 +52,7 @@ join_channel(IRC& irc,
 			const string& nickname,
 			int fd)
 {
-	int i;
-	if ((i = IRC::find_fd(irc.get_servers(), fd)) >= 0)			// check if join recieved by server 
+	if (is_server(irc, fd))											// check if join recieved by server 
 	{
 		if (join_from_server(irc, channel_name, nickname))
 			return;
@@ -66,7 +65,7 @@ join_channel(IRC& irc,
 		return;
 	}
 
-	if (!Channel::is_valid_channel_name(channel_name))			// check channel name
+	if (!Channel::is_valid_channel_name(channel_name))				// check channel name
 	{
 		irc.push_cmd_queue(fd, irc.response_to_client(ERR_NOSUCHCHANNEL, fd, channel_name, ERR_NOSUCHCHANNEL_MESS));
 		return;
@@ -79,19 +78,6 @@ join_channel(IRC& irc,
 	User* new_user = irc.get_user(fd);
 	string message = irc.full_name(new_user) + " JOIN :" + channel_type + channel_name;
 
-	// map<string, Channel>::iterator it = channels.find(channel_name);
-	
-	// if (it == channels.end())									// add new channel
-	// {
-	// 	channels.insert(make_pair(channel_name, Channel(channel_name, channel_key, new_user)));
-	// 	map<string, Channel>::iterator it2 = channels.find(channel_name);
-
-	// 	it2->second.add_operator(new_user);
-	// 	it2->second.add_user(new_user);
-	// 	irc.push_cmd_queue(fd, irc.full_name(new_user) + " JOIN :" + channel_type + channel_name + "\r\n");
-	// 	irc.forward_message_to_servers(fd, message, true);
-	// 	// отправить всем серверам, что создан канал	TODO
-	// }
 	if (!channels.count(channel_name))
 	{
 		channels.insert(make_pair(channel_name, Channel(channel_name, channel_key, new_user)));
@@ -100,59 +86,35 @@ join_channel(IRC& irc,
 		irc.push_cmd_queue(fd, irc.full_name(new_user) + " JOIN :" + channel_type + channel_name + "\r\n");
 		irc.forward_message_to_servers(fd, message, true);
 	}
-	else														// channel already exist
+	else															// channel already exist
 	{
-		if (channels[channel_name].is_user_in_channel(nickname))			// check if user already in channel
+		if (channels[channel_name].is_user_in_channel(nickname))	// check if user already in channel
 			return;
 
-		if (channels[channel_name].is_banned(nickname))						// check if user is banned 
+		if (channels[channel_name].is_banned(nickname))				// check if user is banned 
 		{
 			irc.push_cmd_queue(fd, irc.response_to_client(ERR_BANNEDFROMCHAN, fd, "#" + channel_name, ERR_BANNEDFROMCHAN_MESS));
 			return;
 		}
 
-		if (!channels[channel_name].is_valid_key(channel_key))				// check channel password
+		if (!channels[channel_name].is_valid_key(channel_key))		// check channel password
 		{
 			irc.push_cmd_queue(fd, irc.response_to_client(ERR_BADCHANNELKEY, fd, "#" + channel_name, ERR_BADCHANNELKEY_MESS));
 			return;
 		}
 
-		if (channels[channel_name].is_invite_only())						// check if invite only channel
+		if (channels[channel_name].is_invite_only())				// check if invite only channel
 		{
 			irc.push_cmd_queue(fd, irc.response_to_client(ERR_INVITEONLYCHAN, fd, "#" + channel_name, ERR_INVITEONLYCHAN_MESS));
 			return;
 		}
-		// if (it->second.is_user_in_channel(nickname))			// check if user already in channel
-		// 	return;
-
-		// if (it->second.is_banned(nickname))						// check if user is banned 
-		// {
-		// 	irc.push_cmd_queue(fd, irc.response_to_client(ERR_BANNEDFROMCHAN, fd, "#" + channel_name, ERR_BANNEDFROMCHAN_MESS));
-		// 	return;
-		// }
-
-		// if (!it->second.is_valid_key(channel_key))				// check channel password
-		// {
-		// 	irc.push_cmd_queue(fd, irc.response_to_client(ERR_BADCHANNELKEY, fd, "#" + channel_name, ERR_BADCHANNELKEY_MESS));
-		// 	return;
-		// }
-
-		// if (it->second.is_invite_only())						// check if invite only channel
-		// {
-		// 	irc.push_cmd_queue(fd, irc.response_to_client(ERR_INVITEONLYCHAN, fd, "#" + channel_name, ERR_INVITEONLYCHAN_MESS));
-		// 	return;
-		// }
 
 		channels[channel_name].add_user(new_user);
-		// map<string, Channel>::iterator it = channels.find(channel_name);
-		// it->second.add_user(new_user);
 
 		irc.push_cmd_queue(fd, message + "\r\n");
 		irc.forward_message_to_servers(fd, message, true);
 		irc.forward_message_to_clients(fd, message);
-		// send_topic(irc, fd, channel_type + channel_name, it->second.get_topic());			// отправляем Топик
 		send_topic(irc, fd, channel_type + channel_name, channels[channel_name].get_topic());	// отправляем Топик
-		// :irc.atw-inter.net 332 porrring #q1 ::New topic set
 	}
 	new_user->inc_channel_count();								// увеличиваем количество каналов, в которых состоит пользователь
 	
@@ -180,5 +142,6 @@ join_from_server(IRC& irc, const string& channel_name, const string& nickname)
 		channels.insert(std::make_pair(channel_name, Channel(channel_name)));
 		channels[channel_name].add_user(new_user);
 	}
+	new_user->inc_channel_count();
 	return 0;
 }

@@ -98,6 +98,8 @@ class IRC
 		vector<Client*>& 			get_clients();
 		vector<Server*>& 			get_servers();
 		const string& 				get_server_name();
+		const string& 				get_server_name(int fd);
+		const string&				get_nickname(int fd);
 		int							get_localhost_port() const;
 		const string&				get_localhost_pass() const;
 		const string&				get_operator_user() const;
@@ -106,7 +108,6 @@ class IRC
 		map<string, Channel>&		get_local_channels();
 		map<string, Channel>&		get_shared_channels();
 		Channel*					get_channel(string channel_name);
-		string						get_nickname(int fd);
 		bool						is_empty_queue() const;
 
 		template <typename T>

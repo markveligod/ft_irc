@@ -27,7 +27,7 @@ private:
 	string 		hostname;
 	string 		servername;
 	string 		realname;
-	Client*		client;
+	// Client*		client;
 	ModeUser	mode;
 	size_t		channel_count;
 
@@ -53,13 +53,13 @@ public:
 	void			print_user();
 
 	const string&	getUsername() const;
-	const string&	getName() const;
+	// const string&	getName() const;
 	const string&	getHostname() const;
 	const string&	getServername() const;
 	const string&	getRealname() const;
 	size_t			getChannelCount() const;
-	int				getFd() const;
-	int				getHopcount() const;
+	// int				getFd() const;
+	// int				getHopcount() const;
 
 	void			inc_channel_count();
 	void			dec_channel_count();

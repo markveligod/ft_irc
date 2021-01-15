@@ -8,9 +8,11 @@
 
 #define ERR_NOSUCHNICK				401		// "<nickname> :No such nick/channel"
 	              						// - Used to indicate the nickname parameter supplied to a command is currently unused.
+#define ERR_NOSUCHNICK_MESS			" :No such nick/channel"
 
 #define ERR_NOSUCHSERVER			402		// "<server name> :No such server"
 										// Used to indicate the server name given currently doesn't exist.
+#define ERR_NOSUCHSERVER_MESS		" :No such server"
 
 #define ERR_NOSUCHCHANNEL			403		// <channel name> :No such channel"
 										// - Used to indicate the given channel name is invalid.
@@ -40,6 +42,7 @@
 										// - PING or PONG message missing the originator parameter
 										// which is required since these commands must work
 										// without valid prefixes.
+#define ERR_NOORIGIN_MESS			" :No origin specified"
 
 #define ERR_NORECIPIENT				411		// ":No recipient given (<command>)"
 

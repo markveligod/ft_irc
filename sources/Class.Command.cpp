@@ -122,19 +122,8 @@ is_channel_visible(IRC& irc, int fd, char channel_type, const string& channel_na
 	return i >=0 || it->second.is_visible();
 }
 
-int Command::
-find_name(vector<Channel>& cont, const std::string& name)
+bool Command::
+is_server(IRC& irc, int fd)
 {
-	vector<Channel>::const_iterator v_begin = cont.begin();
-	int i = 0;
-
-	while (v_begin != cont.end())
-	{
-		if ((*v_begin).getName() == name)
-			return (i);
-		v_begin++;
-		i++;
-	}
-	return (-1);
+	return (IRC::find_fd(irc.get_servers(), fd)) >= 0;
 }
-
