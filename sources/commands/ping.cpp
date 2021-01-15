@@ -31,7 +31,6 @@ cmd_ping(IRC& irc, int fd)
 		irc.push_cmd_queue(fd, irc.response(ERR_NOORIGIN, fd, sender_name, ERR_NOORIGIN_MESS));
 		return 1;
 	}
-	std::cout << "SENDER NAME " << irc.get_server_name(fd) << std::endl;
 	
 	if (arguments.size() == 1)
 	{
