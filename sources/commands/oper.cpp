@@ -29,12 +29,12 @@ cmd_oper(IRC& irc, int fd)
 
     if (!this->check_args_number(2))
     {
-        irc.push_cmd_queue(fd, irc.response_to_client(ERR_NEEDMOREPARAMS, fd, "ERR_NEEDMOREPARAMS", ERR_NEEDMOREPARAMS_MESS));
+        irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, fd, "ERR_NEEDMOREPARAMS", ERR_NEEDMOREPARAMS_MESS));
 		return (ERR_NEEDMOREPARAMS);
     }
     if ((pos = irc.find_fd(vec_users, fd)) == -1)
     {
-        irc.push_cmd_queue(fd, irc.response_to_client(ERR_ALREADYREGISTRED, fd, "ERR_ALREADYREGISTRED", ERR_ALREADYREGISTRED_MESS));
+        irc.push_cmd_queue(fd, irc.response(ERR_ALREADYREGISTRED, fd, "ERR_ALREADYREGISTRED", ERR_ALREADYREGISTRED_MESS));
         return (ERR_ALREADYREGISTRED);
     }
     if (this->arguments[0] == irc.get_operator_user() && this->arguments[1] == irc.get_operator_pass())
@@ -48,9 +48,9 @@ cmd_oper(IRC& irc, int fd)
     }
     else
     {
-        irc.push_cmd_queue(fd, irc.response_to_client(ERR_PASSWDMISMATCH, fd, "ERR_PASSWDMISMATCH", ERR_PASSWDMISMATCH_MESS));
+        irc.push_cmd_queue(fd, irc.response(ERR_PASSWDMISMATCH, fd, "ERR_PASSWDMISMATCH", ERR_PASSWDMISMATCH_MESS));
         return (ERR_PASSWDMISMATCH);
     }
-    irc.push_cmd_queue(fd, irc.response_to_client(0, fd, "0", " :cmd_oper is done!"));
+    irc.push_cmd_queue(fd, irc.response(0, fd, "0", " :cmd_oper is done!"));
     return (0);
 }

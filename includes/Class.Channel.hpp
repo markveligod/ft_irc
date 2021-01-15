@@ -84,7 +84,7 @@ public:
 			User u = *(_users[i]);
 			if (i != 0)
 				std::cout << ", ";
-			std::cout << u.getName();
+			std::cout << u.getUsername();
 		}
 		std::cout << std::endl;
 	}

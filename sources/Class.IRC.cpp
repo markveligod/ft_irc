@@ -6,7 +6,7 @@
 # define FD_CLIENT_SSL 3
 # define FD_SERVER_SSL 4
 
-# define COMM_COUNT 12
+# define COMM_COUNT 14
 
 # define CERTIFICATE "cert/cert.pem"
 # define PRIVATE_KEY "cert/key.pem"
@@ -132,7 +132,9 @@ do_command(Command* command, int socket_fd)
 									"NAMES",
 									"SQUIT",
 									"WHO",
-									"TOPIC"};
+									"TOPIC",
+									"PING",
+									"PONG"};
 	doCommand	cmd_func[COMM_COUNT] = {&Command::cmd_nick,
 										&Command::cmd_pass,
 										&Command::cmd_user,
@@ -144,7 +146,9 @@ do_command(Command* command, int socket_fd)
 										&Command::cmd_names,
 										&Command::cmd_squit,
 										&Command::cmd_who,
-										&Command::cmd_topic};
+										&Command::cmd_topic,
+										&Command::cmd_ping,
+										&Command::cmd_pong};
 
 	string comm = command->getCommand();
 	std::transform(comm.begin(), comm.end(), comm.begin(), toupper);
@@ -157,7 +161,7 @@ do_command(Command* command, int socket_fd)
 			return (result);
 		}
 	}
-	this->push_cmd_queue(socket_fd, this->response_to_client(ERR_UNKNOWNCOMMAND, socket_fd, comm, ERR_UNKNOWNCOMMAND_MESS));
+	this->push_cmd_queue(socket_fd, this->response(ERR_UNKNOWNCOMMAND, socket_fd, comm, ERR_UNKNOWNCOMMAND_MESS));
 	return (0);
 }
 
@@ -521,6 +525,9 @@ get_servers()				{ return _servers; }
 const string& IRC::
 get_server_name()			{ return _server_name; }
 
+const string& IRC::
+get_server_name(int fd)		{ return _servers[find_fd(_servers, fd)]->getName(); }
+
 int IRC::
 get_localhost_port() const	{ return _localhost.get_port(); }
 
@@ -558,14 +565,17 @@ get_channel(string channel_name) {
 			: NULL;
 }
 
-string IRC::
+const string& IRC::
 get_nickname(int fd)		{ return _users[find_fd(_users, fd)]->getName(); }
 
 bool IRC::
 is_empty_queue() const		{ return (this->_command_queue.empty());}
 
+bool IRC::
+is_server(int fd) const		{ return (IRC::find_fd(_servers, fd)) >= 0; }
+
 string IRC::
-response_to_client(int response_code, int client_fd, string message_prefix, string message)
+response(int response_code, int client_fd, string message_prefix, string message)
 {
 	string code = utils::int_to_str(response_code);
 	string client_name = _clients[find_fd(_clients, client_fd)]->getName();
@@ -593,11 +603,11 @@ forward_message_to_servers(int fd, const string& message, bool prefix)
 }
 
 void IRC::
-forward_message_to_clients(int fd, const string& message)
+forward_message_to_clients(IRC& irc, const string& message)
 {	
 	for (size_t i = 0; i < _clients.size(); i++)
 	{
-		if (_clients[i]->getSocketFd() != fd)
+		if (!irc.is_server(_clients[i]->getSocketFd()))
 			push_cmd_queue(_clients[i]->getSocketFd(), message + "\r\n");
 	}
 }
@@ -605,7 +615,7 @@ forward_message_to_clients(int fd, const string& message)
 string IRC::
 full_name(const User* user) const
 {
-	string fullname = ":" + user->getName() + "!~" + user->getUsername() + "@" + user->getServername();
+	string fullname = ":" + user->getName() + "!" + user->getUsername() + "@" + user->getHostname();
 	return fullname;
 }
 
@@ -617,7 +627,7 @@ push_mess_client(int fd, int code)
 		utils::print_error(code, "Not found standart error");
 	else
 	{
-		this->push_cmd_queue(fd, this->response_to_client(code, fd, utils::int_to_str(code), it->second));	
+		this->push_cmd_queue(fd, this->response(code, fd, utils::int_to_str(code), it->second));	
 	}
 	return (code);
 }

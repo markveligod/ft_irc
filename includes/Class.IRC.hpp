@@ -98,6 +98,8 @@ class IRC
 		vector<Client*>& 			get_clients();
 		vector<Server*>& 			get_servers();
 		const string& 				get_server_name();
+		const string& 				get_server_name(int fd);
+		const string&				get_nickname(int fd);
 		int							get_localhost_port() const;
 		const string&				get_localhost_pass() const;
 		const string&				get_operator_user() const;
@@ -106,8 +108,8 @@ class IRC
 		map<string, Channel>&		get_local_channels();
 		map<string, Channel>&		get_shared_channels();
 		Channel*					get_channel(string channel_name);
-		string						get_nickname(int fd);
 		bool						is_empty_queue() const;
+		bool						is_server(int fd) const;
 
 		template <typename T>
 		static int					find_fd(T& container, int fd);
@@ -116,10 +118,10 @@ class IRC
 
 		void 						push_cmd_queue(int fd, const string& str);
 		string						full_name(const User*) const;
-		string						response_to_client(int response_code, int client_fd, string message_prefix, string message);
+		string						response(int response_code, int client_fd, string message_prefix, string message);
 		int							push_mess_client(int fd, int code);
 		void						forward_message_to_servers(int fd, const string& message, bool prefix);
-		void						forward_message_to_clients(int fd, const string& message);
+		void						forward_message_to_clients(IRC& irc, const string& message);
 
 		void generate_map_codes();
 		void print_channels() const; //DEBUG

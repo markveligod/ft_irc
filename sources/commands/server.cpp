@@ -18,7 +18,7 @@ server_available(vector<Server *> &servers, string const &server_name) const
 
 	while (v_begin != v_end)
 	{
-		if ((*v_begin)->getServerName() == server_name)
+		if ((*v_begin)->getName() == server_name)
 			return (0);
 		v_begin++;
 	}
@@ -84,7 +84,7 @@ cmd_server(IRC& irc, int fd)
 	std::stringstream out_message;
 	out_message << new_server->getHopcount();
 	utils::print_line("New server registered!\n\t  Server name: " +
-					  new_server->getServerName() +
+					  new_server->getName() +
 					  "\n\t  Hopcount: " + out_message.str() +
 					  "\n\t  Info: " + new_server->getInfo());
 	out_message.str("");
@@ -103,7 +103,7 @@ cmd_server(IRC& irc, int fd)
 		for (int i = 0; i < (int)servers.size() - 1; i++)
 		{
 			out_message << ":" << irc.get_server_name() << " SERVER "
-						<< servers[i]->getServerName() << " "
+						<< servers[i]->getName() << " "
 						<< (servers[i]->getHopcount() + 1) << " :"
 						<< servers[i]->getInfo() << "\r\n";
 			irc.push_cmd_queue(fd, out_message.str());

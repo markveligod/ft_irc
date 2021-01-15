@@ -44,10 +44,12 @@ private:
 	void						leave_channel(IRC& irc, Channel& channels, char type, int fd, string message);
 	void						send_channel_users(IRC& irc, int fd, char type, string cnannel_name);
 	bool						is_channel_visible(IRC& irc, int fd, char channel_type, const string& channel_name);
+	bool						is_server(IRC& irc, int fd);
 	void						send_users_without_channel(IRC& irc, int fd);
 	void						join_channel(IRC& irc, const string& name, const string& key, char type, const string& nickname, int fd);
 	int							join_from_server(IRC& irc, const string& channel_name, const string& nickname);
 	void						send_topic(IRC& irc, int fd, const string& channel_name, const string& topic);
+	string						who_message(const User& user);
 
 
 public:
@@ -66,6 +68,8 @@ public:
 	int					cmd_squit(IRC& irc, int fd);
 	int					cmd_who(IRC& irc, int fd);
 	int					cmd_topic(IRC& irc, int fd);
+	int					cmd_ping(IRC& irc, int fd);
+	int					cmd_pong(IRC& irc, int fd);
 
 	const string&		getCommand() const;
 	const string&		getMessage() const;

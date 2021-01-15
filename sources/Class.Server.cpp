@@ -47,7 +47,7 @@ int Server::
 getSocketFd() const				{ return(this->_fd_socket); }
 
 const std::string& Server::
-getServerName() const           { return (this->_server_name);}
+getName() const           { return (this->_server_name);}
 
 int Server::
 getHopcount() const				{ return (this->_hopcount); }

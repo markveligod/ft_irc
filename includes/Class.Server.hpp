@@ -35,7 +35,7 @@ class Server
 		int					getSocketFd() const;
 		int					getHopcount() const;
 		const string &		getInfo() const;
-		const string &		getServerName() const;
+		const string &		getName() const;
 		const string &		getBuffer() const;
 		// vector<User*>&		getUsers();
 		// vector<Channel>&	getChannels();

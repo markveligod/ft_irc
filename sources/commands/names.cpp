@@ -24,9 +24,8 @@
 int Command::
 cmd_names(IRC& irc, int fd)
 {
-	vector<string> args = utils::split(arguments[0], ',');
+	vector<string> args = (!arguments.empty()) ? utils::split(arguments[0], ',') : vector<string>();
 
-	// if (arguments.empty() || args[0] == "0")
 	if (arguments.empty() || args[0] == "0" || atoi(args[0].c_str()) == irc.get_localhost_port())
 	{
 		if ((IRC::find_fd(irc.get_servers(), fd)) < 0)		// если fd принадлежит Серверу, то ему не надо отправлять список локальных каналов 
@@ -47,7 +46,7 @@ cmd_names(IRC& irc, int fd)
 		}
 
 		send_users_without_channel(irc, fd);
-		irc.push_cmd_queue(fd, irc.response_to_client(RPL_ENDOFNAMES, fd, "*", RPL_ENDOFNAMES_MESS));
+		irc.push_cmd_queue(fd, irc.response(RPL_ENDOFNAMES, fd, "*", RPL_ENDOFNAMES_MESS));
 		return 0;
 	}
 	
@@ -57,10 +56,10 @@ cmd_names(IRC& irc, int fd)
 			&& is_channel_visible(irc, fd, args[i][0], args[i].substr(1)))
 		{
 			send_channel_users(irc, fd, args[i][0], args[i].substr(1));
-			irc.push_cmd_queue(fd, irc.response_to_client(RPL_ENDOFNAMES, fd, args[i][0] + args[i].substr(1), RPL_ENDOFNAMES_MESS));
+			irc.push_cmd_queue(fd, irc.response(RPL_ENDOFNAMES, fd, args[i][0] + args[i].substr(1), RPL_ENDOFNAMES_MESS));
 		}
 		else
-			irc.push_cmd_queue(fd, irc.response_to_client(RPL_ENDOFNAMES, fd, args[i], RPL_ENDOFNAMES_MESS));
+			irc.push_cmd_queue(fd, irc.response(RPL_ENDOFNAMES, fd, args[i], RPL_ENDOFNAMES_MESS));
 	}
 	return 0;
 }
@@ -72,7 +71,7 @@ send_channel_users(IRC& irc, int fd, char channel_type, string channel_name)
 	// 				? irc.get_local_channels().count(channel_name)
 	// 				: irc.get_shared_channels().count(channel_name)) == 0)
 	// {
-	// 	irc.push_cmd_queue(fd, irc.response_to_client(RPL_ENDOFNAMES, fd, channel_type + channel_name, RPL_ENDOFNAMES_MESS));
+	// 	irc.push_cmd_queue(fd, irc.response(RPL_ENDOFNAMES, fd, channel_type + channel_name, RPL_ENDOFNAMES_MESS));
 	// 	return;
 	// }
 
