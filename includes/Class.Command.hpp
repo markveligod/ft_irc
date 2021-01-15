@@ -69,6 +69,7 @@ public:
 	int					cmd_topic(IRC& irc, int fd);
 	int					cmd_ping(IRC& irc, int fd);
 	int					cmd_pong(IRC& irc, int fd);
+	int					cmd_mode(IRC& irc, int fd);
 
 	const string&		getCommand() const;
 	const string&		getMessage() const;

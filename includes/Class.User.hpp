@@ -60,6 +60,7 @@ public:
 	size_t			getChannelCount() const;
 	// int				getFd() const;
 	// int				getHopcount() const;
+	const ModeUser& getModeUser() const;
 
 	void			inc_channel_count();
 	void			dec_channel_count();

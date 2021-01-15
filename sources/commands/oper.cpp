@@ -28,29 +28,18 @@ cmd_oper(IRC& irc, int fd)
     int pos;
 
     if (!this->check_args_number(2))
-    {
-        irc.push_cmd_queue(fd, irc.response_to_client(ERR_NEEDMOREPARAMS, fd, "ERR_NEEDMOREPARAMS", ERR_NEEDMOREPARAMS_MESS));
-		return (ERR_NEEDMOREPARAMS);
-    }
+        return (irc.push_mess_client(fd, ERR_NEEDMOREPARAMS));
     if ((pos = irc.find_fd(vec_users, fd)) == -1)
-    {
-        irc.push_cmd_queue(fd, irc.response_to_client(ERR_ALREADYREGISTRED, fd, "ERR_ALREADYREGISTRED", ERR_ALREADYREGISTRED_MESS));
-        return (ERR_ALREADYREGISTRED);
-    }
+        return (irc.push_mess_client(fd, ERR_ALREADYREGISTRED));
     if (this->arguments[0] == irc.get_operator_user() && this->arguments[1] == irc.get_operator_pass())
     {
         this->command = "MODE";
         this->arguments.clear();
         this->arguments.push_back(vec_users[pos]->getName());
         this->arguments.push_back("+o");
-        utils::print_line("Mode run!");
-        //this->cmd_mode(irc, fd);
+        this->cmd_mode(irc, fd);
     }
     else
-    {
-        irc.push_cmd_queue(fd, irc.response_to_client(ERR_PASSWDMISMATCH, fd, "ERR_PASSWDMISMATCH", ERR_PASSWDMISMATCH_MESS));
-        return (ERR_PASSWDMISMATCH);
-    }
-    irc.push_cmd_queue(fd, irc.response_to_client(0, fd, "0", " :cmd_oper is done!"));
+        return (irc.push_mess_client(fd, ERR_PASSWDMISMATCH));
     return (0);
 }

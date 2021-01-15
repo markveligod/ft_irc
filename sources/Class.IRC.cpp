@@ -6,7 +6,7 @@
 # define FD_CLIENT_SSL 3
 # define FD_SERVER_SSL 4
 
-# define COMM_COUNT 14
+# define COMM_COUNT 15
 
 # define CERTIFICATE "cert/cert.pem"
 # define PRIVATE_KEY "cert/key.pem"
@@ -39,6 +39,7 @@ IRC(string network_ip,
 	int port = std::atoi(localhost_port.c_str());
 	_localhost = Socket(LOCALHOST, port);
 	_localhost_ssl = Socket(LOCALHOST, port + 1);
+	this->generate_map_codes();
 	utils::print_line("Constructor IRC done!");
 	utils::print_line("Socket local done!");
 }
@@ -134,7 +135,8 @@ do_command(Command* command, int socket_fd)
 									"WHO",
 									"TOPIC",
 									"PING",
-									"PONG"};
+									"PONG",
+									"MODE"};
 	doCommand	cmd_func[COMM_COUNT] = {&Command::cmd_nick,
 										&Command::cmd_pass,
 										&Command::cmd_user,
@@ -148,7 +150,8 @@ do_command(Command* command, int socket_fd)
 										&Command::cmd_who,
 										&Command::cmd_topic,
 										&Command::cmd_ping,
-										&Command::cmd_pong};
+										&Command::cmd_pong,
+										&Command::cmd_mode};
 
 	string comm = command->getCommand();
 	std::transform(comm.begin(), comm.end(), comm.begin(), toupper);
@@ -244,10 +247,10 @@ check_fd_select()
 				vector<string> buffer_cmd = this->check_buffer(it->first, buffer);
 
 				utils::print_message(it->first, buffer_cmd);
-				/*std::cout << "\nDEBUG: получен буфер команд размером: " << buffer_cmd.size() << std::endl;
-				std::cout << "\nDEBUG BUFFER:\n";
-				for (size_t i = 0; i < buffer_cmd.size(); i++)
-					std::cout << "Index: " << i << " STR: " << buffer_cmd[i] << std::endl;*/
+				// std::cout << "\nDEBUG: получен буфер команд размером: " << buffer_cmd.size() << std::endl;
+				// std::cout << "\nDEBUG BUFFER:\n";
+				// for (size_t i = 0; i < buffer_cmd.size(); i++)
+				// 	std::cout << "Index: " << i << " STR: " << buffer_cmd[i] << std::endl;
 
 				for (size_t i = 0; i < buffer_cmd.size(); i++)
 				{
