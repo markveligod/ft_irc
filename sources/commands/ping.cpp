@@ -35,7 +35,8 @@ cmd_ping(IRC& irc, int fd)
 	if (arguments.size() == 1)
 	{
 		string name = irc.get_server_name();
-		irc.push_cmd_queue(fd, ":" + name + " PONG " + sender_name + " :" + arguments[0]);
+		irc.push_cmd_queue(fd, ":" + name + " PONG " + sender_name + " :" + arguments[0] + "\r\n");
+
 		return 0;
 	}
 	
@@ -51,7 +52,7 @@ cmd_ping(IRC& irc, int fd)
 							":" + arguments[0] +
 							" PING " +
 							server->getName() +
-							" :" + arguments[1]);
+							" :" + arguments[1] + "\r\n");
 		return 0;
 	}
 	if (i < 0)
@@ -66,7 +67,7 @@ cmd_ping(IRC& irc, int fd)
 							":" + arguments[0] +
 							" PING " +
 							user->getUsername() +
-							" :" + arguments[1]);
+							" :" + arguments[1] + "\r\n");
 	}
 	return 0;
 }

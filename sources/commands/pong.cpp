@@ -41,7 +41,7 @@ cmd_pong(IRC& irc, int fd)
 							":" + arguments[0] +
 							" PONG " +
 							server->getName() +
-							" :" + arguments[1]);
+							" :" + arguments[1] + "\r\n");
 		return 0;
 	}
 	if (i < 0)
@@ -56,7 +56,7 @@ cmd_pong(IRC& irc, int fd)
 							":" + arguments[0] +
 							" PONG " +
 							user->getUsername() +
-							" :" + arguments[1]);
+							" :" + arguments[1] + "\r\n");
 	}
 	return 0;
 }
