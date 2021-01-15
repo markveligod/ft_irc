@@ -145,8 +145,8 @@ getRealname() const						{ return (this->realname); }
 size_t User::
 getChannelCount() const					{ return (this->channel_count); }
 
-const ModeUser& User::
-getModeUser() const						{ return (this->mode);}
+ModeUser& User::
+getModeUser() 							{ return (this->mode);}
 
 // int User::
 // getFd() const							{ return (this->client->getSocketFd()); }
