@@ -578,6 +578,22 @@ bool IRC::
 is_server(int fd) const		{ return (IRC::find_fd(_servers, fd)) >= 0; }
 
 string IRC::
+response_2(int response_code, int fd, string command, string message)
+{
+	string code 		= utils::int_to_str(response_code);
+	string server_name	= _servers[find_fd(_servers, fd)]->getName();
+
+	string response = ":"
+					+ _server_name + " "
+					+ code + " "
+					+ server_name + " "
+					+ command + " "
+					+ message
+					+ "\r\n";
+	return response;
+}
+
+string IRC::
 response(int response_code, int client_fd, string message_prefix, string message)
 {
 	string code = utils::int_to_str(response_code);
@@ -591,6 +607,19 @@ response(int response_code, int client_fd, string message_prefix, string message
 					+ message
 					+ "\r\n";
 	return response;
+}
+
+void IRC::
+forward_message_to_servers_2(int fd, const string& prefix, const string& message)
+{
+	string forward_mess = prefix.empty() ? (message)
+										 : (":" + prefix + " " + message);
+	
+	for (size_t i = 0; i < _servers.size(); i++)
+	{
+		if (_servers[i]->getSocketFd() != fd && _servers[i]->getHopcount() == 1)
+			push_cmd_queue(_servers[i]->getSocketFd(), forward_mess + "\r\n");
+	}
 }
 
 void IRC::
