@@ -108,19 +108,15 @@ check_nickname(const Client& client) const
 }
 
 bool Command::
-is_channel_visible(IRC& irc, int fd, char channel_type, const string& channel_name)
-{
-	map<string, Channel>& channels = (channel_type == '&')
-									? irc.get_local_channels()
-									: irc.get_shared_channels();
-	
-	map<string, Channel>::iterator it = channels.find(channel_name);
-	if (it == channels.end())								// проверяем, что канал существует
-		return false;
-
-	size_t i = IRC::find_fd(it->second.get_users(), fd);	// it->second - канал
-	return i >=0 || it->second.is_visible();
-}
-
-bool Command::
 is_server(IRC& irc, int fd)			{ return irc.is_server(fd); }
+
+User* Command::
+find_user(map<User*, ModeUser>& users, int fd)
+{
+	for (map<User*, ModeUser>::iterator it = users.begin(); it != users.end(); it++)
+	{
+		if (it->first->getSocketFd() == fd)
+			return it->first;
+	}
+	return NULL;
+}

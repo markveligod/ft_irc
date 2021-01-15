@@ -8,6 +8,7 @@
 using std::string;
 using std::vector;
 using std::set;
+using std::map;
 
 struct ModeChannel
 {
@@ -28,17 +29,13 @@ class IRC;
 class Channel
 {
 private:
-	string			_name;
-	string			_key;
-	User*			_creator;
-
-	vector<User*>	_users;
-	vector<User*>	_operators;
-	vector<User*>	_users_have_voice;		// users, who not operators, but can speak on a moderated channel. MODE +v
-	vector<User*>	_banned;
-
-	string			_topic;
-	ModeChannel		_mode;
+	string					_name;
+	string					_key;
+	User*					_creator;
+	map<User*, ModeUser>	_users;
+	vector<User*>			_banned;
+	string					_topic;
+	ModeChannel				_mode;
 	// int				_limit_users;
 	// string			_ban;
 
@@ -48,41 +45,39 @@ public:
 	Channel(const Channel& x);
 	Channel& operator=(const Channel& x);
 
+	const string&			getName() const;
+	const string&			get_key() const;
+	const string&			get_topic() const;
+	map<User*, ModeUser>&	get_users();
+
+	void					set_topic(const string& topic);
+	void					set_operator(User* user);
+
 	void 		add_user(User*);
-	void 		add_operator(User*);
-	void 		set_mode(const string&);
-	bool 		is_banned(const string&) const;
+	bool		is_local_channel() const;
+	bool		is_network_channel() const;
+	bool 		is_banned(User*) const;
 	bool		is_valid_key(const string& key) const;
 	bool		is_private() const;
 	bool		is_secret() const;
 	bool		is_invite_only() const;
 	bool		is_moderated() const;
 	bool		is_topic_only_oper() const;
-	bool		is_user_in_channel(const string&) const;
+	bool		is_user_in_channel(User*) const;
 	bool		is_user_in_channel(int fd) const;
-	bool		is_operator(const string&) const;
-	bool		is_operator(int fd) const;
-	bool		is_have_voice(const string&) const;
-	bool		is_have_voice(int fd) const;
+	bool		is_operator(User* user);
+	bool		is_have_voice(User* user);
 	bool		is_visible();
 	static bool is_valid_channel_name(const string&);
 
-	const string&		getName() const;
-	const ModeChannel&	get_mode() const;
-	const string&		get_key() const;
-	const string&		get_topic() const;
-	vector<User*>&		get_users();
-	vector<User*>&		get_operators();
-
-	void				set_topic(const string& topic);
 
 	void print_users() const
 	{
 		std::cout << std::setw(8) << "\t  Users: ";
-		for (size_t i = 0; i < _users.size(); i++)
+		for (map<User*, ModeUser>::const_iterator it = _users.begin(); it != _users.end(); it++)
 		{
-			User u = *(_users[i]);
-			if (i != 0)
+			User u = *(it->first);
+			if (it != _users.begin())
 				std::cout << ", ";
 			std::cout << u.getUsername();
 		}

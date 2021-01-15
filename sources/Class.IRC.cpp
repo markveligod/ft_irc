@@ -427,13 +427,7 @@ delete_client(int fd)
 }
 
 void IRC::
-delete_channel(string name, char type)
-{
-	if (type == '&')
-		_local_channels.erase(name);
-	else
-		_shared_channels.erase(name);
-}
+delete_channel(string name)			{ _channels.erase(name); }
 
 /*
 ** ----------------------------------------------------------
@@ -547,10 +541,7 @@ const Socket& IRC::
 get_socket() const			{ return _localhost; }
 
 map<string, Channel>& IRC::
-get_local_channels()		{ return _local_channels; }
-
-map<string, Channel>& IRC::
-get_shared_channels()		{ return _shared_channels; }
+get_channels()				{ return _channels; }
 
 Channel* IRC::
 get_channel(string channel_name) {
@@ -558,18 +549,15 @@ get_channel(string channel_name) {
 	if (!(channel_name[0] == '&' || channel_name[0] == '#'))
 		return NULL;
 	
-	map<string, Channel>& channels = (channel_name[0] == '&')
-									? get_local_channels()
-									: get_shared_channels();
-
-	map<string, Channel>::iterator it = channels.find(channel_name.substr(1));
+	map<string, Channel>& channels = get_channels();
+	map<string, Channel>::iterator it = channels.find(channel_name);
 	return (it != channels.end())
 			? &(it->second)
 			: NULL;
 }
 
 User* IRC::
-get_user_by_client(Client *client)
+get_user(Client *client)
 {
 	int i = IRC::find_name(_users, client->getName());
 	return (i >=0) ? _users[i] : NULL;
@@ -803,15 +791,9 @@ generate_map_codes()
 // выводит список существующих на сервере каналов и пользователей на них
 
 void IRC::print_channels() const {
-			std::cout << "Shared channels: \n";
-			for (map<string, Channel>::const_iterator it = _shared_channels.begin(); it != _shared_channels.end(); it++) {
-				std::cout << "\tChannel: " << '#' << it->first << std::endl;
-				it->second.print_users();
-			}
-			std::cout << "Local channels: \n";
-			for (map<string, Channel>::const_iterator it = _local_channels.begin(); it != _local_channels.end(); it++) {
-				std::cout << "\tChannel: " << '&' << it->first << std::endl;
-				it->second.print_users();
-			}
+	for (map<string, Channel>::const_iterator it = _channels.begin(); it != _channels.end(); it++) {
+		std::cout << "\tChannel: " << '#' << it->first << std::endl;
+		it->second.print_users();
+	}
 }
 

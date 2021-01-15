@@ -213,5 +213,5 @@ cmd_nick(IRC& irc, int fd)
 	return 0;
 }
 
-//User *user = irc.get_user_by_client(clients[curr_client]);
+//User *user = irc.get_user(clients[curr_client]);
 //irc.push_cmd_queue(fd, irc.full_name(user) + " NICK :" + this->arguments[0] + "\r\n");

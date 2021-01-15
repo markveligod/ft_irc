@@ -23,9 +23,7 @@ int Command::cmd_part(IRC& irc, int fd)
 
 	vector<string> channels = utils::split(arguments[0], ',');			// получаем вектор каналов
 
-	map<string, Channel>& local_channels = irc.get_local_channels();
-	map<string, Channel>& shared_channels = irc.get_shared_channels();
-
+	map<string, Channel>& _channels = irc.get_channels();
 	string exit_message = " :" + ((arguments.size() == 2) ? arguments[1] : string());
 
 	// channels - список каналов, которые были в arguments[0] перечислены через ','
@@ -33,19 +31,13 @@ int Command::cmd_part(IRC& irc, int fd)
 
 	for (size_t i = 0; i < channels.size(); i++)
 	{
-		if (channels[i][0] == '&')
+		char type = channels[i][0];
+
+		if (type == '&' || type == '#')
 		{
-			map<string, Channel>::iterator it = local_channels.find(channels[i].substr(1));
-			if (it != local_channels.end())
-				leave_channel(irc, it->second, '&', fd, exit_message);
-			else
-				irc.push_cmd_queue(fd, irc.response(ERR_NOSUCHCHANNEL, fd, channels[i], ERR_NOSUCHCHANNEL_MESS));
-		}
-		else if (channels[i][0] == '#')
-		{
-			map<string, Channel>::iterator it = shared_channels.find(channels[i].substr(1));
-			if (it != shared_channels.end())
-				leave_channel(irc, it->second, '#', fd, exit_message);
+			map<string, Channel>::iterator it = _channels.find(channels[i]);
+			if (it != _channels.end())
+				leave_channel(irc, it->second, fd, exit_message);
 			else
 				irc.push_cmd_queue(fd, irc.response(ERR_NOSUCHCHANNEL, fd, channels[i], ERR_NOSUCHCHANNEL_MESS));
 		}
@@ -61,33 +53,27 @@ int Command::cmd_part(IRC& irc, int fd)
 ** и fd клиента, который хочет выйти
 */
 void Command::
-leave_channel(IRC& irc, Channel& channel, char type, int fd, string message)
+leave_channel(IRC& irc, Channel& channel, int fd, string message)
 {
-	vector<User*>& users = channel.get_users();
-	vector<User*>& operators = channel.get_operators();
-
-	int i = IRC::find_fd(users, fd);
-	if (i >= 0)
+	map<User*, ModeUser>& all_users = channel.get_users();
+	User* user = find_user(all_users, fd);
+	if (user)
 	{
-		users[i]->dec_channel_count();
-		users.erase(users.begin() + i);
+		user->dec_channel_count();
+		all_users.erase(user);
 		
 		string full_message = ((is_server(irc, fd)) 
 									? ":" + prefix
-									: irc.full_name(users[i]))
-								+ " PART " + type + channel.getName() + message;
+									: irc.full_name(user))
+								+ " PART " + channel.getName() + message;
 		irc.push_cmd_queue(fd, full_message + "\r\n");
-
-		i = IRC::find_fd(operators, fd);
-		if (i >= 0)
-			operators.erase(operators.begin() + i);
 		
-		if (users.empty())
-			irc.delete_channel(channel.getName(), type);
+		if (all_users.empty())
+			irc.delete_channel(channel.getName());
 		
 		irc.forward_message_to_servers(fd, full_message, true);
 		irc.forward_message_to_clients(irc, full_message);
 	}
 	else
-		irc.push_cmd_queue(fd, irc.response(RPL_ENDOFNAMES, fd, type + channel.getName(), RPL_ENDOFNAMES_MESS));
+		irc.push_cmd_queue(fd, irc.response(RPL_ENDOFNAMES, fd, channel.getName(), RPL_ENDOFNAMES_MESS));
 }

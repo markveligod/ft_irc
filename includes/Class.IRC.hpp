@@ -49,8 +49,7 @@ class IRC
 		vector<User*>				_users;
 		vector<Client*>				_clients;
 		vector<Server*>				_servers;
-		map<string, Channel>		_local_channels;
-		map<string, Channel>		_shared_channels;
+		map<string, Channel>		_channels;
 
 		int							_select_res;
 		SSL*						_ssl;
@@ -87,13 +86,14 @@ class IRC
 		
 		void						delete_user(int fd);
 		void						delete_client(int fd);
-		void						delete_channel(string channel_name, char type);
+		void						delete_channel(string channel_name);
 		void 						close_connect(int fd, int n);
 
 		vector<string> 				check_buffer(int fd, const char* buffer);
 
-		User*						get_user(string nickname);
 		User*						get_user(int fd);
+		User*						get_user(string nickname);
+		User*						get_user(Client* client);
 		vector<User*>& 				get_users();
 		vector<Client*>& 			get_clients();
 		vector<Server*>& 			get_servers();
@@ -105,10 +105,8 @@ class IRC
 		const string&				get_operator_user() const;
 		const string&				get_operator_pass() const;
 		const Socket&				get_socket() const;
-		map<string, Channel>&		get_local_channels();
-		map<string, Channel>&		get_shared_channels();
+		map<string, Channel>&		get_channels();
 		Channel*					get_channel(string channel_name);
-		User*						get_user_by_client(Client *);
 		bool						is_empty_queue() const;
 		bool						is_server(int fd) const;
 

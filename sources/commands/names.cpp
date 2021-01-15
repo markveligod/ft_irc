@@ -26,23 +26,26 @@ cmd_names(IRC& irc, int fd)
 {
 	vector<string> args = (!arguments.empty()) ? utils::split(arguments[0], ',') : vector<string>();
 
+	User* user = (prefix.size()) ? irc.get_user(prefix) : irc.get_user(fd);
+	if (!user) return 1;
+
 	if (arguments.empty() || args[0] == "0" || atoi(args[0].c_str()) == irc.get_localhost_port())
 	{
-		if ((IRC::find_fd(irc.get_servers(), fd)) < 0)		// если fd принадлежит Серверу, то ему не надо отправлять список локальных каналов 
+		map<string, Channel>& channels = irc.get_channels();
+
+		if (!is_server(irc, fd))											// если fd принадлежит Серверу, то ему не надо отправлять список локальных каналов 
 		{
-			map<string, Channel>& channels = irc.get_local_channels();
 			for (map<string, Channel>::iterator it = channels.begin(); it != channels.end(); it++)
 			{
-				if (is_channel_visible(irc, fd, '&', it->first))
-					send_channel_users(irc, fd, '&', it->first);
+				if (it->second.is_visible() && it->second.is_local_channel())
+					send_channel_users(irc, fd, user, it->second);
 			}
 		}
 
-		map<string, Channel>& channels = irc.get_shared_channels();
 		for (map<string, Channel>::iterator it = channels.begin(); it != channels.end(); it++)
 		{
-			if (is_channel_visible(irc, fd, '#', it->first))
-				send_channel_users(irc, fd, '#', it->first);
+			if (it->second.is_visible() && it->second.is_network_channel())
+					send_channel_users(irc, fd, user, it->second);
 		}
 
 		send_users_without_channel(irc, fd);
@@ -50,13 +53,17 @@ cmd_names(IRC& irc, int fd)
 		return 0;
 	}
 	
+	map<string, Channel> channels = irc.get_channels();
+
 	for (size_t i = 0; i < args.size(); i++)
 	{
-		if ((args[i][0] == '&' || args[i][0] == '#')
-			&& is_channel_visible(irc, fd, args[i][0], args[i].substr(1)))
+		if (channels.count(args[i]))
 		{
-			send_channel_users(irc, fd, args[i][0], args[i].substr(1));
-			irc.push_cmd_queue(fd, irc.response(RPL_ENDOFNAMES, fd, args[i][0] + args[i].substr(1), RPL_ENDOFNAMES_MESS));
+			if (channels[args[i]].is_visible())
+			{
+				send_channel_users(irc, fd, user, channels[args[i]]);
+				irc.push_cmd_queue(fd, irc.response(RPL_ENDOFNAMES, fd, args[i], RPL_ENDOFNAMES_MESS));
+			}
 		}
 		else
 			irc.push_cmd_queue(fd, irc.response(RPL_ENDOFNAMES, fd, args[i], RPL_ENDOFNAMES_MESS));
@@ -65,31 +72,16 @@ cmd_names(IRC& irc, int fd)
 }
 
 void Command::
-send_channel_users(IRC& irc, int fd, char channel_type, string channel_name)
+send_channel_users(IRC& irc, int fd, User* user, Channel& channel)
 {
-	// if ((channel_type == '&'
-	// 				? irc.get_local_channels().count(channel_name)
-	// 				: irc.get_shared_channels().count(channel_name)) == 0)
-	// {
-	// 	irc.push_cmd_queue(fd, irc.response(RPL_ENDOFNAMES, fd, channel_type + channel_name, RPL_ENDOFNAMES_MESS));
-	// 	return;
-	// }
-
-	Channel& channel = (channel_type == '&'
-						? irc.get_local_channels().find(channel_name)->second
-						: irc.get_shared_channels().find(channel_name)->second);
-
-	vector<User*>& users = channel.get_users();
-
-	int i = IRC::find_fd(irc.get_users(), fd);		// ищем никнейм пользователя (отправившего NAMES) по его fd
+	map<User*, ModeUser>& users = channel.get_users();
 
 	string prefix = ":"
 					+ irc.get_server_name() + " "
 					+ utils::int_to_str(RPL_NAMREPLY) + " "
-					+ irc.get_users()[i]->getName()
+					+ user->getName()
 					+ " = "
-					+ channel_type
-					+ channel_name
+					+ channel.getName()
 					+ " :";
 
 	for (size_t i = 0; i < users.size(); )
@@ -99,10 +91,11 @@ send_channel_users(IRC& irc, int fd, char channel_type, string channel_name)
 		bool first = true;
 		while (i < users.size())
 		{
-			string nickname = users[i]->getName();
-			if (channel.is_operator(nickname))
+			string nickname = user->getName();
+
+			if (channel.is_operator(user))
 				nickname = "@" + nickname;
-			if (!channel.is_operator(nickname) && channel.is_have_voice(nickname))
+			if (!channel.is_operator(user) && channel.is_have_voice(user))
 				nickname = "+" + nickname;
 			if (!first)
 				nickname = " " + nickname;

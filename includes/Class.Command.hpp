@@ -39,16 +39,17 @@ private:
 	void						user_change(User* curr_user);
 	void						user_create(Client* curr_client, vector<User*>& users, Server* curr_server);
 	vector<Client*>::iterator	find_fd(vector<Client*>& vect, int fd);
+	User*						find_user(map<User*, ModeUser>& users, int fd);
 	bool						check_args_number(int n) const;
 	bool						check_password(const Client& client) const;
 	bool						check_nickname(const Client& client) const;
-	void						leave_channel(IRC& irc, Channel& channels, char type, int fd, string message);
-	void						send_channel_users(IRC& irc, int fd, char type, string cnannel_name);
-	bool						is_channel_visible(IRC& irc, int fd, char channel_type, const string& channel_name);
+	void						leave_channel(IRC& irc, Channel& channels, int fd, string message);
+	void						send_channel_users(IRC& irc, int fd, User* user, Channel& channel);
+	bool						is_channel_visible(IRC& irc, int fd, const string& channel_name);
 	bool						is_server(IRC& irc, int fd);
 	void						send_users_without_channel(IRC& irc, int fd);
-	void						join_channel(IRC& irc, const string& name, const string& key, char type, const string& nickname, int fd);
-	int							join_from_server(IRC& irc, const string& channel_name, const string& nickname);
+	void						join_channel(IRC& irc, const string& name, const string& key, User* user, int fd);
+	int							join_from_server(IRC& irc, User* user, const string& channel_name);
 	void						send_topic(IRC& irc, int fd, const string& channel_name, const string& topic);
 	string						who_message(const User* user);
 

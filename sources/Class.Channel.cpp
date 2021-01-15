@@ -16,14 +16,14 @@ Channel& Channel::operator=(const Channel& x)
 	_name = x._name;
 	_key = x._key;
 	_creator = x._creator;
+	_users = x._users;
+	_topic = x._topic;
+	_mode = x._mode;
 	return *this;
 }
 
 const string& Channel::
 getName() const										{ return _name; }
-
-const ModeChannel& Channel::
-get_mode() const									{ return _mode; }
 
 const string& Channel::
 get_key() const										{ return _key; }
@@ -31,23 +31,34 @@ get_key() const										{ return _key; }
 const string& Channel::
 get_topic() const									{ return _topic; }
 
-vector<User*>& Channel::
+map<User*, ModeUser>& Channel::
 get_users()											{ return _users; }
-
-vector<User*>& Channel::
-get_operators()										{ return _operators; }
 
 void Channel::
 set_topic(const string& topic)						{ _topic = topic; }
 
 void Channel::
-add_user(User* user)								{ _users.push_back(user); }
-
-void Channel::
-add_operator(User* user)							{ _operators.push_back(user); }
+add_user(User* user)
+{
+	if (!_users.count(user)) 
+		_users[user] = ModeUser();
+}
 
 bool Channel::
-is_banned(const string& nickname) const				{ return IRC::find_name(_banned, nickname) >= 0; }
+is_local_channel() const							{ return _name[0] == '&'; }
+
+bool Channel::
+is_network_channel() const							{ return _name[0] == '#'; }
+
+
+void Channel::
+set_operator(User* user)							{ _users[user].o = true; }
+
+bool Channel::
+is_banned(User* user) const							
+{
+	return find(_banned.begin(), _banned.end(), user) != _banned.end();
+}
 
 bool Channel::
 is_valid_key(const string& key) const				{ return key == _key; }
@@ -68,22 +79,13 @@ bool Channel::
 is_topic_only_oper() const 							{ return _mode.topic_only_oper_mode; }
 
 bool Channel::
-is_user_in_channel(const string& nickname) const	{ return IRC::find_name(_users, nickname) >= 0; }
+is_user_in_channel(User* user) const				{ return _users.count(user); }
 
 bool Channel::
-is_user_in_channel(int fd) const					{ return IRC::find_fd(_users, fd) >= 0; }
+is_operator(User* user) 							{ return _users[user].o; }
 
 bool Channel::
-is_operator(const string& nickname) const			{ return IRC::find_name(_operators, nickname) >= 0; }
-
-bool Channel::
-is_operator(int fd) const							{ return IRC::find_fd(_operators, fd) >= 0; }
-
-bool Channel::
-is_have_voice(const string& nickname) const			{ return IRC::find_name(_users_have_voice, nickname) >= 0; }
-
-bool Channel::
-is_have_voice(int fd) const							{ return IRC::find_fd(_users_have_voice, fd) >= 0; }
+is_have_voice(User* user) 							{ return _users[user].v; }
 
 bool Channel::
 is_visible()										{ return !is_private() && !is_secret(); }

@@ -37,20 +37,18 @@ cmd_who(IRC& irc, int fd)
 	}
 	else if (arguments[0][0] == '&' || arguments[0][0] == '#')
 	{
-		string channel_name = arguments[0].substr(1);
+		string channel_name = arguments[0];
 
-		size_t n = (arguments[0][0] == '&')
-					? irc.get_local_channels().count(channel_name)
-					: irc.get_shared_channels().count(channel_name);
+		size_t n = irc.get_channels().count(channel_name);
+		
 		if (n > 0)
 		{
-			vector<User*> users = (arguments[0][0] == '&')
-									? irc.get_local_channels()[channel_name].get_users()
-									: irc.get_shared_channels()[channel_name].get_users();
-			for (size_t i = 0; i < users.size(); i++)
+			map<User*, ModeUser> users = irc.get_channels()[channel_name].get_users();
+
+			for (map<User*, ModeUser>::iterator it = users.begin(); it != users.end(); it++)
 			{
-				if (!users[i]->is_i_mode())
-					irc.push_cmd_queue(fd, irc.response(RPL_WHOREPLY, fd, who_message(users[i]), ""));
+				if (!(it->first->is_i_mode()))
+					irc.push_cmd_queue(fd, irc.response(RPL_WHOREPLY, fd, who_message(it->first), ""));
 			}
 			irc.push_cmd_queue(fd, irc.response(RPL_ENDOFWHO, fd, arguments[0], RPL_ENDOFWHO_MESS));
 		}
