@@ -526,7 +526,11 @@ const string& IRC::
 get_server_name()			{ return _server_name; }
 
 const string& IRC::
+<<<<<<< HEAD
 get_server_name(int fd)		{ return _servers[find_fd(_servers, fd)]->getName(); }
+=======
+get_server_name(int fd)		{ return _users[find_fd(_servers, fd)]->getName(); }
+>>>>>>> 31c06279e254668047c0f3ee70e2bfd55dca1d5e
 
 int IRC::
 get_localhost_port() const	{ return _localhost.get_port(); }

@@ -150,12 +150,15 @@ getChannelCount() const					{ return (this->channel_count); }
 
 // int User::
 // getHopcount() const						{ return (this->client->getHopcount()); }
+<<<<<<< HEAD
 
 bool User::
 is_i_mode() const						{ return mode.i; }
 
 bool User::
 is_o_mode() const						{ return mode.o; }
+=======
+>>>>>>> 31c06279e254668047c0f3ee70e2bfd55dca1d5e
 
 void User::
 inc_channel_count()						{ channel_count++; }

@@ -114,8 +114,13 @@ join_channel(IRC& irc,
 		channels[channel_name].add_user(new_user);
 
 		irc.push_cmd_queue(fd, message + "\r\n");
+<<<<<<< HEAD
 		irc.forward_message_to_clients(irc, message1);
 		irc.forward_message_to_servers(fd, message2, true);
+=======
+		irc.forward_message_to_servers(fd, message, true);
+		irc.forward_message_to_clients(fd, message);
+>>>>>>> 31c06279e254668047c0f3ee70e2bfd55dca1d5e
 		send_topic(irc, fd, channel_type + channel_name, channels[channel_name].get_topic());	// отправляем Топик
 	}
 	new_user->inc_channel_count();								// увеличиваем количество каналов, в которых состоит пользователь

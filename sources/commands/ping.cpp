@@ -31,7 +31,6 @@ cmd_ping(IRC& irc, int fd)
 		irc.push_cmd_queue(fd, irc.response(ERR_NOORIGIN, fd, sender_name, ERR_NOORIGIN_MESS));
 		return 1;
 	}
-	std::cout << "SENDER NAME " << irc.get_server_name(fd) << std::endl;
 	
 	if (arguments.size() == 1)
 	{
@@ -57,7 +56,11 @@ cmd_ping(IRC& irc, int fd)
 	}
 	if (i < 0)
 	{
+<<<<<<< HEAD
 		irc.push_cmd_queue(fd, irc.response(ERR_NOSUCHSERVER, fd, sender_name, ERR_NOSUCHSERVER_MESS));
+=======
+		irc.push_cmd_queue(fd, irc.response_to_client(ERR_NOSUCHSERVER, fd, sender_name, ERR_NOSUCHSERVER_MESS));
+>>>>>>> 31c06279e254668047c0f3ee70e2bfd55dca1d5e
 		return 1;
 	}
 	else
