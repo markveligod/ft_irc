@@ -119,8 +119,10 @@ class IRC
 		void 						push_cmd_queue(int fd, const string& str);
 		string						full_name(const User*) const;
 		string						response(int response_code, int client_fd, string message_prefix, string message);
+		string						response_2(int response_code, int fd, string command, string message);
 		int							push_mess_client(int fd, int code);
 		void						forward_message_to_servers(int fd, const string& message, bool prefix);
+		void						forward_message_to_servers_2(int fd, const string& prefix, const string& message);
 		void						forward_message_to_clients(IRC& irc, const string& message);
 
 		void generate_map_codes();
