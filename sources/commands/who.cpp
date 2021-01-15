@@ -72,14 +72,14 @@ cmd_who(IRC& irc, int fd)
 }
 
 string Command::
-who_message(const User& user)
+who_message(const User* user)
 {
 	return "* "
-			+ user.getUsername() + " "
-			+ user.getHostname() + " "
-			+ user.getServername() + " "
-			+ user.getNickname() + " "
-			+ "H" + (user.is_o_mode() ? "* " : " ")
-			+ ":" + utils::int_to_str(user.getHopcount())
-			+ user.getRealname();
+			+ user->getUsername() + " "
+			+ user->getHostname() + " "
+			+ user->getServername() + " "
+			+ user->getNickname() + " "
+			+ "H" + (user->is_o_mode() ? "* " : " ")
+			+ ":" + utils::int_to_str(user->getHopcount()) + " "
+			+ user->getRealname();
 }

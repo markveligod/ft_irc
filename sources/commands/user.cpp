@@ -24,10 +24,6 @@ user_create(Client* curr_client, vector<User*>& users, Server* curr_server)
 	User* curr_user = new User(curr_client);
 	curr_user->user_from_client(this->arguments[0], this->arguments[1],
 								this->arguments[2], this->arguments[3]);
-	std::cout << "1 " << this->arguments[0] << std::endl;
-	std::cout << "2 " << this->arguments[1] << std::endl;
-	std::cout << "3 " << this->arguments[2] << std::endl;
-	std::cout << "4 " << this->arguments[3] << std::endl;
 	users.push_back(curr_user);
 	utils::print_line("USER created");
 
@@ -52,9 +48,9 @@ cmd_user(IRC& irc, int fd)
 
 	if (!(this->prefix.empty()) &&								// если префикс есть
 		(server_fd = IRC::find_fd(servers, fd)) >= 0 &&			// и сообщение пришло с сервера
-		(i = IRC::find_name(clients, this->prefix)) >= 0)	// и есть клиент с таким ником
+		(i = IRC::find_name(clients, this->prefix)) >= 0)		// и есть клиент с таким ником
 	{
-		if (!(check_nickname(*clients[i])))							// и ввел ли клиент ник
+		if (!(check_nickname(*clients[i])))						// и ввел ли клиент ник
 			return 0;
 		if (IRC::find_name(users, this->prefix) >= 0)			// если уже есть юзер с таким никнеймом
 		{
