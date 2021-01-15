@@ -120,9 +120,12 @@ cmd_mode(IRC& irc, int fd)
 		if (vec_users[pos]->getName() != this->arguments[0])
 			return (irc.push_mess_client(fd, ERR_NOSUCHNICK));
 		ModeUser mode = vec_users[pos]->getModeUser();
+		std::cout << "\nBEFORE DEBUG:\na: " << mode.a << "\ni: " << mode.i << "\n0: " << mode.O << "\no: " << mode.o << "\nr: " << mode.r << "\nw: " << mode.w << std::endl;
+		//if (mode.o == false && this->command != "OPER")
+		//	return (irc.push_mess_client(fd, ERR_USERSDONTMATCH));
 		changeMode(&mode, this->arguments[1][1], ((this->arguments[1][0] == '+') ? true : false));
 		vec_users[pos]->setMode(mode);
-		// std::cout << "\nDEBUG:\na: " << mode.a << "\ni: " << mode.i << "\n0: " << mode.O << "\no: " << mode.o << "\nr: " << mode.r << "\nw: " << mode.w << std::endl;
+		std::cout << "\nAFTER DEBUG:\na: " << mode.a << "\ni: " << mode.i << "\n0: " << mode.O << "\no: " << mode.o << "\nr: " << mode.r << "\nw: " << mode.w << std::endl;
 	}
 	return (0);
 }

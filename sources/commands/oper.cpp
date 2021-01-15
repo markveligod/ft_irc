@@ -33,7 +33,6 @@ cmd_oper(IRC& irc, int fd)
         return (irc.push_mess_client(fd, ERR_ALREADYREGISTRED));
     if (this->arguments[0] == irc.get_operator_user() && this->arguments[1] == irc.get_operator_pass())
     {
-        this->command = "MODE";
         this->arguments.clear();
         this->arguments.push_back(vec_users[pos]->getName());
         this->arguments.push_back("+o");
