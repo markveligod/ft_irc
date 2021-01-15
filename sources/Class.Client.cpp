@@ -85,7 +85,7 @@ int Client::
 getSocketFd() const				{ return (this->socket_fd); }
 
 const string& Client::
-getName() const				{ return (this->nickname); }
+getName() const					{ return (this->nickname); }
 
 const string&	Client::
 getBuffer() const				{ return (this->buffer); }

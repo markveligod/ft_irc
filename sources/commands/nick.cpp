@@ -144,6 +144,7 @@ cmd_nick(IRC& irc, int fd)
 	int						curr_client = -1;
 	int						curr_user	= -1;
 	int						error;
+	std::stringstream		out_mess;
 
 	if ((error = nick_check_errors(fd, server_el, irc)) != 0)
 		return (error);
@@ -177,22 +178,27 @@ cmd_nick(IRC& irc, int fd)
 	// Если это от клиента
 	else if (client_el >= 0)
 	{
-		if (clients[client_el]->getName().empty())
-			utils::print_line("Nickname for client set -> " + this->arguments[0]);
-		else
-			utils::print_line("Nickname changed " + clients[curr_client]->getName() + " -> " + this->arguments[0]);
-			
 		curr_client = client_el;
 		if (!this->prefix.empty())
 			curr_client = IRC::find_name(clients, this->prefix);
-		clients[curr_client]->setNickname(this->arguments[0]);
 
+		if (clients[curr_client]->getName().empty())
+			utils::print_line("Nickname for client set -> " + this->arguments[0]);
+		else
+		{
+			if (prefix.empty())
+				out_mess << ":" + clients[curr_client]->getName() + " ";
+			User *user = irc.get_user_by_client(clients[curr_client]);
+			irc.push_cmd_queue(fd, irc.full_name(user) + " NICK :" + this->arguments[0] + "\r\n");
+			utils::print_line("Nickname changed " + clients[curr_client]->getName() + " -> " + this->arguments[0]);
+		}
+		
+		clients[curr_client]->setNickname(this->arguments[0]);
 		if ((curr_user = IRC::find_name(users, prefix)) >= 0)
 			users[curr_user]->setNickname(arguments[0]);
 	}
 	
 	// Отправка сообщения о новом или измененном юзере всем серверам
-	std::stringstream out_mess;
 	out_mess << "NICK " << arguments[0] << " " << (clients[curr_client]->getHopcount() + 1) << "\r\n";
 	irc.forward_message_to_servers_2(fd, prefix, out_mess.str());
 

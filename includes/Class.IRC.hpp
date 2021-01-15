@@ -108,6 +108,7 @@ class IRC
 		map<string, Channel>&		get_local_channels();
 		map<string, Channel>&		get_shared_channels();
 		Channel*					get_channel(string channel_name);
+		User*						get_user_by_client(Client *);
 		bool						is_empty_queue() const;
 		bool						is_server(int fd) const;
 
