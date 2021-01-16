@@ -38,7 +38,10 @@ int Command::cmd_join(IRC& irc, int fd)
 		
 		string key = (i < keys.size()) ? keys[i] : string();
 
-		join_channel(irc, channels[i], key, irc.get_user(fd), fd);
+		User *user = (prefix.size()) ? irc.get_user(prefix) : irc.get_user(fd);
+		if (!user)
+			return 1;
+		join_channel(irc, channels[i], key, user, fd);
 	}
 	return 0;
 }
