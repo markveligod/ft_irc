@@ -53,6 +53,9 @@ cmd_user(IRC& irc, int fd)
 	if (!(this->check_args_number(4)))
 		return (ERR_NEEDMOREPARAMS);
 
+	if (arguments[0][0] == '~')
+		arguments[0] = arguments[0].substr(1, arguments[0].size());
+
 	if (!(this->prefix.empty()) &&								// если префикс есть
 		(server_fd = IRC::find_fd(servers, fd)) >= 0 &&			// и сообщение пришло с сервера
 		(i = IRC::find_name(clients, this->prefix)) >= 0)		// и есть клиент с таким ником
