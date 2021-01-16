@@ -83,8 +83,6 @@ join_channel(IRC& irc,
 		channels[channel_name].set_operator(user);
 
 		irc.push_cmd_queue(fd, message1 + "\r\n");
-		irc.push_cmd_queue(fd, irc.full_name(user) + " MODE :" + channel_name + " +o " + user->getName() + "\r\n");
-
 		irc.forward_message_to_servers(fd, message2, true);
 
 		utils::print_line("Channel " + channel_name + " created");
@@ -117,8 +115,7 @@ join_channel(IRC& irc,
 		channels[channel_name].add_user(user);
 
 		irc.push_cmd_queue(fd, message1 + "\r\n");
-
-		irc.forward_message_to_clients(irc, message1);
+		irc.forward_message_to_channel(fd, channel_name, message1);
 		irc.forward_message_to_servers(fd, message2, true);
 
 		send_topic(irc, fd, channel_name, channels[channel_name].get_topic());	// отправляем Топик

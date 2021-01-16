@@ -62,17 +62,18 @@ leave_channel(IRC& irc, Channel& channel, int fd, string message)
 		user->dec_channel_count();
 		all_users.erase(user);
 		
-		string full_message = ((is_server(irc, fd)) 
-									? ":" + prefix
-									: irc.full_name(user))
-								+ " PART " + channel.getName() + message;
-		irc.push_cmd_queue(fd, full_message + "\r\n");
+		string message1 = (":" + irc.full_name(user))
+							   + " PART " + channel.getName() + message;
+		string message2 =  ":" + user->getName()
+							   + " PART " + channel.getName() + message;
 		
 		if (all_users.empty())
 			irc.delete_channel(channel.getName());
 		
-		irc.forward_message_to_servers(fd, full_message, true);
-		irc.forward_message_to_clients(irc, full_message);
+		if (!irc.is_server(fd))
+			irc.push_cmd_queue(fd, message1 + "\r\n");
+		irc.forward_message_to_channel(fd, channel, message1);
+		irc.forward_message_to_servers(fd, message2, true);
 	}
 	else
 		irc.push_cmd_queue(fd, irc.response(RPL_ENDOFNAMES, fd, channel.getName(), RPL_ENDOFNAMES_MESS));
