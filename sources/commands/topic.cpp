@@ -36,7 +36,7 @@ cmd_topic(IRC& irc, int fd)
 			irc.push_cmd_queue(fd, irc.response(ERR_NOTONCHANNEL, fd, channels[i], ERR_NOTONCHANNEL_MESS));
 		}
 		else if (chann->is_topic_only_oper()
-				&& !chann->is_operator(user))				// check, if channel +t mode and user isn't operator
+				&& !chann->is_channel_operator(user))				// check, if channel +t mode and user isn't operator
 		{
 			irc.push_cmd_queue(fd, irc.response(ERR_CHANOPRIVSNEEDED, fd, channels[i], ERR_CHANOPRIVSNEEDED_MESS));
 		}

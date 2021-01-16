@@ -9,8 +9,8 @@
 
 #pragma once
 #include "main.hpp"
-#include "Class.User.hpp"
 #include "Class.IRC.hpp"
+#include "Class.User.hpp"
 #include "codes.hpp"
 
 using std::string;
@@ -46,7 +46,7 @@ private:
 	int							join_from_server(IRC& irc, User* user, const string& channel_name);
 
 	vector<Client*>::iterator	find_fd(vector<Client*>& vect, int fd);
-	User*						find_user(map<User*, ModeUser>& users, int fd);
+	User*						find_user(user_map& users, int fd);
 	bool						check_args_number(int n) const;
 	bool						check_password(const Client& client) const;
 	bool						check_nickname(const Client& client) const;
@@ -56,7 +56,7 @@ private:
 	bool						is_server(IRC& irc, int fd);
 	void						send_users_without_channel(IRC& irc, int fd);
 	void						send_topic(IRC& irc, int fd, const string& channel_name, const string& topic);
-	string						who_message(const User* user);
+	string						who_message(const User* user, string channel_name, string user_prefix);
 
 
 public:

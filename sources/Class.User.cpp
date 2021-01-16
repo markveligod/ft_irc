@@ -10,7 +10,12 @@ using std::string;
 */
 
 ModeUser::
-ModeUser() {}
+ModeUser() : a(false),
+			 i(false),
+			 w(false),
+			 r(false),
+			 o(false),
+			 O(false) {}
 
 ModeUser::
 ModeUser(const ModeUser& src) { *this = src; }
@@ -23,7 +28,7 @@ operator=(const ModeUser& src)
 	w = src.w;
 	r = src.r;
 	o = src.o;
-	o = src.O;
+	O = src.O;
 
 	return* this;
 }
@@ -148,6 +153,9 @@ getServername() const					{ return(this->servername); }
 
 const string& User::
 getRealname() const						{ return (this->realname); }
+
+const ModeUser& User::
+getMode() const							{ return mode; }
 
 size_t User::
 getChannelCount() const					{ return (this->channel_count); }

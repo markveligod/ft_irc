@@ -30,8 +30,13 @@ cmd_who(IRC& irc, int fd)
 		vector<User*> users = irc.get_users();
 		for (size_t i = 0; i < users.size(); i++)
 		{
+			string prefix = "H";
+
+			if (irc.is_server_operator(users[i]))
+				prefix += "*";
+
 			if (!users[i]->is_i_mode())
-				irc.push_cmd_queue(fd, irc.response(RPL_WHOREPLY, fd, who_message(users[i]), ""));
+				irc.push_cmd_queue(fd, irc.response(RPL_WHOREPLY, fd, who_message(users[i], "*", prefix), ""));
 		}
 		irc.push_cmd_queue(fd, irc.response(RPL_ENDOFWHO, fd, "*", RPL_ENDOFWHO_MESS));
 	}
@@ -43,12 +48,21 @@ cmd_who(IRC& irc, int fd)
 		
 		if (n > 0)
 		{
-			map<User*, ModeUser> users = irc.get_channels()[channel_name].get_users();
+			const Channel& channel = irc.get_channels()[channel_name];
+			user_map users = irc.get_channels()[channel_name].get_users();
 
-			for (map<User*, ModeUser>::iterator it = users.begin(); it != users.end(); it++)
+			for (user_iterator it = users.begin(); it != users.end(); it++)
 			{
 				if (!(it->first->is_i_mode()))
-					irc.push_cmd_queue(fd, irc.response(RPL_WHOREPLY, fd, who_message(it->first), ""));
+				{
+					string prefix = "H";
+
+					if (irc.is_server_operator(it->first))
+						prefix += "*";
+					if (channel.is_channel_operator(it->first))
+						prefix += "@";
+					irc.push_cmd_queue(fd, irc.response(RPL_WHOREPLY, fd, who_message(it->first, arguments[0], prefix), ""));
+				}
 			}
 			irc.push_cmd_queue(fd, irc.response(RPL_ENDOFWHO, fd, arguments[0], RPL_ENDOFWHO_MESS));
 		}
@@ -57,7 +71,14 @@ cmd_who(IRC& irc, int fd)
 	{
 		int i = IRC::find_name(irc.get_users(), arguments[0]);
 		if (i >= 0)
-			irc.push_cmd_queue(fd, irc.response(RPL_WHOREPLY, fd, who_message(irc.get_users()[i]), ""));
+		{
+			string prefix = "H";
+
+			if (irc.is_server_operator(irc.get_users()[i]))
+				prefix += "*";
+
+			irc.push_cmd_queue(fd, irc.response(RPL_WHOREPLY, fd, who_message(irc.get_users()[i], arguments[0], prefix), ""));
+		}
 		else
 		{
 			irc.push_cmd_queue(fd, irc.response(ERR_NOSUCHSERVER, fd, irc.get_nickname(fd), ERR_NOSUCHSERVER_MESS));
@@ -70,14 +91,14 @@ cmd_who(IRC& irc, int fd)
 }
 
 string Command::
-who_message(const User* user)
+who_message(const User* user, string channel, string prefix)
 {
-	return "* "
+	return channel + " "
 			+ user->getUsername() + " "
 			+ user->getHostname() + " "
 			+ user->getServername() + " "
 			+ user->getNickname() + " "
-			+ "H" + (user->is_o_mode() ? "* " : " ")
+			+ prefix + " "
 			+ ":" + utils::int_to_str(user->getHopcount()) + " "
 			+ user->getRealname();
 }

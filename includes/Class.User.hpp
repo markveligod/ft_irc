@@ -4,6 +4,11 @@
 #include "main.hpp"
 #include "Class.Client.hpp"
 
+class User;
+struct ModeUser;
+typedef std::map<User*, ModeUser>			user_map;
+typedef std::map<User*, ModeUser>::iterator	user_iterator;
+
 using std::string;
 
 struct ModeUser
@@ -60,6 +65,7 @@ public:
 	const string&	getHostname() const;
 	const string&	getServername() const;
 	const string&	getRealname() const;
+	const ModeUser&	getMode() const;
 	size_t			getChannelCount() const;
 	// int				getFd() const;
 	// int				getHopcount() const;

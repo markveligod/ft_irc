@@ -99,29 +99,64 @@ bool check_mode_users(std::string param)
 	return (false);
 }
 
+bool change_mode_channel(Channel *chan, const char param, bool res)
+{
+	(void)chan;
+	(void)param;
+	(void)res;
+	return (true);
+}
+
 int Command::
 cmd_mode(IRC& irc, int fd)
 {
-	if (!this->check_args_number(2) && !this->check_args_number(3))
-		return (irc.push_mess_client(fd, ERR_NEEDMOREPARAMS));
-	if (this->arguments[0][0] == '#' || this->arguments[0][0] == '&')
-	{
-		utils::print_line("Этот канал " + this->arguments[0] + " запрашивает права " + this->arguments[1]);
-	}
-	else
-	{
-		std::vector<User*>& vec_users = irc.get_users();
-		int pos;
+	std::vector<User*>& vec_users = irc.get_users();
+	int pos_oper;
 
-		if (!check_mode_users(this->arguments[1]))
+	if (!this->check_args_number(2) && !this->check_args_number(3)) // проверяем на соответствие количеству аргументов
+		return (irc.push_mess_client(fd, ERR_NEEDMOREPARAMS));
+
+	if ((pos_oper = irc.find_fd(vec_users, fd)) == -1) // находим предварительную позицию опера
+			return (irc.push_mess_client(fd, ERR_USERSDONTMATCH));
+
+	if (vec_users[pos_oper]->getModeUser().o == false && this->command != "OPER") //проверяем опер ли это или нет 
+			return (irc.push_mess_client(fd, ERR_USERSDONTMATCH));
+	
+	if (this->arguments[0][0] == '#') // логика касается модов для каналов
+	{
+		Channel* curr_channel = irc.get_channel(this->arguments[0]); // получаем канал из списка
+		if (curr_channel == NULL)
+			return (irc.push_mess_client(fd, ERR_NOSUCHCHANNEL));
+
+		if (this->arguments[1][0] != '+' || this->arguments[1][0] != '-') // проверяем на корректность параметра ключа + и -
 			return (irc.push_mess_client(fd, ERR_UNKNOWNMODE));
-		if ((pos = irc.find_name(vec_users, this->arguments[0])) == -1)
+		
+		if (this->arguments.size() == 2) // если указано два параметра то это касается только ключей канала
+		{
+			for (size_t i = 1; i < this->arguments[1].size(); i++)
+			{
+				if (!change_mode_channel(curr_channel, this->arguments[1][i], ((this->arguments[1][0] == '+') ? true : false)))
+					return (irc.push_mess_client(fd, ERR_UNKNOWNMODE));
+			}
+		}
+		else // иначе мы меняем особые привелегии юзерам на сервере
+		{
+			
+		}
+	}
+	else // часть кода касается только модов для юзера
+	{
+		int pos_user;
+		
+		if (!check_mode_users(this->arguments[1])) // проверяем входные ключи
+			return (irc.push_mess_client(fd, ERR_UNKNOWNMODE));
+		if ((pos_user = irc.find_name(vec_users, this->arguments[0])) == -1) // находим позицию юзера которого указал опер
 			return (irc.push_mess_client(fd, ERR_USERSDONTMATCH));
-		if (vec_users[pos]->getModeUser().o == false && this->command != "OPER")
-			return (irc.push_mess_client(fd, ERR_USERSDONTMATCH));
-		changeMode(vec_users[pos], this->arguments[1][1], ((this->arguments[1][0] == '+') ? true : false));
-		// ModeUser mode = vec_users[pos]->getModeUser();
-		// std::cout << "\nAFTER DEBUG:\na: " << mode.a << "\ni: " << mode.i << "\n0: " << mode.O << "\no: " << mode.o << "\nr: " << mode.r << "\nw: " << mode.w << std::endl;
+		changeMode(vec_users[pos_user], this->arguments[1][1], ((this->arguments[1][0] == '+') ? true : false)); // меняем моды
+		// ModeUser mode = vec_users[pos_oper]->getModeUser();
+		// std::cout << "\nOPER DEBUG:\na: " << mode.a << "\ni: " << mode.i << "\n0: " << mode.O << "\no: " << mode.o << "\nr: " << mode.r << "\nw: " << mode.w << std::endl;
+		// mode = vec_users[pos_user]->getModeUser();
+		// std::cout << "\nUSER DEBUG:\na: " << mode.a << "\ni: " << mode.i << "\n0: " << mode.O << "\no: " << mode.o << "\nr: " << mode.r << "\nw: " << mode.w << std::endl;
 	}
 	return (0);
 }

@@ -23,7 +23,7 @@ int Command::cmd_part(IRC& irc, int fd)
 
 	vector<string> channels = utils::split(arguments[0], ',');			// получаем вектор каналов
 
-	map<string, Channel>& _channels = irc.get_channels();
+	channel_map& _channels = irc.get_channels();
 	string exit_message = " :" + ((arguments.size() == 2) ? arguments[1] : string());
 
 	// channels - список каналов, которые были в arguments[0] перечислены через ','
@@ -35,7 +35,7 @@ int Command::cmd_part(IRC& irc, int fd)
 
 		if (type == '&' || type == '#')
 		{
-			map<string, Channel>::iterator it = _channels.find(channels[i]);
+			channel_map::iterator it = _channels.find(channels[i]);
 			if (it != _channels.end())
 				leave_channel(irc, it->second, fd, exit_message);
 			else
@@ -55,24 +55,25 @@ int Command::cmd_part(IRC& irc, int fd)
 void Command::
 leave_channel(IRC& irc, Channel& channel, int fd, string message)
 {
-	map<User*, ModeUser>& all_users = channel.get_users();
+	user_map& all_users = channel.get_users();
 	User* user = find_user(all_users, fd);
 	if (user)
 	{
 		user->dec_channel_count();
 		all_users.erase(user);
 		
-		string full_message = ((is_server(irc, fd)) 
-									? ":" + prefix
-									: irc.full_name(user))
-								+ " PART " + channel.getName() + message;
-		irc.push_cmd_queue(fd, full_message + "\r\n");
+		string message1 = (":" + irc.full_name(user))
+							   + " PART " + channel.getName() + message;
+		string message2 =  ":" + user->getName()
+							   + " PART " + channel.getName() + message;
 		
 		if (all_users.empty())
 			irc.delete_channel(channel.getName());
 		
-		irc.forward_message_to_servers(fd, full_message, true);
-		irc.forward_message_to_clients(irc, full_message);
+		if (!irc.is_server(fd))
+			irc.push_cmd_queue(fd, message1 + "\r\n");
+		irc.forward_message_to_channel(fd, channel, message1);
+		irc.forward_message_to_servers(fd, message2, true);
 	}
 	else
 		irc.push_cmd_queue(fd, irc.response(RPL_ENDOFNAMES, fd, channel.getName(), RPL_ENDOFNAMES_MESS));
