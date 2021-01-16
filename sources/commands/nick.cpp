@@ -171,7 +171,7 @@ cmd_nick(IRC& irc, int fd)
 				utils::print_error(0, "DEBUG Ignoring prefix (message from server with both prefix and hopcount).");
 			}
 
-			Client *new_client = new Client(fd, this->arguments[0], std::atoi(this->arguments[1].c_str()));
+			Client *new_client = new Client(fd, this->arguments[0], "" ,std::atoi(this->arguments[1].c_str()));
 			clients.push_back(new_client);
 			servers[server_el]->addClient(new_client);
 			utils::print_line("New client created");

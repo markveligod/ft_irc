@@ -9,6 +9,7 @@ class Client
 {
 protected:
 	string	nickname;
+	string	hostname;
 	int		socket_fd;
 	int		hopcount;
 	bool	password;
@@ -16,8 +17,8 @@ protected:
 	bool	is_server;
 
 public:
-	Client(int socket_fd = 0, int hopcount = 0);
-	Client(int socket_fd, const string& nickname, int hopcount = 0);
+	Client(string const &hostname = "", int socket_fd = 0, int hopcount = 0);
+	Client(int socket_fd, const string &nickname, string const &hostname = "", int hopcount = 0);
 	Client(const Client& src);
 	Client& operator=(const Client&);
 
@@ -33,6 +34,7 @@ public:
 	int				getSocketFd() const;
 	const string&	getBuffer() const;
 	bool			getIsServer() const;
+	const string&	getHostname() const;
 
 	bool			find_line_break();
 	string			get_line_break();

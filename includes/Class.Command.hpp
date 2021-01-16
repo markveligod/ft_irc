@@ -33,11 +33,18 @@ private:
 	bool						nick_valid() const;
 	template <typename T> bool	nick_available(vector<T> vect, const string& nick);
 	int							nick_check_errors(int fd, int serv_client, IRC& irc);
+
 	int							server_available(vector<Server *> &servers, string const &server_name) const;
 	int							server_check_errors(IRC& irc, int fd) const;
+
 	bool						pass(string password, string local_pass);
-	void						user_change(User* curr_user);
+
 	void						user_create(Client* curr_client, vector<User*>& users, Server* curr_server);
+	int							user_check_errors(IRC& irc, int fd);
+
+	void						join_channel(IRC& irc, const string& name, const string& key, User* user, int fd);
+	int							join_from_server(IRC& irc, User* user, const string& channel_name);
+
 	vector<Client*>::iterator	find_fd(vector<Client*>& vect, int fd);
 	User*						find_user(map<User*, ModeUser>& users, int fd);
 	bool						check_args_number(int n) const;
@@ -48,8 +55,6 @@ private:
 	bool						is_channel_visible(IRC& irc, int fd, const string& channel_name);
 	bool						is_server(IRC& irc, int fd);
 	void						send_users_without_channel(IRC& irc, int fd);
-	void						join_channel(IRC& irc, const string& name, const string& key, User* user, int fd);
-	int							join_from_server(IRC& irc, User* user, const string& channel_name);
 	void						send_topic(IRC& irc, int fd, const string& channel_name, const string& topic);
 	string						who_message(const User* user);
 

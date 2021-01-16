@@ -18,6 +18,7 @@ class Server
 	private:
 		int					_fd_socket;
 		string				_server_name;
+		string				_host_name;
 		int					_hopcount;
 		string				_info;
 		vector<User*>		_users;

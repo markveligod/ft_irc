@@ -9,16 +9,18 @@ using std::string;
 */
 
 Client::
-Client(int socket_fd, int hopcount) 		
+Client(const string& hostname, int socket_fd, int hopcount) 		
 					  : nickname(""),
+					  	hostname(hostname),
 					  	socket_fd(socket_fd),
 						hopcount(hopcount),
 						password(false),
 						is_server(false) {}
 
 Client::
-Client(int socket_fd, const string&  nickname, int hopcount)
+Client(int socket_fd, const string&  nickname, const string& hostname, int hopcount)
 									: nickname(nickname),
+									  hostname(hostname),
 									  socket_fd(socket_fd),
 									  hopcount(hopcount),
 									  password(true),
@@ -27,6 +29,7 @@ Client(int socket_fd, const string&  nickname, int hopcount)
 Client::
 Client(const Client& src)
 					  : nickname(src.nickname),
+					  	hostname(src.hostname),
 						socket_fd(src.socket_fd),
 						hopcount(src.hopcount),
 						password(src.password),
@@ -36,6 +39,7 @@ Client& Client::
 operator=(const Client& src)
 {
 	nickname = src.nickname;
+	hostname = src.hostname;
 	socket_fd = src.socket_fd;
 	hopcount = src.hopcount;
 	password = src.password;
@@ -93,6 +97,9 @@ getBuffer() const				{ return (this->buffer); }
 
 bool			Client::
 getIsServer() const				{ return  (this->is_server); }
+
+const string& Client::
+getHostname() const				{ return (this->hostname); }
 
 /*
 ** ----------------------------------------------------------

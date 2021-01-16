@@ -29,6 +29,7 @@ class IRC
 {
 	private:
 		string						_server_name;
+		string						_host_name;
 
 		Socket						_network;
 		string						_network_ip;

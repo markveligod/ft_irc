@@ -32,6 +32,7 @@ User::
 User(Client* src) : Client(*src)
 {
 	this->nickname		= src->getName();
+	this->hostname		= src->getHostname();
 	this->password		= src->getPassword();
 	this->hopcount		= src->getHopcount();
 	this->socket_fd		= src->getSocketFd();

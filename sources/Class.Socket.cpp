@@ -107,3 +107,10 @@ get_fd() const		{ return _fd; }
 
 int Socket::
 get_port() const	{ return _port; }
+
+const std::string Socket::
+getHostname() const
+{
+	//std::string hostname(inet_ntoa(this->_addr.sin_addr));
+	return (std::string(inet_ntoa(this->_addr.sin_addr)));
+}

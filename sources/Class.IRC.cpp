@@ -30,6 +30,7 @@ IRC(string network_ip,
 	string operator_pass)
 {
 	_server_name = LOCALHOST + string("/") + localhost_port;
+	_host_name = LOCALHOST;
 	_operator_user = operator_user;
 	_operator_pass = operator_pass;
 	_network_ip = network_ip;
@@ -91,7 +92,7 @@ create_socket_network(std::vector<std::string> network)
 	utils::print_line("Socket network connection!");
 
 	_array_fd_select[fd] = FD_CLIENT;
-	_clients.push_back(new Client(fd));
+	_clients.push_back(new Client(network[0], fd));
 	//_servers.push_back(new Server(fd, network[0] + "/" + network[1], 1, "info"));
 	utils::print_line("Trying to connect to server!\nServer name: " +
 					  network[0] + "/" + network[1] +
@@ -284,7 +285,15 @@ check_fd_select()
 				// char response[] = "Accepted\n";
 				// _send(it->second, client_socket, response, 10, 0);
 				// push_cmd_queue(client_socket, string(response));
-				this->_clients.push_back(new Client(client_socket));
+				Client *new_client;
+				if (it->second == FD_SERVER)
+					new_client = new Client(_localhost.getHostname(), client_socket);
+				else
+					new_client = new Client(_localhost_ssl.getHostname(), client_socket);
+				this->_clients.push_back(new_client);
+				std::cout << "DEBUG client information:\n"
+						  << "Socket FD: " << new_client->getSocketFd() << std::endl
+						  << "Hostname: " << new_client->getHostname() << std::endl;
 			}
 			_select_res--;
 		}

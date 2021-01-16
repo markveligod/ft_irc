@@ -30,14 +30,15 @@ public:
 			int protocol = 0);
 	~Socket();
 	
-	const Socket& operator=(const Socket& other);
+	const Socket&	operator=(const Socket& other);
 
-	int		_socket();
-	int		_bind();
-	int		_connect();
-	int		_listen(int backlog = 10);
-	int		_accept();
+	int				_socket();
+	int				_bind();
+	int				_connect();
+	int				_listen(int backlog = 10);
+	int				_accept();
 	
-	int		get_fd() const;
-	int		get_port() const;
+	int				get_fd() const;
+	int				get_port() const;
+	const std::string getHostname() const;
 };

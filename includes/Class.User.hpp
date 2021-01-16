@@ -63,7 +63,7 @@ public:
 	size_t			getChannelCount() const;
 	// int				getFd() const;
 	// int				getHopcount() const;
-	ModeUser& getModeUser();
+	ModeUser&		getModeUser();
 	bool			is_i_mode() const;
 	bool			is_o_mode() const;
 
