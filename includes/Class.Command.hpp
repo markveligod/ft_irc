@@ -43,7 +43,6 @@ private:
 	int							user_check_errors(IRC& irc, int fd);
 
 	void						join_channel(IRC& irc, const string& name, const string& key, User* user, int fd);
-	int							join_from_server(IRC& irc, User* user, const string& channel_name);
 
 	vector<Client*>::iterator	find_fd(vector<Client*>& vect, int fd);
 	User*						find_user(user_map& users, int fd);
