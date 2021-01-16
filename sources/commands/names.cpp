@@ -75,6 +75,7 @@ void Command::
 send_channel_users(IRC& irc, int fd, User* user, Channel& channel)
 {
 	map<User*, ModeUser>& users = channel.get_users();
+	map<User *, ModeUser>::const_iterator it = users.begin();
 
 	string prefix = ":"
 					+ irc.get_server_name() + " "
@@ -84,13 +85,14 @@ send_channel_users(IRC& irc, int fd, User* user, Channel& channel)
 					+ channel.getName()
 					+ " :";
 
-	for (size_t i = 0; i < users.size(); )
+	while (it != users.end())
 	{
 		string response = prefix;
-	
+
 		bool first = true;
-		while (i < users.size())
+		while (it != users.end())
 		{
+			user = (it->first);
 			string nickname = user->getName();
 
 			if (channel.is_operator(user))
@@ -103,11 +105,15 @@ send_channel_users(IRC& irc, int fd, User* user, Channel& channel)
 			if (response.size() + nickname.size() < MAX_MESSAGE_LEN)
 			{
 				response += nickname;
-				i++;
-			} else
+				it++;
+				first = false;
+			}
+			else
 				break;
 		}
 		irc.push_cmd_queue(fd, response + "\r\n");
+		if (first)
+			it++;
 	}
 }
 
