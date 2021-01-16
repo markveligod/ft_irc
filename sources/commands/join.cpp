@@ -52,9 +52,8 @@ join_channel(IRC& irc,
 {
 	if (is_server(irc, fd))											// check if join recieved by server 
 	{
-		if (join_from_server(irc, user, channel_name))
-			return;
-		
+		join_from_server(irc, user, channel_name);
+
 		string message1 = irc.full_name(user) + " JOIN :" + channel_name;
 		string message2 = ":" + user->getName() + " JOIN :" + channel_name;
 
@@ -138,7 +137,11 @@ join_from_server(IRC& irc, User* user, const string& channel_name)
 	{
 		channels.insert(std::make_pair(channel_name, Channel(channel_name)));
 		channels[channel_name].add_user(user);
+		utils::print_line("Channel " + channel_name + " created");
 	}
+	utils::print_line("User " + user->getNickname() + " joined channel " + channel_name);
+	std::cout << "DEBUG Channel members list:\n";
+	channels[channel_name].print_users();
 	user->inc_channel_count();
 	return 0;
 }
