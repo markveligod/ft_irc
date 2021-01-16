@@ -31,18 +31,18 @@ cmd_names(IRC& irc, int fd)
 
 	if (arguments.empty() || args[0] == "0" || atoi(args[0].c_str()) == irc.get_localhost_port())
 	{
-		map<string, Channel>& channels = irc.get_channels();
+		channel_map& channels = irc.get_channels();
 
 		if (!is_server(irc, fd))											// если fd принадлежит Серверу, то ему не надо отправлять список локальных каналов 
 		{
-			for (map<string, Channel>::iterator it = channels.begin(); it != channels.end(); it++)
+			for (channel_map::iterator it = channels.begin(); it != channels.end(); it++)
 			{
 				if (it->second.is_visible() && it->second.is_local_channel())
 					send_channel_users(irc, fd, user, it->second);
 			}
 		}
 
-		for (map<string, Channel>::iterator it = channels.begin(); it != channels.end(); it++)
+		for (channel_map::iterator it = channels.begin(); it != channels.end(); it++)
 		{
 			if (it->second.is_visible() && it->second.is_network_channel())
 					send_channel_users(irc, fd, user, it->second);
@@ -53,7 +53,7 @@ cmd_names(IRC& irc, int fd)
 		return 0;
 	}
 	
-	map<string, Channel> channels = irc.get_channels();
+	channel_map channels = irc.get_channels();
 
 	for (size_t i = 0; i < args.size(); i++)
 	{
@@ -74,7 +74,7 @@ cmd_names(IRC& irc, int fd)
 void Command::
 send_channel_users(IRC& irc, int fd, User* user, Channel& channel)
 {
-	map<User*, ModeUser>& users = channel.get_users();
+	user_map& users = channel.get_users();
 	map<User *, ModeUser>::const_iterator it = users.begin();
 
 	string prefix = ":"
@@ -95,9 +95,9 @@ send_channel_users(IRC& irc, int fd, User* user, Channel& channel)
 			user = (it->first);
 			string nickname = user->getName();
 
-			if (channel.is_operator(user))
+			if (channel.is_channel_operator(user))
 				nickname = "@" + nickname;
-			if (!channel.is_operator(user) && channel.is_have_voice(user))
+			if (!channel.is_channel_operator(user) && channel.is_have_voice(user))
 				nickname = "+" + nickname;
 			if (!first)
 				nickname = " " + nickname;

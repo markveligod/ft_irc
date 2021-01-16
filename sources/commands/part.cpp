@@ -23,7 +23,7 @@ int Command::cmd_part(IRC& irc, int fd)
 
 	vector<string> channels = utils::split(arguments[0], ',');			// получаем вектор каналов
 
-	map<string, Channel>& _channels = irc.get_channels();
+	channel_map& _channels = irc.get_channels();
 	string exit_message = " :" + ((arguments.size() == 2) ? arguments[1] : string());
 
 	// channels - список каналов, которые были в arguments[0] перечислены через ','
@@ -35,7 +35,7 @@ int Command::cmd_part(IRC& irc, int fd)
 
 		if (type == '&' || type == '#')
 		{
-			map<string, Channel>::iterator it = _channels.find(channels[i]);
+			channel_map::iterator it = _channels.find(channels[i]);
 			if (it != _channels.end())
 				leave_channel(irc, it->second, fd, exit_message);
 			else
@@ -55,7 +55,7 @@ int Command::cmd_part(IRC& irc, int fd)
 void Command::
 leave_channel(IRC& irc, Channel& channel, int fd, string message)
 {
-	map<User*, ModeUser>& all_users = channel.get_users();
+	user_map& all_users = channel.get_users();
 	User* user = find_user(all_users, fd);
 	if (user)
 	{

@@ -16,7 +16,8 @@
 #include "Class.Channel.hpp"
 #include "Class.Server.hpp"
 
-typedef map<User*, ModeUser>::iterator	user_iterator;
+typedef std::map<string, Channel>			channel_map;
+typedef std::map<string, Channel>::iterator	channel_iterator;
 
 using std::map;
 using std::string;
@@ -51,13 +52,13 @@ class IRC
 		vector<User*>				_users;
 		vector<Client*>				_clients;
 		vector<Server*>				_servers;
-		map<string, Channel>		_channels;
+		channel_map					_channels;
 
 		int							_select_res;
 		SSL*						_ssl;
 		SSL_CTX*					_ctx;
 
-		std::map<int, std::string> map_codes;
+		map<int, string> 			map_codes;
 
 	public:
 		IRC();
@@ -107,10 +108,11 @@ class IRC
 		const string&				get_operator_user() const;
 		const string&				get_operator_pass() const;
 		const Socket&				get_socket() const;
-		map<string, Channel>&		get_channels();
+		channel_map&				get_channels();
 		Channel*					get_channel(string channel_name);
 		bool						is_empty_queue() const;
 		bool						is_server(int fd) const;
+		bool						is_server_operator(const User*) const;
 
 		template <typename T>
 		static int					find_fd(T& container, int fd);
@@ -125,8 +127,8 @@ class IRC
 		void						forward_message_to_servers(int fd, const string& message, bool prefix);
 		void						forward_message_to_servers_2(int fd, const string& prefix, const string& message);
 		void						forward_message_to_clients(IRC& irc, const string& message);
-		void						forward_message_to_channel(Channel& channel, const string& message);
-		void						forward_message_to_channel(const string& channel_name, const string& message);
+		void						forward_message_to_channel(int fd, Channel& channel, const string& message);
+		void						forward_message_to_channel(int fd, const string& channel_name, const string& message);
 
 		void generate_map_codes();
 		void print_channels() const; //DEBUG

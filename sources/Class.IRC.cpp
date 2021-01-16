@@ -221,11 +221,7 @@ check_fd_select()
 	{
 		if (FD_ISSET(it->first, &_fd_set_write))
 		{
-			/*string DEBUG = _command_queue.front().second;
-			size_t t = DEBUG.find("\r"); DEBUG[t] = 0; DEBUG[t+1] = 0;
-			std::cout << "DEBUG: Сообщение отправлено клиенту " << it->first << ": |" << DEBUG << "|\n";*/
-			// CHANGED
-			std::cout << "DEBUG: Сообщение отправлено клиенту: " << _command_queue.front().second.substr(0, _command_queue.front().second.size() - 1) << std::endl;
+			// std::cout << "DEBUG: Сообщение отправлено клиенту: " << _command_queue.front().second.substr(0, _command_queue.front().second.size() - 1) << std::endl;
 			_send(it->second, it->first, _command_queue.front().second.c_str(), strlen(_command_queue.front().second.c_str()), 0);
 			_command_queue.pop();
 		}
@@ -258,8 +254,6 @@ check_fd_select()
 
 					// передаем в исполнение команды сообщение и сокет, из которого пришло сообщение
 					this->do_command(&mess, it->first);
-					// _send(it->second, it->first, buffer_cmd[i].c_str(), strlen(buffer_cmd[i].c_str()), 0);
-					// push_cmd_queue(it->first, buffer_cmd[i]);
 				}
 				bzero(buffer, 512);
 			}
@@ -280,10 +274,7 @@ check_fd_select()
 					ssl_connection(client_socket);
 
 				utils::print_client(client_socket, "New client joined server!");
-				//std::cout << "New client#" << client_socket << " joined server\n";
-				// char response[] = "Accepted\n";
-				// _send(it->second, client_socket, response, 10, 0);
-				// push_cmd_queue(client_socket, string(response));
+
 				this->_clients.push_back(new Client(client_socket));
 			}
 			_select_res--;
@@ -540,7 +531,7 @@ get_operator_pass() const	{ return _operator_pass; }
 const Socket& IRC::
 get_socket() const			{ return _localhost; }
 
-map<string, Channel>& IRC::
+channel_map& IRC::
 get_channels()				{ return _channels; }
 
 Channel* IRC::
@@ -549,8 +540,8 @@ get_channel(string channel_name) {
 	if (!(channel_name[0] == '&' || channel_name[0] == '#'))
 		return NULL;
 	
-	map<string, Channel>& channels = get_channels();
-	map<string, Channel>::iterator it = channels.find(channel_name);
+	channel_map& channels = get_channels();
+	channel_map::iterator it = channels.find(channel_name);
 	return (it != channels.end())
 			? &(it->second)
 			: NULL;
@@ -564,13 +555,16 @@ get_user(Client *client)
 }
 
 const string& IRC::
-get_nickname(int fd)		{ return _users[find_fd(_users, fd)]->getName(); }
+get_nickname(int fd)						{ return _users[find_fd(_users, fd)]->getName(); }
 
 bool IRC::
-is_empty_queue() const		{ return (this->_command_queue.empty());}
+is_empty_queue() const						{ return (this->_command_queue.empty());}
 
 bool IRC::
-is_server(int fd) const		{ return (IRC::find_fd(_servers, fd)) >= 0; }
+is_server(int fd) const						{ return (IRC::find_fd(_servers, fd)) >= 0; }
+
+bool IRC::
+is_server_operator(const User* user) const 	{ return user->getMode().o; }
 
 string IRC::
 response_2(int response_code, int fd, string command, string message)
@@ -640,22 +634,22 @@ forward_message_to_clients(IRC& irc, const string& message)
 }
 
 void IRC::
-forward_message_to_channel(Channel& channel, const string& message)
+forward_message_to_channel(int fd, Channel& channel, const string& message)
 {
-	map<User*, ModeUser>& users = channel.get_users();
+	user_map& users = channel.get_users();
 
 	for (user_iterator it = users.begin(); it != users.end(); it++)
 	{
-		if (it->first->getHopcount() == 0)
+		if (it->first->getHopcount() == 0 && it->first->getSocketFd() != fd)
 			push_cmd_queue(it->first->getSocketFd(), message + "\r\n");
 	}
 }
 
 void IRC::
-forward_message_to_channel(const string& channel_name, const string& message)
+forward_message_to_channel(int fd, const string& channel_name, const string& message)
 {
 	Channel& channel = _channels[channel_name];
-	forward_message_to_channel(channel, message);
+	forward_message_to_channel(fd, channel, message);
 }
 
 string IRC::
@@ -810,7 +804,7 @@ generate_map_codes()
 // выводит список существующих на сервере каналов и пользователей на них
 
 void IRC::print_channels() const {
-	for (map<string, Channel>::const_iterator it = _channels.begin(); it != _channels.end(); it++) {
+	for (channel_map::const_iterator it = _channels.begin(); it != _channels.end(); it++) {
 		std::cout << "\tChannel: " << '#' << it->first << std::endl;
 		it->second.print_users();
 	}
