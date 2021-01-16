@@ -16,6 +16,8 @@
 #include "Class.Channel.hpp"
 #include "Class.Server.hpp"
 
+typedef map<User*, ModeUser>::iterator	user_iterator;
+
 using std::map;
 using std::string;
 using std::vector;
@@ -123,6 +125,8 @@ class IRC
 		void						forward_message_to_servers(int fd, const string& message, bool prefix);
 		void						forward_message_to_servers_2(int fd, const string& prefix, const string& message);
 		void						forward_message_to_clients(IRC& irc, const string& message);
+		void						forward_message_to_channel(Channel& channel, const string& message);
+		void						forward_message_to_channel(const string& channel_name, const string& message);
 
 		void generate_map_codes();
 		void print_channels() const; //DEBUG

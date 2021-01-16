@@ -639,6 +639,25 @@ forward_message_to_clients(IRC& irc, const string& message)
 	}
 }
 
+void IRC::
+forward_message_to_channel(Channel& channel, const string& message)
+{
+	map<User*, ModeUser>& users = channel.get_users();
+
+	for (user_iterator it = users.begin(); it != users.end(); it++)
+	{
+		if (it->first->getHopcount() == 0)
+			push_cmd_queue(it->first->getSocketFd(), message + "\r\n");
+	}
+}
+
+void IRC::
+forward_message_to_channel(const string& channel_name, const string& message)
+{
+	Channel& channel = _channels[channel_name];
+	forward_message_to_channel(channel, message);
+}
+
 string IRC::
 full_name(const User* user) const
 {

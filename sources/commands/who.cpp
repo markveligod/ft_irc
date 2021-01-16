@@ -45,7 +45,7 @@ cmd_who(IRC& irc, int fd)
 		{
 			map<User*, ModeUser> users = irc.get_channels()[channel_name].get_users();
 
-			for (map<User*, ModeUser>::iterator it = users.begin(); it != users.end(); it++)
+			for (user_iterator it = users.begin(); it != users.end(); it++)
 			{
 				if (!(it->first->is_i_mode()))
 					irc.push_cmd_queue(fd, irc.response(RPL_WHOREPLY, fd, who_message(it->first), ""));
