@@ -15,13 +15,13 @@ struct ModeUser
 {
 	// https://tools.ietf.org/html/rfc2812#section-3.1.5
 
-	bool a = false;
-	bool i = false;
-	bool w = false;
-	bool r = false;
-	bool o = false;
-	bool O = false;
-	bool v = false;
+	bool a;
+	bool i;
+	bool w;
+	bool r;
+	bool o;
+	bool O;
+	bool v;
 
 	ModeUser();
 	ModeUser(const ModeUser&);
