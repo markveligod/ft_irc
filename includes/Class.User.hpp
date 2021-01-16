@@ -4,19 +4,24 @@
 #include "main.hpp"
 #include "Class.Client.hpp"
 
+class User;
+struct ModeUser;
+typedef std::map<User*, ModeUser>			user_map;
+typedef std::map<User*, ModeUser>::iterator	user_iterator;
+
 using std::string;
 
 struct ModeUser
 {
 	// https://tools.ietf.org/html/rfc2812#section-3.1.5
 
-	bool a;
-	bool i;
-	bool w;
-	bool r;
-	bool o;
-	bool O;
-	bool v;
+	bool a = false;
+	bool i = false;
+	bool w = false;
+	bool r = false;
+	bool o = false;
+	bool O = false;
+	bool v = false;
 
 	ModeUser();
 	ModeUser(const ModeUser&);
@@ -60,6 +65,7 @@ public:
 	const string&	getHostname() const;
 	const string&	getServername() const;
 	const string&	getRealname() const;
+	const ModeUser&	getMode() const;
 	size_t			getChannelCount() const;
 	// int				getFd() const;
 	// int				getHopcount() const;

@@ -60,7 +60,7 @@ join_channel(IRC& irc,
 		string message1 = irc.full_name(user) + " JOIN :" + channel_name;
 		string message2 = ":" + user->getName() + " JOIN :" + channel_name;
 
-		irc.forward_message_to_channel(channel_name, message1);
+		irc.forward_message_to_channel(fd, channel_name, message1);
 		irc.forward_message_to_servers(fd, message2, true);
 		return;
 	}
@@ -71,12 +71,12 @@ join_channel(IRC& irc,
 		return;
 	}
 
-	map<string, Channel>& channels = irc.get_channels();
+	channel_map& channels = irc.get_channels();
 
 	string message1 = irc.full_name(user) + " JOIN :" + channel_name;
 	string message2 = ":" + user->getName() + " JOIN " + channel_name;
 
-	if (!channels.count(channel_name))
+	if (!channels.count(channel_name))								// create new server
 	{
 		channels.insert(make_pair(channel_name, Channel(channel_name, channel_key, user)));
 		channels[channel_name].add_user(user);
@@ -85,7 +85,6 @@ join_channel(IRC& irc,
 		irc.push_cmd_queue(fd, message1 + "\r\n");
 		irc.push_cmd_queue(fd, irc.full_name(user) + " MODE :" + channel_name + " +o " + user->getName() + "\r\n");
 
-		irc.forward_message_to_channel(channel_name, message1);
 		irc.forward_message_to_servers(fd, message2, true);
 
 		utils::print_line("Channel " + channel_name + " created");
@@ -140,7 +139,7 @@ join_channel(IRC& irc,
 int Command::
 join_from_server(IRC& irc, User* user, const string& channel_name)
 {
-	map<string, Channel>& channels = irc.get_channels();
+	channel_map& channels = irc.get_channels();
 
 	if (channels.count(channel_name))
 		channels[channel_name].add_user(user);

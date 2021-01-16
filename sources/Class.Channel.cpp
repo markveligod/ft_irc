@@ -31,7 +31,7 @@ get_key() const										{ return _key; }
 const string& Channel::
 get_topic() const									{ return _topic; }
 
-map<User*, ModeUser>& Channel::
+user_map& Channel::
 get_users()											{ return _users; }
 
 void Channel::
@@ -82,13 +82,13 @@ bool Channel::
 is_user_in_channel(User* user) const				{ return _users.count(user); }
 
 bool Channel::
-is_operator(User* user) 							{ return _users[user].o; }
+is_channel_operator(User* user) const				{ return _users.find(user)->second.o; }
 
 bool Channel::
-is_have_voice(User* user) 							{ return _users[user].v; }
+is_have_voice(User* user) const						{ return _users.find(user)->second.v; }
 
 bool Channel::
-is_visible()										{ return !is_private() && !is_secret(); }
+is_visible() const									{ return !is_private() && !is_secret(); }
 
 bool Channel::
 is_valid_channel_name(const string& name)

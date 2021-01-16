@@ -29,13 +29,13 @@ class IRC;
 class Channel
 {
 private:
-	string					_name;
-	string					_key;
-	User*					_creator;
-	map<User*, ModeUser>	_users;
-	vector<User*>			_banned;
-	string					_topic;
-	ModeChannel				_mode;
+	string			_name;
+	string			_key;
+	User*			_creator;
+	user_map		_users;
+	vector<User*>	_banned;
+	string			_topic;
+	ModeChannel		_mode;
 	// int				_limit_users;
 	// string			_ban;
 
@@ -48,7 +48,7 @@ public:
 	const string&			getName() const;
 	const string&			get_key() const;
 	const string&			get_topic() const;
-	map<User*, ModeUser>&	get_users();
+	user_map&	get_users();
 
 	void					set_topic(const string& topic);
 	void					set_operator(User* user);
@@ -65,16 +65,16 @@ public:
 	bool		is_topic_only_oper() const;
 	bool		is_user_in_channel(User*) const;
 	bool		is_user_in_channel(int fd) const;
-	bool		is_operator(User* user);
-	bool		is_have_voice(User* user);
-	bool		is_visible();
+	bool		is_channel_operator(User* user) const;
+	bool		is_have_voice(User* user) const;
+	bool		is_visible() const;
 	static bool is_valid_channel_name(const string&);
 
 
 	void print_users() const
 	{
 		std::cout << std::setw(8) << "\t  Users: ";
-		for (map<User*, ModeUser>::const_iterator it = _users.begin(); it != _users.end(); it++)
+		for (user_map::const_iterator it = _users.begin(); it != _users.end(); it++)
 		{
 			User u = *(it->first);
 			if (it != _users.begin())
