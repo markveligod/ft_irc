@@ -138,7 +138,7 @@ cmd_user(IRC& irc, int fd)
 	out_message << ":" << curr_user->getNickname() << " USER "
 				<< curr_user->getUsername() << " "
 				<< curr_user->getHostname() << " "
-				<< curr_user->getServername() << " "
+				<< curr_user->getServername() << " :"
 				<< curr_user->getRealname();
 	irc.forward_to_servers_2(fd, "", out_message.str());
 

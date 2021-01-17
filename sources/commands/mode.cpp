@@ -139,7 +139,7 @@ void change_mode_channel(Channel *chan, const char param, bool res)
 
 bool check_keys_two(std::string arg)
 {
-	std::vector<char> temp = {'a', 'i', 'm', 'n', 'q', 'p', 's', 'r', 't'};
+	std::vector<char> temp;// = {'a', 'i', 'm', 'n', 'q', 'p', 's', 'r', 't'};
 	if (arg[0] != '+' || arg[0] != '-') // проверяем на корректность параметра ключа + и -
 			return (false);
 	for (size_t i = 1; i < arg.size(); i++)
@@ -157,7 +157,7 @@ bool check_keys_two(std::string arg)
 
 bool check_keys_three(std::string arg)
 {
-	std::vector<char> temp = {'O', 'o', 'v', 'k', 'l', 'b', 'e', 'I'};
+	std::vector<char> temp; //= {'O', 'o', 'v', 'k', 'l', 'b', 'e', 'I'};
 	if (arg.size() != 2)
 		return (false);
 	if (arg[0] != '+' || arg[0] != '-') // проверяем на корректность параметра ключа + и -

@@ -179,7 +179,7 @@ cmd_server(IRC& irc, int fd)
 	out_message << ":" << irc.get_server_name() <<
 				  " SERVER " + new_server->getName() <<
 				  " " << (new_server->getHopcount() + 1) <<
-				  " 0 " << new_server->getInfo() + "\r\n";
+				  " 0 " << new_server->getInfo();
 	irc.forward_to_servers_2(fd, "", out_message.str());
 
 	return (0);

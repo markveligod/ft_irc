@@ -107,6 +107,7 @@ join_channel(IRC& irc,
 		}
 
 		channel.add_user(user);
+		utils::print_line("User " + user->getNickname() + " joined channel " + channel_name);
 
 		if (!irc.is_server(fd))
 		{
