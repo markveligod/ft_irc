@@ -98,6 +98,7 @@
 #define ERR_USERNOTINCHANNEL		441		// "<nick> <channel> :They aren't on that channel"
 										// - Returned by the server to indicate that the target
 										// user of the command is not on the given channel.
+#define ERR_USERNOTINCHANNEL_MESS	" :They aren't on that channel"
 
 #define ERR_NOTONCHANNEL			442		// "<channel> :You're not on that channel"
 										// - Returned by the server whenever a client tries to

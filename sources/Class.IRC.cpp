@@ -6,7 +6,7 @@
 # define FD_CLIENT_SSL 3
 # define FD_SERVER_SSL 4
 
-# define COMM_COUNT 15
+# define COMM_COUNT 16
 
 # define CERTIFICATE "cert/cert.pem"
 # define PRIVATE_KEY "cert/key.pem"
@@ -29,7 +29,7 @@ IRC(string network_ip,
 	string operator_user,
 	string operator_pass)
 {
-	_server_name = LOCALHOST + string("/") + localhost_port;
+	_server_name = SERVERNAME + string("/") + localhost_port;
 	_host_name = LOCALHOST;
 	_operator_user = operator_user;
 	_operator_pass = operator_pass;
@@ -99,10 +99,6 @@ create_socket_network(std::vector<std::string> network)
 					  "\nHopcount: 1\nInfo: info");
 	push_cmd_queue(fd, "PASS " + _network_pass + "\r\nSERVER " + _server_name + " 1 info\r\n");
 	_clients[0]->setIsServer(true);
-	//if (!_network_pass.empty())
-	//	push_cmd_queue(fd, "PASS " + _network_pass + " \r\n");
-	//push_cmd_queue(fd, "SERVER " + _server_name + " 1 " + "1234" + " :[" + _server_name + "] server\r\n");
-	// отправить список пользователей и каналов TODO
 }
 
 /*
@@ -137,7 +133,8 @@ do_command(Command* command, int fd)
 									"TOPIC",
 									"PING",
 									"PONG",
-									"MODE"};
+									"MODE",
+									"KICK"};
 	doCommand	cmd_func[COMM_COUNT] = {&Command::cmd_nick,
 										&Command::cmd_pass,
 										&Command::cmd_user,
@@ -152,7 +149,8 @@ do_command(Command* command, int fd)
 										&Command::cmd_topic,
 										&Command::cmd_ping,
 										&Command::cmd_pong,
-										&Command::cmd_mode};
+										&Command::cmd_mode,
+										&Command::cmd_kick};
 
 	string comm = command->getCommand();
 	std::transform(comm.begin(), comm.end(), comm.begin(), toupper);
@@ -608,7 +606,9 @@ string IRC::
 response(int response_code, int client_fd, string message_prefix, string message)
 {
 	string code = utils::int_to_str(response_code);
-	string client_name = _clients[find_fd(_clients, client_fd)]->getName();
+
+	int i = find_fd(_clients, client_fd);
+	string client_name = (i >= 0) ? _clients[i]->getName() : string();
 
 	string response = ":"
 					+ _server_name + " "
@@ -827,7 +827,7 @@ generate_map_codes()
 
 void IRC::print_channels() const {
 	for (channel_map::const_iterator it = _channels.begin(); it != _channels.end(); it++) {
-		std::cout << "\tChannel: " << '#' << it->first << std::endl;
+		std::cout << "\tChannel: " << it->first << std::endl;
 		it->second.print_users();
 	}
 }
