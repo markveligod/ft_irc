@@ -260,22 +260,15 @@ check_fd_select()
 					continue;
 				}
 				buffer[n] = '\0';
-				//utils::print_client(it->first, buffer);
 				//получаем распарсенный вектор команд если нашли \r\n
 				vector<string> buffer_cmd = this->check_buffer(it->first, buffer);
 
 				utils::print_message(it->first, buffer_cmd);
-				// std::cout << "\nDEBUG: получен буфер команд размером: " << buffer_cmd.size() << std::endl;
-				// std::cout << "\nDEBUG BUFFER:\n";
-				// for (size_t i = 0; i < buffer_cmd.size(); i++)
-				// 	std::cout << "Index: " << i << " STR: " << buffer_cmd[i] << std::endl;
 
 				for (size_t i = 0; i < buffer_cmd.size(); i++)
 				{
 					Command mess(buffer_cmd[i]);
-
-					// передаем в исполнение команды сообщение и сокет, из которого пришло сообщение
-					this->do_command(&mess, it->first);
+					this->do_command(&mess, it->first); // передаем в исполнение команды сообщение и сокет, из которого пришло сообщение
 				}
 				bzero(buffer, 512);
 			}
