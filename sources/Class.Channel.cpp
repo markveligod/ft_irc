@@ -34,8 +34,17 @@ get_topic() const									{ return _topic; }
 user_map& Channel::
 get_users()											{ return _users; }
 
+ModeChannel&	Channel::
+getModeChannel() 									{ return (this->_mode);}
+
 void Channel::
 set_topic(const string& topic)						{ _topic = topic; }
+
+void Channel::
+set_key(const string & new_key)						{ this->_key = new_key;}
+
+void Channel::
+set_limit_users(int new_limit)						{ this->_limit_users = new_limit;}
 
 void Channel::
 add_user(User* user)
@@ -50,9 +59,23 @@ is_local_channel() const							{ return _name[0] == '&'; }
 bool Channel::
 is_network_channel() const							{ return _name[0] == '#'; }
 
-
 void Channel::
 set_operator(User* user)							{ _users[user].o = true; }
+
+void Channel::
+del_operator(User* user)							{ _users[user].o = false; }
+
+void Channel::
+set_creator(User* creator)							{ this->_creator = creator;}
+
+void Channel::
+del_creator()										{ this->_creator = NULL;}
+
+void Channel::
+set_voice(User* user) 								{ _users[user].v = true;}
+
+void Channel::
+del_voice(User* user)								{ _users[user].v = false;}
 
 bool Channel::
 is_banned(User* user) const							

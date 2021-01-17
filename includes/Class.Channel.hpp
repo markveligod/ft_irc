@@ -21,6 +21,11 @@ struct ModeChannel
 	bool	ban_mode;
 	bool	topic_only_oper_mode;
 
+	bool	a; // a - переключить флаг анонимного канала;
+	bool	n; // n - переключить отсутствие сообщений на канал от клиентов снаружи;
+	bool	q; // q - переключить флаг тихого канала;
+	bool	r; // r - переключить флаг канала перезапуска сервера;
+
 	ModeChannel() { bzero(this, sizeof(*this)); }
 };
 
@@ -36,7 +41,7 @@ private:
 	vector<User*>	_banned;
 	string			_topic;
 	ModeChannel		_mode;
-	// int				_limit_users;
+	int				_limit_users;
 	// string			_ban;
 
 public:
@@ -49,9 +54,17 @@ public:
 	const string&			get_key() const;
 	const string&			get_topic() const;
 	user_map&	get_users();
+	ModeChannel &			getModeChannel();
 
 	void					set_topic(const string& topic);
 	void					set_operator(User* user);
+	void					del_operator(User* user);
+	void					set_key(const string & new_key);
+	void					set_limit_users(int new_limit);
+	void					set_creator(User* creator);
+	void					del_creator();
+	void					set_voice(User* user);
+	void					del_voice(User* user);
 
 	void 		add_user(User*);
 	bool		is_local_channel() const;

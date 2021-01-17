@@ -83,7 +83,7 @@ void changeMode(User* user, const char param, bool res)
 			break;
 		case 'o': user->getModeUser().o = res;
 			break;
-		case '0': user->getModeUser().O = res;
+		case 'O': user->getModeUser().O = res;
 			break;
 		default:
 			break;
@@ -94,17 +94,80 @@ bool check_mode_users(std::string param)
 {
 	if (param.size() != 2)
 		return (false);
-	if ((param[0] == '+' || param[0]  == '-') && (param[1] == 'a' || param[1] == 'i' || param[1] == 'w' || param[1] == 'r' || param[1] == 'o' || param[1] == '0'))
+	if ((param[0] == '+' || param[0]  == '-') && (param[1] == 'a' || param[1] == 'i' || param[1] == 'w' || param[1] == 'r' || param[1] == 'o' || param[1] == 'O'))
 		return (true);
 	return (false);
 }
 
-bool change_mode_channel(Channel *chan, const char param, bool res)
+void change_mode_channel(Channel *chan, const char param, bool res)
 {
-	(void)chan;
-	(void)param;
-	(void)res;
+	/*
+	**	a - переключить флаг анонимного канала; [done]
+	**	i - переключить флаг канала только по приглашению; [done]
+	**	m - переключить модерируемый канал; [done]
+	**	n - переключить отсутствие сообщений на канал от клиентов снаружи; [done]
+	**	q - переключить флаг тихого канала; [done]
+	**	p - переключить флаг приватного канала; [done]
+	**	s - переключить флаг секретного канала; [done]
+	**	r - переключить флаг канала перезапуска сервера; [done]
+	**	t - переключить TOPIC, устанавливаемую только оператором канала;
+	*/
+	switch (param)
+	{
+		case 'i': chan->getModeChannel().invite_only_mode = res;
+			break;
+		case 'm': chan->getModeChannel().moderated_mode = res;
+			break;
+		case 'p': chan->getModeChannel().private_mode = res;
+			break;
+		case 's': chan->getModeChannel().secret_mode = res;
+			break;
+		case 'a': chan->getModeChannel().a = res;
+			break;
+		case 'n': chan->getModeChannel().n = res;
+			break;
+		case 'q': chan->getModeChannel().q = res;
+			break;
+		case 'r': chan->getModeChannel().r = res;
+			break;
+		case 't': chan->getModeChannel().topic_only_oper_mode = res;
+			break;
+		default:
+			break;
+	}
+}
+
+bool check_keys_two(std::string arg)
+{
+	std::vector<char> temp = {'a', 'i', 'm', 'n', 'q', 'p', 's', 'r', 't'};
+	if (arg[0] != '+' || arg[0] != '-') // проверяем на корректность параметра ключа + и -
+			return (false);
+	for (size_t i = 1; i < arg.size(); i++)
+	{
+		for (size_t j = 0; j < temp.size(); j++)
+		{
+			if (arg[i] == temp[j])
+				break;
+			if (j + 1 == temp.size())
+				return (false);
+		}
+	}
 	return (true);
+}
+
+bool check_keys_three(std::string arg)
+{
+	std::vector<char> temp = {'O', 'o', 'v', 'k', 'l', 'b', 'e', 'I'};
+	if (arg.size() != 2)
+		return (false);
+	if (arg[0] != '+' || arg[0] != '-') // проверяем на корректность параметра ключа + и -
+			return (false);
+	for (size_t i = 0; i < temp.size(); i++)
+	{
+		if (temp[i] == arg[1])
+			return (true);
+	}
+	return (false);
 }
 
 int Command::
@@ -119,29 +182,119 @@ cmd_mode(IRC& irc, int fd)
 	if ((pos_oper = irc.find_fd(vec_users, fd)) == -1) // находим предварительную позицию опера
 			return (irc.push_mess_client(fd, ERR_USERSDONTMATCH));
 
-	if (vec_users[pos_oper]->getModeUser().o == false && this->command != "OPER") //проверяем опер ли это или нет 
+	if (vec_users[pos_oper]->getModeUser().o == false) //проверяем опер ли это или нет 
 			return (irc.push_mess_client(fd, ERR_USERSDONTMATCH));
 	
-	if (this->arguments[0][0] == '#') // логика касается модов для каналов
+	if (this->arguments[0][0] == '#' || this->arguments[0][0] == '&') // логика касается модов для каналов
 	{
 		Channel* curr_channel = irc.get_channel(this->arguments[0]); // получаем канал из списка
 		if (curr_channel == NULL)
 			return (irc.push_mess_client(fd, ERR_NOSUCHCHANNEL));
-
-		if (this->arguments[1][0] != '+' || this->arguments[1][0] != '-') // проверяем на корректность параметра ключа + и -
-			return (irc.push_mess_client(fd, ERR_UNKNOWNMODE));
 		
-		if (this->arguments.size() == 2) // если указано два параметра то это касается только ключей канала
+		if (this->arguments.size() == 2 && this->arguments[0][0] == '#') // если указано два параметра то это касается только ключей канала и канал начинается с #
 		{
+			if (!check_keys_two(this->arguments[1]))
+				return (irc.push_mess_client(fd, ERR_UNKNOWNMODE));
 			for (size_t i = 1; i < this->arguments[1].size(); i++)
 			{
-				if (!change_mode_channel(curr_channel, this->arguments[1][i], ((this->arguments[1][0] == '+') ? true : false)))
-					return (irc.push_mess_client(fd, ERR_UNKNOWNMODE));
+				change_mode_channel(curr_channel, this->arguments[1][i], ((this->arguments[1][0] == '+') ? true : false));
 			}
 		}
-		else // иначе мы меняем особые привелегии юзерам на сервере
+		else // иначе мы меняем особые привелегии юзерам на сервере или работа с масками
 		{
-			
+			/*
+			**	O - присвоить статус «создатель канала»;
+			**	o - дать / принять привилегию оператора канала;
+			**	v - дать / принять право голоса;
+			**	k - установить / удалить ключ канала (пароль); [done]
+			**	l - установить / снять лимит пользователя на канал; [done]
+			**	b - установить / удалить маску бана, чтобы пользователи не заходили;
+			**	e - установить / удалить маску исключения для отмены маски бана;
+			**	I - установить / удалить маску приглашения для автоматического переопределения флаг "только для приглашения";
+			*/
+			if (!check_keys_three(this->arguments[1]))
+				return (irc.push_mess_client(fd, ERR_UNKNOWNMODE));
+
+			if (this->arguments[0][0] == '&')
+			{
+				std::cout << "Здесь типа работа с масками которых пока нет в классе channel (:D)\n";
+			}
+			else if (this->arguments[1][1] == 'k') // установить / удалить ключ канала (пароль);
+			{
+				if (this->arguments[1][0] == '+')
+					curr_channel->set_key(this->arguments[2]);
+				else
+					curr_channel->set_key("");
+			}
+			else if (this->arguments[1][1] == 'l') // установить / снять лимит пользователя на канал;
+			{
+				int new_key = atoi(this->arguments[2].c_str());
+				if (new_key != 0 && this->arguments[1][0] == '+')
+					curr_channel->set_limit_users(new_key);
+				else if (this->arguments[1][0] == '-')
+					curr_channel->set_limit_users(0);
+				else
+					return (irc.push_mess_client(fd, ERR_UMODEUNKNOWNFLAG));
+			}
+			else if (this->arguments[1][1] == 'O') //присвоить статус «создатель канала»;
+			{
+				int pos_creator = irc.find_name(vec_users, this->arguments[2]);
+
+				if (pos_creator == -1)
+					return (irc.push_mess_client(fd, ERR_USERSDONTMATCH));
+				
+				User *prev_creator = vec_users[pos_creator];
+
+				std::map<User*, ModeUser> temp_map = curr_channel->get_users();
+				std::map<User*, ModeUser>::iterator temp_it = temp_map.find(prev_creator);
+				if (temp_it == temp_map.end())
+					return (irc.push_mess_client(fd, ERR_USERSDONTMATCH));
+
+				if (this->arguments[1][0] == '+')
+					curr_channel->set_creator(temp_it->first);
+				else
+					curr_channel->del_creator();
+			}
+			else if (this->arguments[1][1] == 'o') // дать / принять привилегию оператора канала;
+			{
+				int pos_oper = irc.find_name(vec_users, this->arguments[2]);
+
+				if (pos_oper == -1)
+					return (irc.push_mess_client(fd, ERR_USERSDONTMATCH));
+				
+				User *prev_oper = vec_users[pos_oper];
+
+				std::map<User*, ModeUser> temp_map = curr_channel->get_users();
+				std::map<User*, ModeUser>::iterator temp_it = temp_map.find(prev_oper);
+				if (temp_it == temp_map.end())
+					return (irc.push_mess_client(fd, ERR_USERSDONTMATCH));
+				
+				if (this->arguments[1][0] == '+')
+					curr_channel->set_operator(temp_it->first);
+				else
+					curr_channel->del_operator(temp_it->first);
+			}
+			else if (this->arguments[1][1] == 'v')
+			{
+				int pos_user_voice = irc.find_name(vec_users, this->arguments[2]);
+
+				if (pos_user_voice == -1)
+					return (irc.push_mess_client(fd, ERR_USERSDONTMATCH));
+				
+				User *prev_user_voice = vec_users[pos_user_voice];
+
+				std::map<User*, ModeUser> temp_map = curr_channel->get_users();
+				std::map<User*, ModeUser>::iterator temp_it = temp_map.find(prev_user_voice);
+				if (temp_it == temp_map.end())
+					return (irc.push_mess_client(fd, ERR_USERSDONTMATCH));
+				
+				if (this->arguments[1][0] == '+')
+					curr_channel->set_voice(temp_it->first);
+				else
+					curr_channel->del_voice(temp_it->first);
+			}
+			else
+				return (irc.push_mess_client(fd, ERR_UNKNOWNMODE));
 		}
 	}
 	else // часть кода касается только модов для юзера
