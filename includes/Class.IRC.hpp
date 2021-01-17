@@ -68,8 +68,8 @@ class IRC
 			string network_pass,
 			string localhost_port,
 			string localhost_pass,
-			string operator_user = "foo",
-			string operator_pass = "bar");
+			string operator_user = "op*",
+			string operator_pass = "pass");
 		~IRC();
 
 		IRC&						operator=(const IRC& other);

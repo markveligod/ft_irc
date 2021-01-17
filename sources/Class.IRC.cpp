@@ -167,7 +167,7 @@ do_command(Command* command, int fd)
 	{
 		string message = ":" + _server_name + " " +
 						 utils::int_to_str(ERR_NOTREGISTERED) + " "
-						 "*" + " " + ERR_NOTREGISTERED_MESS + "\r\n";
+						 "*" + ERR_NOTREGISTERED_MESS + "\r\n";
 		this->push_cmd_queue(fd, message);
 		return 0;
 	}

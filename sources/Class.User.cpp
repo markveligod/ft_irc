@@ -139,6 +139,22 @@ setRealname(const string& realname)		{ this->realname = realname; }
 void User::
 setMode(const ModeUser& mode)			{ this->mode = mode; }
 
+void User::
+setMode(char mode)
+{
+	switch (mode)
+	{
+		case 'a': this->mode.a = true; break;
+		case 'i': this->mode.i = true; break;
+		case 'w': this->mode.w = true; break;
+		case 'r': this->mode.r = true; break;
+		case 'o': this->mode.o = true; break;
+		case 'O': this->mode.O = true; break;
+		case 'v': this->mode.v = true; break;
+		default: return;
+	}
+}
+
 const string& User::
 getUsername() const						{ return (this->username); }
 
