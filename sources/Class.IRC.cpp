@@ -364,10 +364,8 @@ init_ctx()
 {
 	const SSL_METHOD* method;
 
-	// if (server)
-		method = TLS_server_method();	/* create new server-method instance */
-	// if (client)
-	// 	method = TLS_client_method();
+	method = TLS_server_method();	/* create new server-method instance */
+
 	if (!(_ctx = SSL_CTX_new(method)))	/* create new context from method */
 		utils::print_error(1, "SSL: SSL_CTX_new failed\n");
 
@@ -382,13 +380,24 @@ init_ctx()
 SSL* IRC::
 ssl_connection(int fd)
 {
-	_ssl = SSL_new(_ctx);
+	if(!(_ssl = SSL_new(_ctx)))
+		utils::exit_error(1, "SSL: init failed\n");
 
-	if (SSL_set_fd(_ssl, fd) <= 0)
-		utils::print_error(1, "SSL: SSL_set_fd failed\n");
+	int i = SSL_set_fd(_ssl, fd);
+	std::cout << "SSL_set_fd :" << i << std::endl;
+	if (i < 0)
+		utils::exit_error(1, "SSL: SSL_set_fd failed\n");
 
-	if (SSL_accept(_ssl) < 0)		/* do SSL-protocol accept */
-		utils::print_error(1, "SSL: SSL_accept failed\n");
+	i = SSL_accept(_ssl);
+	std::cout << "SSL_accept :" << i << std::endl;
+	if (i < 0)
+		utils::exit_error(1, "SSL: SSL_accept failed\n");
+
+	// if (SSL_set_fd(_ssl, fd) <= 0)
+	// 	utils::exit_error(1, "SSL: SSL_set_fd failed\n");
+
+	// if (SSL_accept(_ssl) < 0)		/* do SSL-protocol accept */
+	// 	utils::exit_error(1, "SSL: SSL_accept failed\n");
 
 	return _ssl;
 }
