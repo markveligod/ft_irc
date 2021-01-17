@@ -69,6 +69,7 @@
 **==========================
 */
 
+#define SERVERNAME "ft_irc.net"
 #define LOCALHOST "127.0.0.1"
 #define DEF_PORT "0"
 #define BUFFER_SIZE	512

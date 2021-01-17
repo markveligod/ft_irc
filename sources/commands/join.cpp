@@ -3,7 +3,9 @@
 
 /*
 ** ====================================================================
-** Команда: JOIN <channel>{,<channel>} [<key>{,<key>}] 
+** Команда: JOIN
+** ====================================================================
+** Параметры: <channel>{,<channel>} [<key>{,<key>}]
 ** ====================================================================
 ** Команда JOIN используется клиентом для входа на канал. Так или иначе, 
 ** клиенту позволительно войти на канал, проверенным только сервером, к 
@@ -30,7 +32,7 @@ int Command::cmd_join(IRC& irc, int fd)
 	
 	for (size_t i = 0; i < channels.size(); i++)
 	{
-		if (!(channels[i][0] == '&' || channels[i][0] == '#'))
+		if (!(channels[i][0] == '&' || channels[i][0] == '#') || !Channel::is_valid_channel_name(channels[i]))
 		{
 			irc.push_cmd_queue(fd, irc.response(ERR_NOSUCHCHANNEL, fd, channels[i], ERR_NOSUCHCHANNEL_MESS));
 			continue;
@@ -53,17 +55,11 @@ join_channel(IRC& irc,
 			User* user,
 			int fd)
 {
-	if (!Channel::is_valid_channel_name(channel_name))				// check channel name
-	{
-		irc.push_cmd_queue(fd, irc.response(ERR_NOSUCHCHANNEL, fd, channel_name, ERR_NOSUCHCHANNEL_MESS));
-		return;
-	}
-
 	channel_map& channels = irc.get_channels();
 
 	string mess_to_user = 		irc.full_name(user) + " JOIN :" + channel_name;
 	string mess_to_server =		":" + user->getName() + " JOIN " + channel_name;
-	string mode_message = 		":" + user->getName() + " MODE :" + channel_name + " +o " + user->getName();
+	string mode_message = 		":" + user->getName() + " MODE " + channel_name + " +o " + user->getName();
 
 	if (!channels.count(channel_name))								// create new server
 	{
@@ -74,7 +70,7 @@ join_channel(IRC& irc,
 		if (!irc.is_server(fd))
 			irc.push_cmd_queue(fd, mess_to_user + "\r\n");
 		
-		irc.forward_to_channel(fd,channel_name, mess_to_user);
+		irc.forward_to_channel(fd, channel_name, mess_to_user);
 		irc.forward_to_servers(fd, mess_to_server, true);
 		irc.forward_to_servers(fd, mode_message, true);
 
@@ -88,7 +84,7 @@ join_channel(IRC& irc,
 		if (channel.is_user_in_channel(user))		// check if user already in channel
 			return;
 
-		if (channel.is_banned(user))					// check if user is banned 
+		if (channel.is_banned(user))				// check if user is banned 
 		{
 			irc.push_cmd_queue(fd, irc.response(ERR_BANNEDFROMCHAN, fd, channel_name, ERR_BANNEDFROMCHAN_MESS));
 			return;
