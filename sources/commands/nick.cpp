@@ -71,7 +71,7 @@ nick_check_errors(int fd, int serv_client, IRC& irc)
 	if (arguments.size() > 2)
 	{
 		utils::print_error(ERR_NEEDMOREPARAMS, "Too much arguments");
-		irc.push_cmd_queue(fd, irc.response_2(ERR_NEEDMOREPARAMS, fd, "NICK", ":Syntax error"));
+		irc.push_cmd_queue(fd, irc.response_2(ERR_NEEDMOREPARAMS, fd, "NICK", " :Syntax error"));
 		return (ERR_NEEDMOREPARAMS);
 	}
 
@@ -87,7 +87,7 @@ nick_check_errors(int fd, int serv_client, IRC& irc)
 	if (arguments.size() == 2 && serv_client < 0)
 	{
 		utils::print_error(ERR_NEEDMOREPARAMS, "Too much arguments");
-		irc.push_cmd_queue(fd, irc.response_2(ERR_NEEDMOREPARAMS, fd, "NICK", ":Syntax error"));
+		irc.push_cmd_queue(fd, irc.response_2(ERR_NEEDMOREPARAMS, fd, "NICK", " :Syntax error"));
 		return (ERR_NEEDMOREPARAMS);
 	}
 
@@ -178,7 +178,7 @@ cmd_nick(IRC& irc, int fd)
 			curr_client = clients.size() - 1;
 			out_mess << "NICK " << arguments[0] << " " << (clients[curr_client]->getHopcount() + 1) << "\r\n";
 		}
-		irc.forward_message_to_servers_2(fd, prefix, out_mess.str());
+		irc.forward_to_servers_2(fd, prefix, out_mess.str());
 	}
 
 	// Если это от клиента
@@ -202,7 +202,7 @@ cmd_nick(IRC& irc, int fd)
 				irc.push_cmd_queue(fd, irc.full_name(users[curr_user]) + " NICK :" + this->arguments[0] + "\r\n");
 			}
 			out_mess << "NICK " << arguments[0] << "\r\n";
-			irc.forward_message_to_servers_2(fd, prefix, out_mess.str());
+			irc.forward_to_servers_2(fd, prefix, out_mess.str());
 
 			utils::print_line("Nickname changed " + clients[curr_client]->getName() + " -> " + this->arguments[0]);
 		}

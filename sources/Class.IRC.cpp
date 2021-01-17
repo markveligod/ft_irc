@@ -97,7 +97,7 @@ create_socket_network(std::vector<std::string> network)
 	utils::print_line("Trying to connect to server!\nServer name: " +
 					  network[0] + "/" + network[1] +
 					  "\nHopcount: 1\nInfo: info");
-	push_cmd_queue(fd, "PASS 123\r\nSERVER " + _server_name + " 1 info\r\n");
+	push_cmd_queue(fd, "PASS " + _network_pass + "\r\nSERVER " + _server_name + " 1 info\r\n");
 	_clients[0]->setIsServer(true);
 	//if (!_network_pass.empty())
 	//	push_cmd_queue(fd, "PASS " + _network_pass + " \r\n");
@@ -120,7 +120,7 @@ typedef int (Command::*doCommand)(IRC& irc, int fd);
 typedef void (IRC::*SignalHandlerPointer)(int);
 
 int IRC::
-do_command(Command* command, int socket_fd)
+do_command(Command* command, int fd)
 {
 	int			result = 123;
 	string cmd_name[COMM_COUNT] =  {"NICK",
@@ -156,17 +156,33 @@ do_command(Command* command, int socket_fd)
 
 	string comm = command->getCommand();
 	std::transform(comm.begin(), comm.end(), comm.begin(), toupper);
+
+	int i = IRC::find_fd(_clients, fd);
+
+	if (!(comm == "PASS"
+		|| (i >= 0 && _clients[i]->getPassword()
+			&& (comm == "NICK" || comm == "USER" || comm == "SERVER"))	// client entered correct pass
+		|| IRC::find_fd(_servers, fd) >= 0								// client is registred as Server
+		|| IRC::find_fd(_users, fd) >= 0))								// client is registred as User
+	{
+		string message = ":" + _server_name + " " +
+						 utils::int_to_str(ERR_NOTREGISTERED) + " "
+						 "*" + " " + ERR_NOTREGISTERED_MESS + "\r\n";
+		this->push_cmd_queue(fd, message);
+		return 0;
+	}
+
 	for (int i = 0; i < COMM_COUNT; i++)
 	{
 		if (cmd_name[i] == comm)
 		{
-			utils::print_command(socket_fd, command->getMessage());
-			result = (command->*(cmd_func[i]))(*this, socket_fd);
+			utils::print_command(fd, command->getMessage());
+			result = (command->*(cmd_func[i]))(*this, fd);
 			return (result);
 		}
 	}
-	this->push_cmd_queue(socket_fd, this->response(ERR_UNKNOWNCOMMAND, socket_fd, comm, ERR_UNKNOWNCOMMAND_MESS));
-	return (0);
+	this->push_cmd_queue(fd, this->response(ERR_UNKNOWNCOMMAND, fd, comm, ERR_UNKNOWNCOMMAND_MESS));
+	return 0;
 }
 
 /*
@@ -233,6 +249,11 @@ check_fd_select()
 			{
 				char buffer[512 + 1];
 				int n = _recv(it->second, it->first, buffer, 512, 0);
+				if (!strcmp(buffer, "\n"))
+				{
+					buffer[0] = '\0';
+					continue;
+				}
 				if (n < 1)
 				{
 					it = _array_fd_select.begin();
@@ -584,7 +605,7 @@ response_2(int response_code, int fd, string command, string message)
 					+ _server_name + " "
 					+ code + " "
 					+ server_name + " "
-					+ command + " "
+					+ command
 					+ message
 					+ "\r\n";
 	return response;
@@ -607,7 +628,7 @@ response(int response_code, int client_fd, string message_prefix, string message
 }
 
 void IRC::
-forward_message_to_servers_2(int fd, const string& prefix, const string& message)
+forward_to_servers_2(int fd, const string& prefix, const string& message)
 {
 	string forward_mess = prefix.empty() ? (message)
 										 : (":" + prefix + " " + message);
@@ -620,7 +641,7 @@ forward_message_to_servers_2(int fd, const string& prefix, const string& message
 }
 
 void IRC::
-forward_message_to_servers(int fd, const string& message, bool prefix)
+forward_to_servers(int fd, const string& message, bool prefix)
 {
 	string forward_mess = prefix ? message : (":" + get_nickname(fd) + " " + message);
 	
@@ -632,7 +653,7 @@ forward_message_to_servers(int fd, const string& message, bool prefix)
 }
 
 void IRC::
-forward_message_to_clients(IRC& irc, const string& message)
+forward_to_clients(IRC& irc, const string& message)
 {	
 	for (size_t i = 0; i < _clients.size(); i++)
 	{
@@ -642,7 +663,7 @@ forward_message_to_clients(IRC& irc, const string& message)
 }
 
 void IRC::
-forward_message_to_channel(int fd, Channel& channel, const string& message)
+forward_to_channel(int fd, Channel& channel, const string& message)
 {
 	user_map& users = channel.get_users();
 
@@ -654,10 +675,10 @@ forward_message_to_channel(int fd, Channel& channel, const string& message)
 }
 
 void IRC::
-forward_message_to_channel(int fd, const string& channel_name, const string& message)
+forward_to_channel(int fd, const string& channel_name, const string& message)
 {
 	Channel& channel = _channels[channel_name];
-	forward_message_to_channel(fd, channel, message);
+	forward_to_channel(fd, channel, message);
 }
 
 string IRC::

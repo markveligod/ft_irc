@@ -140,7 +140,7 @@ cmd_user(IRC& irc, int fd)
 				<< curr_user->getHostname() << " "
 				<< curr_user->getServername() << " "
 				<< curr_user->getRealname();
-	irc.forward_message_to_servers_2(fd, "", out_message.str());
+	irc.forward_to_servers_2(fd, "", out_message.str());
 
 	return 0;
 }

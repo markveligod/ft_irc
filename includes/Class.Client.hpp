@@ -18,7 +18,7 @@ protected:
 
 public:
 	Client(string const &hostname = "", int socket_fd = 0, int hopcount = 0);
-	Client(int socket_fd, const string &nickname, string const &hostname = "", int hopcount = 0);
+	Client(int socket_fd, const string& nickname, const string& hostname = "", int hopcount = 0);
 	Client(const Client& src);
 	Client& operator=(const Client&);
 

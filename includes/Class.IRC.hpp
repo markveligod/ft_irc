@@ -125,11 +125,11 @@ class IRC
 		string						response(int response_code, int client_fd, string message_prefix, string message);
 		string						response_2(int response_code, int fd, string command, string message);
 		int							push_mess_client(int fd, int code);
-		void						forward_message_to_servers(int fd, const string& message, bool prefix);
-		void						forward_message_to_servers_2(int fd, const string& prefix, const string& message);
-		void						forward_message_to_clients(IRC& irc, const string& message);
-		void						forward_message_to_channel(int fd, Channel& channel, const string& message);
-		void						forward_message_to_channel(int fd, const string& channel_name, const string& message);
+		void						forward_to_servers(int fd, const string& message, bool prefix);
+		void						forward_to_servers_2(int fd, const string& prefix, const string& message);
+		void						forward_to_clients(IRC& irc, const string& message);
+		void						forward_to_channel(int fd, Channel& channel, const string& message);
+		void						forward_to_channel(int fd, const string& channel_name, const string& message);
 
 		void generate_map_codes();
 		void print_channels() const; //DEBUG

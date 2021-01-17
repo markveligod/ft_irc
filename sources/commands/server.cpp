@@ -179,7 +179,7 @@ cmd_server(IRC& irc, int fd)
 				  " SERVER " + new_server->getName() <<
 				  " " << (new_server->getHopcount() + 1) <<
 				  " 0 " << new_server->getInfo() + "\r\n";
-	irc.forward_message_to_servers_2(fd, "", out_message.str());
+	irc.forward_to_servers_2(fd, "", out_message.str());
 	// for (int i = 0; i < (int)servers.size(); i++)
 	// {
 	// 	if (i != IRC::find_fd(servers, fd) && servers[i]->getHopcount() == 1) // отправляем только напрямую подключенным серверам

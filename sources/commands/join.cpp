@@ -61,8 +61,9 @@ join_channel(IRC& irc,
 
 	channel_map& channels = irc.get_channels();
 
-	string message1 = irc.full_name(user) + " JOIN :" + channel_name;
-	string message2 = ":" + user->getName() + " JOIN " + channel_name;
+	string message1 = 		irc.full_name(user) + " JOIN :" + channel_name;
+	string message2 =		":" + user->getName() + " JOIN " + channel_name;
+	string mode_message = 	":" + user->getName() + " MODE :" + channel_name + " +o " + user->getName();
 
 	if (!channels.count(channel_name))								// create new server
 	{
@@ -73,12 +74,9 @@ join_channel(IRC& irc,
 		if (!irc.is_server(fd))
 			irc.push_cmd_queue(fd, message1 + "\r\n");
 		
-		irc.forward_message_to_channel(fd,channel_name, message1);
-		irc.forward_message_to_servers(fd, message2, true);
-	
-		string mode_message = irc.full_name(user) + " MODE :" + channel_name + " +o " + user->getName() + "\r\n";
-		irc.forward_message_to_channel(fd, channel_name, mode_message);
-		irc.forward_message_to_servers(fd, mode_message, true);
+		irc.forward_to_channel(fd,channel_name, message1);
+		irc.forward_to_servers(fd, message2, true);
+		irc.forward_to_servers(fd, mode_message, true);
 
 		utils::print_line("Channel " + channel_name + " created");
 		utils::print_line("User " + user->getNickname() + " joined channel " + channel_name);
@@ -116,8 +114,8 @@ join_channel(IRC& irc,
 			if (channel.get_topic().size())
 				send_topic(irc, fd, channel_name, channel.get_topic());	// отправляем Топик
 		}
-		irc.forward_message_to_channel(fd, channel_name, message1);
-		irc.forward_message_to_servers(fd, message2, true);
+		irc.forward_to_channel(fd, channel_name, message1);
+		irc.forward_to_servers(fd, message2, true);
 
 
 		// std::cout << "DEBUG Channel members list:\n";
