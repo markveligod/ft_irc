@@ -28,7 +28,8 @@ cmd_topic(IRC& irc, int fd)
 	for (size_t i = 0; i < channels.size(); i++)		// channels[i] - (#/&)channel_name
 	{
 		Channel* chann = irc.get_channel(channels[i]);
-		User* user = irc.get_user(fd);
+		User* user = (prefix.size()) ? irc.get_user(prefix) : irc.get_user(fd);
+        if (!user) return 1;
 
 		if (!chann || !user								// channel doesn't exist
 			|| !chann->is_user_in_channel(user))		// check, if user in channel
@@ -42,8 +43,18 @@ cmd_topic(IRC& irc, int fd)
 		}
 		else if (arguments.size() == 1)
 			send_topic(irc, fd, channels[i], chann->get_topic());
+		else if (arguments.size() > 2)
+			irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, fd, channels[i], ERR_NEEDMOREPARAMS_MESS));
 		else
+		{
 			chann->set_topic(arguments[1]);
+
+			string mess_to_user = 	irc.full_name(user) + " TOPIC " + chann->getName() + " :" + arguments[1];
+			string mess_to_server =	":" + user->getName() + " TOPIC " + chann->getName() + " :" + arguments[1];
+
+			irc.forward_to_channel(fd,*chann, mess_to_user);
+			irc.forward_to_servers(fd, mess_to_server, true);
+		}
 	}
 	return 0;
 }
