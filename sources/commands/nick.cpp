@@ -162,7 +162,8 @@ cmd_nick(IRC& irc, int fd)
 				users[curr_user]->setNickname(arguments[0]);
 
 			utils::print_line("Nickname for client changed from " + clients[curr_client]->getName() + " to " + this->arguments[0]);
-			out_mess << "NICK " << arguments[0] << "\r\n";
+			out_mess << "NICK " << arguments[0];
+			irc.forward_to_servers_2(fd, prefix, out_mess.str());
 		}
 		else if (arguments.size() == 2)		// Создание нового клиента
 		{
@@ -177,9 +178,8 @@ cmd_nick(IRC& irc, int fd)
 			servers[server_el]->addClient(new_client);
 			utils::print_line("New client created");
 			curr_client = clients.size() - 1;
-			out_mess << "NICK " << arguments[0] << " " << (clients[curr_client]->getHopcount() + 1) << "\r\n";
+			//out_mess << "NICK " << arguments[0] << " " << (clients[curr_client]->getHopcount() + 1) << "\r\n";
 		}
-		irc.forward_to_servers_2(fd, prefix, out_mess.str());
 	}
 
 	// Если это от клиента
@@ -202,7 +202,7 @@ cmd_nick(IRC& irc, int fd)
 				users[curr_user]->setNickname(arguments[0]);
 				irc.push_cmd_queue(fd, irc.full_name(users[curr_user]) + " NICK :" + this->arguments[0] + "\r\n");
 			}
-			out_mess << "NICK " << arguments[0] << "\r\n";
+			out_mess << "NICK " << arguments[0];
 			irc.forward_to_servers_2(fd, prefix, out_mess.str());
 
 			utils::print_line("Nickname changed " + clients[curr_client]->getName() + " -> " + this->arguments[0]);
