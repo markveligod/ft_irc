@@ -171,6 +171,7 @@ cmd_server(IRC& irc, int fd)
 				out_message.str("");
 			}
 		}
+		new_server->setBuffer(clients[client_el]->getBuffer());
 		irc.delete_client(fd);
 		utils::print_line("DEBUG: Client deleted (as it is a new connection)");
 	}
@@ -180,11 +181,6 @@ cmd_server(IRC& irc, int fd)
 				  " " << (new_server->getHopcount() + 1) <<
 				  " 0 " << new_server->getInfo() + "\r\n";
 	irc.forward_to_servers_2(fd, "", out_message.str());
-	// for (int i = 0; i < (int)servers.size(); i++)
-	// {
-	// 	if (i != IRC::find_fd(servers, fd) && servers[i]->getHopcount() == 1) // отправляем только напрямую подключенным серверам
-	// 		irc.push_cmd_queue(servers[i]->getSocketFd(), out_message.str());
-	// }
 
 	return (0);
 }
