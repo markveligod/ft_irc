@@ -141,16 +141,16 @@ void change_mode_channel(Channel *chan, const char param, bool res)
 
 bool check_keys_two(std::string arg)
 {
-	std::vector<char> temp;// = {'a', 'i', 'm', 'n', 'q', 'p', 's', 'r', 't'};
-	if (arg[0] != '+' || arg[0] != '-') // проверяем на корректность параметра ключа + и -
+	char temp[10] = {'a', 'i', 'm', 'n', 'q', 'p', 's', 'r', 't', '\0'};
+	if (arg[0] != '+' && arg[0] != '-') // проверяем на корректность параметра ключа + и -
 			return (false);
 	for (size_t i = 1; i < arg.size(); i++)
 	{
-		for (size_t j = 0; j < temp.size(); j++)
+		for (size_t j = 0; j < 9; j++)
 		{
 			if (arg[i] == temp[j])
 				break;
-			if (j + 1 == temp.size())
+			if (j + 1 == 9)
 				return (false);
 		}
 	}
@@ -159,12 +159,12 @@ bool check_keys_two(std::string arg)
 
 bool check_keys_three(std::string arg)
 {
-	std::vector<char> temp; //= {'O', 'o', 'v', 'k', 'l', 'b', 'e', 'I'};
+	char temp[9] = {'O', 'o', 'v', 'k', 'l', 'b', 'e', 'I', '\0'};
 	if (arg.size() != 2)
 		return (false);
-	if (arg[0] != '+' || arg[0] != '-') // проверяем на корректность параметра ключа + и -
+	if (arg[0] != '+' && arg[0] != '-') // проверяем на корректность параметра ключа + и -
 			return (false);
-	for (size_t i = 0; i < temp.size(); i++)
+	for (size_t i = 0; i < 8; i++)
 	{
 		if (temp[i] == arg[1])
 			return (true);
@@ -189,12 +189,14 @@ cmd_mode(IRC& irc, int fd)
 	
 	if (this->arguments[0][0] == '#' || this->arguments[0][0] == '&') // логика касается модов для каналов
 	{
+		std::cout << "\nDEBUG: Здесь код с участием каналов\n";
 		Channel* curr_channel = irc.get_channel(this->arguments[0]); // получаем канал из списка
 		if (curr_channel == NULL)
 			return (irc.push_mess_client(fd, ERR_NOSUCHCHANNEL));
 		
 		if (this->arguments.size() == 2 && this->arguments[0][0] == '#') // если указано два параметра то это касается только ключей канала и канал начинается с #
 		{
+			std::cout << "\nDEBUG: Здесь код для формата MODE #test +/-param\n";
 			if (!check_keys_two(this->arguments[1]))
 				return (irc.push_mess_client(fd, ERR_UNKNOWNMODE));
 			for (size_t i = 1; i < this->arguments[1].size(); i++)
@@ -214,6 +216,7 @@ cmd_mode(IRC& irc, int fd)
 			**	e - установить / удалить маску исключения для отмены маски бана;
 			**	I - установить / удалить маску приглашения для автоматического переопределения флаг "только для приглашения";
 			*/
+			std::cout << "\nDEBUG: Здесь код для формата MODE #test +/-param <nickname>\n";
 			if (!check_keys_three(this->arguments[1]))
 				return (irc.push_mess_client(fd, ERR_UNKNOWNMODE));
 
@@ -223,6 +226,7 @@ cmd_mode(IRC& irc, int fd)
 			}
 			else if (this->arguments[1][1] == 'k') // установить / удалить ключ канала (пароль);
 			{
+				std::cout << "\nDEBUG: ключ k старт\n";
 				if (this->arguments[1][0] == '+')
 					curr_channel->set_key(this->arguments[2]);
 				else
@@ -230,6 +234,7 @@ cmd_mode(IRC& irc, int fd)
 			}
 			else if (this->arguments[1][1] == 'l') // установить / снять лимит пользователя на канал;
 			{
+				std::cout << "\nDEBUG: ключ l старт\n";
 				int new_key = atoi(this->arguments[2].c_str());
 				if (new_key != 0 && this->arguments[1][0] == '+')
 					curr_channel->set_limit_users(new_key);
@@ -240,6 +245,7 @@ cmd_mode(IRC& irc, int fd)
 			}
 			else if (this->arguments[1][1] == 'O') //присвоить статус «создатель канала»;
 			{
+				std::cout << "\nDEBUG: ключ O старт\n";
 				int pos_creator = irc.find_name(vec_users, this->arguments[2]);
 
 				if (pos_creator == -1)
@@ -259,6 +265,7 @@ cmd_mode(IRC& irc, int fd)
 			}
 			else if (this->arguments[1][1] == 'o') // дать / принять привилегию оператора канала;
 			{
+				std::cout << "\nDEBUG: ключ o старт\n";
 				int pos_oper = irc.find_name(vec_users, this->arguments[2]);
 
 				if (pos_oper == -1)
@@ -278,6 +285,7 @@ cmd_mode(IRC& irc, int fd)
 			}
 			else if (this->arguments[1][1] == 'v')
 			{
+				std::cout << "\nDEBUG: ключ v старт\n";
 				int pos_user_voice = irc.find_name(vec_users, this->arguments[2]);
 
 				if (pos_user_voice == -1)
@@ -301,6 +309,7 @@ cmd_mode(IRC& irc, int fd)
 	}
 	else // часть кода касается только модов для юзера
 	{
+		std::cout << "\nDEBUG: Здесь код только модов для юзера\n";
 		int pos_user;
 		
 		if (!check_mode_users(this->arguments[1])) // проверяем входные ключи
@@ -308,10 +317,10 @@ cmd_mode(IRC& irc, int fd)
 		if ((pos_user = irc.find_name(vec_users, this->arguments[0])) == -1) // находим позицию юзера которого указал опер
 			return (irc.push_mess_client(fd, ERR_USERSDONTMATCH));
 		changeMode(vec_users[pos_user], this->arguments[1][1], ((this->arguments[1][0] == '+') ? true : false)); // меняем моды
-		// ModeUser mode = vec_users[pos_oper]->getModeUser();
-		// std::cout << "\nOPER DEBUG:\na: " << mode.a << "\ni: " << mode.i << "\n0: " << mode.O << "\no: " << mode.o << "\nr: " << mode.r << "\nw: " << mode.w << std::endl;
-		// mode = vec_users[pos_user]->getModeUser();
-		// std::cout << "\nUSER DEBUG:\na: " << mode.a << "\ni: " << mode.i << "\n0: " << mode.O << "\no: " << mode.o << "\nr: " << mode.r << "\nw: " << mode.w << std::endl;
+		ModeUser mode = vec_users[pos_oper]->getModeUser();
+		std::cout << "\nOPER DEBUG:\na: " << mode.a << "\ni: " << mode.i << "\n0: " << mode.O << "\no: " << mode.o << "\nr: " << mode.r << "\nw: " << mode.w << std::endl;
+		mode = vec_users[pos_user]->getModeUser();
+		std::cout << "\nUSER DEBUG:\na: " << mode.a << "\ni: " << mode.i << "\n0: " << mode.O << "\no: " << mode.o << "\nr: " << mode.r << "\nw: " << mode.w << std::endl;
 	}
 	return (0);
 }
