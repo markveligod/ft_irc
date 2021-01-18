@@ -476,7 +476,7 @@ check_buffer(int fd, const char* buffer)
 		while (ptr_server->find_line_break())
 		{
 			string temp_str = ptr_server->get_line_break();
-			if (is_equal(temp_str, "CAP LS"))
+			if (is_equal(temp_str, "CAP LS") || is_equal(temp_str, ""))
 				continue;
 			temp_vec.push_back(temp_str);
 		}
@@ -489,7 +489,7 @@ check_buffer(int fd, const char* buffer)
 		while (ptr_client->find_line_break())
 		{
 			string temp_str = ptr_client->get_line_break();
-			if (is_equal(temp_str, "CAP LS"))
+			if (is_equal(temp_str, "CAP LS") || is_equal(temp_str, ""))
 				continue;
 			temp_vec.push_back(temp_str);
 		}
