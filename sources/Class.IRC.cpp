@@ -367,12 +367,13 @@ _recv(int connection_type, int fd, char* response, size_t size, int flags)
 
 void IRC::close_connection(int fd, int n)
 {
-	this->delete_client(fd);
-	this->delete_user(fd);
-
-	utils::print_line((n == 0 ? "connection closed" : "message receiving failed"));
-	_array_fd_select.erase(fd);
-	close(fd);
+	if (n)
+	utils::print_line("message receiving failed");
+	
+	if (is_server(fd))
+		close_connection(get_server(fd));
+	else
+		close_connection(get_user(fd));
 }
 
 void IRC::
@@ -634,6 +635,9 @@ get_servers()				{ return _servers; }
 
 map<string, CmdStats> &IRC::
 get_map_cmd_stats()			{ return map_cmd_stats; }
+
+Server* IRC::
+get_server(int fd)			{ return _servers[find_fd(_servers, fd)]; }
 
 const string& IRC::
 get_server_name()			{ return _server_name; }

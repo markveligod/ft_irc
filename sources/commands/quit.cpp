@@ -79,7 +79,7 @@ int Command::cmd_quit(IRC& irc, int fd)
 		
 		//закрываем соединение, если сообщение от клиента
 		if (!is_server(irc, fd))
-			irc.close_connection(fd, 0);
+			irc.close_connection(user);
 	}
 	return (0);
 }
