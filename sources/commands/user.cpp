@@ -26,7 +26,7 @@ user_create(Client* curr_client, vector<User*>& users, Server* curr_server)
 	std::cout << "RealName: " << curr_user->getRealname() << std::endl;
 	std::cout << "NickName: " << curr_user->getNickname() << std::endl;
 	std::cout << "HopCount: " << curr_user->getHopcount() << std::endl;
-	(void)curr_server;
+	//(void)curr_server;
 	if (curr_server != NULL)
 	{
 		curr_server->addUser(curr_user);
@@ -109,6 +109,7 @@ cmd_user(IRC& irc, int fd)
 	vector<User*>& users 		= irc.get_users();
 	vector<Server*>& servers 	= irc.get_servers();
 	int server_el				= IRC::find_fd(servers, fd);
+	int server_el_name			= irc.find_name(servers, arguments[2]);
 	int client_el				= IRC::find_fd(clients, fd);
 	int error;
 
@@ -121,10 +122,13 @@ cmd_user(IRC& irc, int fd)
 	// Если сообщение от сервера
 	if (server_el >= 0)
 	{
-		if (irc.find_name(servers, arguments[2]) <= 0)
+		if (server_el_name <= 0)
 			arguments[2] = irc.get_server_name();
 		client_el = IRC::find_name(clients, this->prefix);
-		this->user_create(clients[client_el], users, servers[irc.find_name(servers, arguments[2])]);
+		if (server_el_name <= 0)
+			this->user_create(clients[client_el], users, servers[server_el]);
+		else
+			this->user_create(clients[client_el], users, servers[server_el_name]);
 	}
 	else
 	{
