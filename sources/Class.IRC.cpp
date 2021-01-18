@@ -6,7 +6,7 @@
 # define FD_CLIENT_SSL 3
 # define FD_SERVER_SSL 4
 
-# define COMM_COUNT 18
+# define COMM_COUNT 19
 
 # define CERTIFICATE "cert/cert.pem"
 # define PRIVATE_KEY "cert/key.pem"
@@ -136,7 +136,8 @@ do_command(Command* command, int fd)
 									"MODE",
 									"KICK",
 									"PRIVMSG",
-									"AWAY"
+									"AWAY",
+									"NOTICE"
 									};
 	doCommand	cmd_func[COMM_COUNT] = {&Command::cmd_nick,
 										&Command::cmd_pass,
@@ -156,6 +157,7 @@ do_command(Command* command, int fd)
 										&Command::cmd_kick,
 										&Command::cmd_privmsg,
 										&Command::cmd_away,
+										&Command::cmd_notice
 										};
 
 	int i = IRC::find_fd(_clients, fd);

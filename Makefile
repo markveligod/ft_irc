@@ -51,7 +51,8 @@ COMMS		= nick.cpp \
 			mode.cpp \
 			kick.cpp \
 			privmsg.cpp \
-			away.cpp
+			away.cpp \
+			notice.cpp
 
 
 SRC			= $(addprefix $(SRC_DIR), $(SRCS))

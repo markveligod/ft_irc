@@ -26,6 +26,10 @@ struct ModeChannel
 	bool	q; // q - переключить флаг тихого канала;
 	bool	r; // r - переключить флаг канала перезапуска сервера;
 
+	vector<string> ban_masks; //b - установить / удалить маску бана, чтобы пользователи не заходили;
+	vector<string> exception_masks; //e - установить / удалить маску исключения для отмены маски бана;
+	vector<string> invite_masks; //I - установить / удалить маску приглашения для автоматического переопределения флаг "только для приглашения";
+
 	ModeChannel() { bzero(this, sizeof(*this)); }
 };
 
@@ -54,7 +58,7 @@ public:
 	const string&			get_key() const;
 	const string&			get_topic() const;
 	user_map&				get_users();
-	ModeChannel&			getModeChannel();
+	ModeChannel*			getModeChannel();
 	bool					getModeChannel(char mode);
 
 	void					set_topic(const string& topic);
