@@ -144,20 +144,23 @@ void User::
 setMode(const ModeUser& mode)			{ this->mode = mode; }
 
 void User::
-setMode(char mode)
+setMode(char mode, bool flag)
 {
 	switch (mode)
 	{
-		case 'a': this->mode.a = true; break;
-		case 'i': this->mode.i = true; break;
-		case 'w': this->mode.w = true; break;
-		case 'r': this->mode.r = true; break;
-		case 'o': this->mode.o = true; break;
-		case 'O': this->mode.O = true; break;
-		case 'v': this->mode.v = true; break;
+		case 'a': this->mode.a = flag; break;
+		case 'i': this->mode.i = flag; break;
+		case 'w': this->mode.w = flag; break;
+		case 'r': this->mode.r = flag; break;
+		case 'o': this->mode.o = flag; break;
+		case 'O': this->mode.O = flag; break;
+		case 'v': this->mode.v = flag; break;
 		default: return;
 	}
 }
+
+void User::
+setAway(const string& mess)				{ mode.away_message = mess; }
 
 const string& User::
 getUsername() const						{ return (this->username); }

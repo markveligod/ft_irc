@@ -48,7 +48,7 @@ cmd_oper(IRC& irc, int fd)
 
 		if (arguments[0] == operator_mask && user_name == operator_mask)
 		{
-			vec_users[pos]->setMode('o');
+			vec_users[pos]->setMode('o', true);
 			irc.push_cmd_queue(fd, irc.response(RPL_YOUREOPER, fd, command, RPL_YOUREOPER_MESS));
 		}
 		else
