@@ -37,6 +37,9 @@ get_users()											{ return _users; }
 ModeChannel* Channel::
 getModeChannel() 									{ return (&(this->_mode));}
 
+vector<User*>& Channel::
+getVecBanned()										{ return (this->_banned);}
+
 bool Channel::
 getModeChannel(char mode)
 {
