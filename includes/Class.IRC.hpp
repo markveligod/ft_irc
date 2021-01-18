@@ -118,6 +118,7 @@ class IRC
 		Client*						get_client(User* user);
 		Client*						get_client(Server* user);
 		vector<Server*>& 			get_servers();
+		Server*						get_server(int fd);
 		const string& 				get_server_name();
 		const string& 				get_server_name(int fd);
 		const string&				get_nickname(int fd);
