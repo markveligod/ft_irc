@@ -85,6 +85,6 @@ cmd_stats(IRC& irc, int fd)
 	if (arguments.size() && arguments[0] == "m")
 		stats_m(irc, fd, clients[client_el]);
 
-	irc.push_cmd_queue(fd, irc.response_3(RPL_ENDOFSTATS, clients[client_el]->getName(), arguments.size() ? arguments[0] : "*", ":End of STATS report");
+	irc.push_cmd_queue(fd, irc.response_3(RPL_ENDOFSTATS, clients[client_el]->getName(), arguments.size() ? arguments[0] : "*", ":End of STATS report"));
 	return (0);
 }
