@@ -116,23 +116,23 @@ void change_mode_channel(Channel *chan, const char param, bool res)
 	*/
 	switch (param)
 	{
-		case 'i': chan->getModeChannel().i = res;
+		case 'i': chan->getModeChannel()->i = res;
 			break;
-		case 'm': chan->getModeChannel().m = res;
+		case 'm': chan->getModeChannel()->m = res;
 			break;
-		case 'p': chan->getModeChannel().p = res;
+		case 'p': chan->getModeChannel()->p = res;
 			break;
-		case 's': chan->getModeChannel().s = res;
+		case 's': chan->getModeChannel()->s = res;
 			break;
-		case 'a': chan->getModeChannel().a = res;
+		case 'a': chan->getModeChannel()->a = res;
 			break;
-		case 'n': chan->getModeChannel().n = res;
+		case 'n': chan->getModeChannel()->n = res;
 			break;
-		case 'q': chan->getModeChannel().q = res;
+		case 'q': chan->getModeChannel()->q = res;
 			break;
-		case 'r': chan->getModeChannel().r = res;
+		case 'r': chan->getModeChannel()->r = res;
 			break;
-		case 't': chan->getModeChannel().t = res;
+		case 't': chan->getModeChannel()->t = res;
 			break;
 		default:
 			break;
@@ -172,6 +172,20 @@ bool check_keys_three(std::string arg)
 	return (false);
 }
 
+std::vector<std::string>::iterator find_arg(std::vector<std::string> vec, std::string str)
+{
+	std::vector<std::string>::iterator it_start = vec.begin();
+	std::vector<std::string>::iterator it_end = vec.end();
+
+	while (it_start != it_end)
+	{
+		if (*it_start == str)
+			return (it_start);
+		++it_start;
+	}
+	return (it_end);
+}
+
 int Command::
 cmd_mode(IRC& irc, int fd)
 {
@@ -207,9 +221,9 @@ cmd_mode(IRC& irc, int fd)
 		else // иначе мы меняем особые привелегии юзерам на сервере или работа с масками
 		{
 			/*
-			**	O - присвоить статус «создатель канала»;
-			**	o - дать / принять привилегию оператора канала;
-			**	v - дать / принять право голоса;
+			**	O - присвоить статус «создатель канала»; [done]
+			**	o - дать / принять привилегию оператора канала; [done]
+			**	v - дать / принять право голоса; [done]
 			**	k - установить / удалить ключ канала (пароль); [done]
 			**	l - установить / снять лимит пользователя на канал; [done]
 			**	b - установить / удалить маску бана, чтобы пользователи не заходили;
@@ -222,7 +236,85 @@ cmd_mode(IRC& irc, int fd)
 
 			if (this->arguments[0][0] == '&')
 			{
-				std::cout << "Здесь типа работа с масками которых пока нет в классе channel (:D)\n";
+				std::cout << "\nDEBUG: Здесь код для формата MODE &test +/-param or MODE &test +/-param <masks>\n";
+				ModeChannel *temp = curr_channel->getModeChannel();
+				if (this->arguments.size() == 2 && (this->arguments[1][1] == 'b' || this->arguments[1][1] == 'e' || this->arguments[1][1] == 'I'))
+				{
+					std::cout << "\nDEBUG: Здесь код для формата MODE &test +/-param\n";
+					if (this->arguments[1][0] == '+')
+					{
+						std::cout << "\nDEBUG: Здесь код +b/+e/+I для вывода списка масок\n";
+						if (this->arguments[1][1] == 'b')
+							for (size_t i = 0; i < temp->ban_masks.size(); i++)
+								irc.push_cmd_queue(fd, temp->ban_masks[i]);
+						
+						if (this->arguments[1][1] == 'e')
+							for (size_t i = 0; i < temp->exception_masks.size(); i++)
+								irc.push_cmd_queue(fd, temp->exception_masks[i]);
+						
+						if (this->arguments[1][1] == 'I')
+							for (size_t i = 0; i < temp->invite_masks.size(); i++)
+								irc.push_cmd_queue(fd, temp->invite_masks[i]);
+					}
+					if (this->arguments[1][0] == '-')
+					{
+						std::cout << "\nDEBUG: Здесь код -b/-e/-I для чистки списка масок\n";
+						if (this->arguments[1][1] == 'b')
+							temp->ban_masks.clear();
+						
+						if (this->arguments[1][1] == 'e')
+							temp->exception_masks.clear();
+						
+						if (this->arguments[1][1] == 'I')
+							temp->invite_masks.clear();
+					}
+				}
+				else if (this->arguments.size() == 3 && (this->arguments[1][1] == 'b' || this->arguments[1][1] == 'e' || this->arguments[1][1] == 'I'))
+				{
+					std::cout << "\nDEBUG: Здесь код для формата MODE &test +/-param <mask>\n";
+					if (this->arguments[1][0] == '+')
+					{
+						std::cout << "\nDEBUG: Здесь код +b/+e/+I для добавления в список масок\n";
+						if (this->arguments[1][1] == 'b')
+							temp->ban_masks.push_back(this->arguments[2]);
+						
+						if (this->arguments[1][1] == 'e')
+							temp->exception_masks.push_back(this->arguments[2]);
+						
+						if (this->arguments[1][1] == 'I')
+							temp->invite_masks.push_back(this->arguments[2]);
+					}
+					if (this->arguments[1][0] == '-')
+					{
+						std::cout << "\nDEBUG: Здесь код -b/-e/-I для удаление конкретной маски\n";
+						if (this->arguments[1][1] == 'b')
+						{
+							std::vector<std::string>::iterator it_temp = find_arg(temp->ban_masks, this->arguments[2]);
+							if (it_temp == temp->ban_masks.end())
+								return (irc.push_mess_client(fd, RPL_BANLIST));
+							temp->ban_masks.erase(it_temp);
+						}
+						
+						if (this->arguments[1][1] == 'e')
+						{
+							std::vector<std::string>::iterator it_temp = find_arg(temp->exception_masks, this->arguments[2]);
+							if (it_temp == temp->exception_masks.end())
+								return (irc.push_mess_client(fd, RPL_BANLIST));
+							temp->exception_masks.erase(it_temp);
+						}
+						
+						if (this->arguments[1][1] == 'I')
+						{
+							std::vector<std::string>::iterator it_temp = find_arg(temp->invite_masks, this->arguments[2]);
+							if (it_temp == temp->invite_masks.end())
+								return (irc.push_mess_client(fd, RPL_BANLIST));
+							temp->invite_masks.erase(it_temp);
+						}
+					}
+				}
+				else
+					return (irc.push_mess_client(fd, ERR_UNKNOWNMODE));
+				
 			}
 			else if (this->arguments[1][1] == 'k') // установить / удалить ключ канала (пароль);
 			{

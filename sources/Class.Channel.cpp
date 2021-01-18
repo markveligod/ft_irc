@@ -34,8 +34,8 @@ get_topic() const									{ return _topic; }
 user_map& Channel::
 get_users()											{ return _users; }
 
-ModeChannel& Channel::
-getModeChannel() 									{ return (this->_mode);}
+ModeChannel* Channel::
+getModeChannel() 									{ return (&(this->_mode));}
 
 bool Channel::
 getModeChannel(char mode)
