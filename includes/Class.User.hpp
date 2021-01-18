@@ -59,7 +59,8 @@ public:
 	void			setServername(const string& servername);
 	void			setRealname(const string& realname);
 	void			setMode(const ModeUser& mode);
-	void			setMode(char mode);
+	void			setMode(char mode, bool flag);
+	void			setAway(const string& away_message);
 	void			print_user();
 
 	const string&	getUsername() const;

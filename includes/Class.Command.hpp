@@ -79,6 +79,7 @@ public:
 	int					cmd_mode(IRC& irc, int fd);
 	int					cmd_kick(IRC& irc, int fd);
 	int					cmd_privmsg(IRC& irc, int fd);
+	int					cmd_away(IRC& irc, int fd);
 
 	const string&		getCommand() const;
 	const string&		getMessage() const;

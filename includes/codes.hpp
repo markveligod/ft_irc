@@ -237,6 +237,7 @@
 										// query list.
 
 #define RPL_UNAWAY					305		// ":You are no longer marked as being away"
+#define RPL_UNAWAY_MESS				":You are no longer marked as being away"
 
 #define RPL_NOWAWAY					306		// ":You have been marked as being away"
 										// - These replies are used with the AWAY command (if
@@ -245,6 +246,7 @@
 										// sent by the server to which the client is connected.
 										// Replies RPL_UNAWAY and RPL_NOWAWAY are sent when the
 										// client removes and sets an AWAY message.
+#define RPL_NOWAWAY_MESS			":You have been marked as being away"
 
 #define RPL_WHOISUSER				311		// "<nick> <user> <host>*  :<real name>"
 #define RPL_WHOISSERVER				312		// "<nick> <server> :<server info>"
