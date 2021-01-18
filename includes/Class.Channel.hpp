@@ -60,6 +60,7 @@ public:
 	user_map&				get_users();
 	ModeChannel*			getModeChannel();
 	bool					getModeChannel(char mode);
+	vector<User*>&			getVecBanned();
 
 	void					set_topic(const string& topic);
 	void					set_operator(User* user);

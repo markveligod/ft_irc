@@ -208,7 +208,7 @@ cmd_mode(IRC& irc, int fd)
 		if (curr_channel == NULL)
 			return (irc.push_mess_client(fd, ERR_NOSUCHCHANNEL));
 		
-		if (this->arguments.size() == 2 && this->arguments[0][0] == '#') // если указано два параметра то это касается только ключей канала и канал начинается с #
+		if (this->arguments.size() == 2 && this->arguments[0][0] == '#' && check_keys_two(this->arguments[1])) // если указано два параметра то это касается только ключей канала и канал начинается с #
 		{
 			std::cout << "\nDEBUG: Здесь код для формата MODE #test +/-param\n";
 			if (!check_keys_two(this->arguments[1]))
@@ -234,11 +234,11 @@ cmd_mode(IRC& irc, int fd)
 			if (!check_keys_three(this->arguments[1]))
 				return (irc.push_mess_client(fd, ERR_UNKNOWNMODE));
 
-			if (this->arguments[0][0] == '&')
+			if ((this->arguments[0][0] == '&' || this->arguments[0][0] == '#') && (this->arguments[1][1] == 'b' || this->arguments[1][1] == 'e' || this->arguments[1][1] == 'I'))
 			{
 				std::cout << "\nDEBUG: Здесь код для формата MODE &test +/-param or MODE &test +/-param <masks>\n";
 				ModeChannel *temp = curr_channel->getModeChannel();
-				if (this->arguments.size() == 2 && (this->arguments[1][1] == 'b' || this->arguments[1][1] == 'e' || this->arguments[1][1] == 'I'))
+				if (this->arguments.size() == 2)
 				{
 					std::cout << "\nDEBUG: Здесь код для формата MODE &test +/-param\n";
 					if (this->arguments[1][0] == '+')
@@ -269,7 +269,7 @@ cmd_mode(IRC& irc, int fd)
 							temp->invite_masks.clear();
 					}
 				}
-				else if (this->arguments.size() == 3 && (this->arguments[1][1] == 'b' || this->arguments[1][1] == 'e' || this->arguments[1][1] == 'I'))
+				else if (this->arguments.size() == 3)
 				{
 					std::cout << "\nDEBUG: Здесь код для формата MODE &test +/-param <mask>\n";
 					if (this->arguments[1][0] == '+')
