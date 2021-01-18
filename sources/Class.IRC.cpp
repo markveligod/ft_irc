@@ -6,7 +6,7 @@
 # define FD_CLIENT_SSL 3
 # define FD_SERVER_SSL 4
 
-# define COMM_COUNT 19
+# define COMM_COUNT 20
 
 # define CERTIFICATE "cert/cert.pem"
 # define PRIVATE_KEY "cert/key.pem"
@@ -16,6 +16,14 @@
 ** Constructors
 ** ----------------------------------------------------------
 */
+
+CmdStats::
+CmdStats() {}
+
+CmdStats::
+CmdStats(string cmd_name) : cmd_name(cmd_name),
+							count(0),
+							byte_count(0) {}
 
 IRC::
 IRC() {}
@@ -43,6 +51,7 @@ IRC(string network_ip,
 	this->generate_map_codes();
 	utils::print_line("Constructor IRC done!");
 	utils::print_line("Socket local done!");
+	generate_map_cmd_stats();
 }
 
 IRC::
@@ -137,7 +146,8 @@ do_command(Command* command, int fd)
 									"KICK",
 									"PRIVMSG",
 									"AWAY",
-									"NOTICE"
+									"NOTICE",
+									"STATS"
 									};
 	doCommand	cmd_func[COMM_COUNT] = {&Command::cmd_nick,
 										&Command::cmd_pass,
@@ -157,16 +167,32 @@ do_command(Command* command, int fd)
 										&Command::cmd_kick,
 										&Command::cmd_privmsg,
 										&Command::cmd_away,
-										&Command::cmd_notice
+										&Command::cmd_notice,
+										&Command::cmd_stats
 										};
 
-	int i = IRC::find_fd(_clients, fd);
 	const string& comm = command->getCommand();
+	int client_el = IRC::find_fd(_clients, fd);
+	int server_el = IRC::find_fd(_servers, fd);
+
+
+	for (int i = 0; i < COMM_COUNT; i++)
+	{
+		if (is_equal(cmd_name[i], comm))
+		{
+			map_cmd_stats[cmd_name[i]].count++;
+			if (server_el < 0)
+				_clients[client_el]->fill_map_cmd(cmd_name[i]);
+			else
+				_servers[server_el]->fill_map_cmd(cmd_name[i]);
+			break;
+		}
+	}
 
 	if (!(is_equal(comm, "PASS")
-		|| (i >= 0 && _clients[i]->getPassword()
+		|| (client_el >= 0 && _clients[client_el]->getPassword()
 			&& (is_equal(comm, "NICK") || is_equal(comm, "USER") || is_equal(comm, "SERVER")))	// client entered correct pass
-		|| IRC::find_fd(_servers, fd) >= 0								// client is registred as Server
+		|| server_el >= 0								// client is registred as Server
 		|| IRC::find_fd(_users, fd) >= 0))								// client is registred as User
 	{
 		string message = ":" + _server_name + " " +
@@ -535,6 +561,9 @@ get_clients()				{ return _clients; }
 vector<Server*>& IRC::
 get_servers()				{ return _servers; }
 
+map<string, CmdStats> &IRC::
+get_map_cmd_stats()			{return map_cmd_stats; }
+
 const string& IRC::
 get_server_name()			{ return _server_name; }
 
@@ -602,6 +631,21 @@ response_2(int response_code, int fd, string command, string message)
 					+ code + " "
 					+ server_name + " "
 					+ command
+					+ message
+					+ "\r\n";
+	return response;
+}
+
+string IRC::
+response_3(int response_code, string name, string command, string message)
+{
+	string code 		= utils::int_to_str(response_code);
+
+	string response = ":"
+					+ _server_name + " "
+					+ code + " "
+					+ name + " "
+					+ command + " "
 					+ message
 					+ "\r\n";
 	return response;
@@ -704,6 +748,37 @@ push_mess_client(int fd, int code)
 ** generate_map_codes - генерирует стандартные коды ошибок в мапу map_codes
 **==========================
 */
+
+
+void IRC::
+generate_map_cmd_stats()
+{
+	string cmd_name[COMM_COUNT] = {"NICK",
+								   "PASS",
+								   "USER",
+								   "SERVER",
+								   "JOIN",
+								   "OPER",
+								   "QUIT",
+								   "PART",
+								   "NAMES",
+								   "SQUIT",
+								   "WHO",
+								   "TOPIC",
+								   "PING",
+								   "PONG",
+								   "MODE",
+								   "KICK",
+								   "PRIVMSG",
+								   "AWAY",
+								   "NOTICE",
+								   "STATS"};
+
+	for (int i = 0; i < COMM_COUNT; i++)
+	{
+		map_cmd_stats.insert(std::make_pair<string, CmdStats>(cmd_name[i], CmdStats(cmd_name[i])));
+	}
+}
 
 void IRC::
 generate_map_codes()

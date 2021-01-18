@@ -101,6 +101,18 @@ getIsServer() const				{ return  (this->is_server); }
 const string& Client::
 getHostname() const				{ return (this->hostname); }
 
+std::map<string, int> &Client::
+getMapCmd()						{ return (this->map_cmd); }
+
+void Client::
+fill_map_cmd(string const &cmd_name)
+{
+	if (map_cmd.count(cmd_name) == 0)
+		map_cmd.insert(std::make_pair<string, int>(cmd_name, 1));
+	else
+		map_cmd[cmd_name] = map_cmd[cmd_name] + 1;
+}
+
 /*
 ** ----------------------------------------------------------
 ** Набор функций для парсинга незавершенных команд:

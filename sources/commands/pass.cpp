@@ -39,12 +39,11 @@ cmd_pass(IRC& irc, int fd)
 	bool res;
 	vector<Client*>& clients	= irc.get_clients();
 	vector<Server*>& servers 	= irc.get_servers();
-
+	
 	//if (!(check_args_number(1)))
 	//	return (ERR_NEEDMOREPARAMS);
 
-	if ((i = IRC::find_fd(clients, fd)) < 0 &&
-		(IRC::find_fd(servers, fd)) < 0)
+	if ((i = IRC::find_fd(clients, fd)) < 0)
 		return (0);								// по идее, такой ситуации быть не может
 
 	if (clients[i]->getPassword() || IRC::find_fd(servers, fd) >= 0)

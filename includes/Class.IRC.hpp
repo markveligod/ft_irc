@@ -29,6 +29,17 @@ using utils::is_equal;
 class Channel;
 class Command;
 
+struct CmdStats
+{
+	string				cmd_name;
+	int					count;
+	int					byte_count;
+	map<int, int>		fd_count;
+
+	CmdStats();
+	CmdStats(string cmd_name);
+};
+
 class IRC
 {
 	private:
@@ -61,6 +72,7 @@ class IRC
 		SSL_CTX*					_ctx;
 
 		map<int, string> 			map_codes;
+		map<string, CmdStats>		map_cmd_stats;
 
 	public:
 		IRC();
@@ -112,6 +124,7 @@ class IRC
 		const Socket&				get_socket() const;
 		channel_map&				get_channels();
 		Channel*					get_channel(string channel_name);
+		map<string, CmdStats>&		get_map_cmd_stats();
 		bool						is_empty_queue() const;
 		bool						is_server(int fd) const;
 		bool						is_server_operator(const User*) const;
@@ -125,6 +138,7 @@ class IRC
 		string						full_name(const User*) const;
 		string						response(int response_code, int client_fd, string message_prefix, string message);
 		string						response_2(int response_code, int fd, string command, string message);
+		string						response_3(int response_code, string name, string command, string message);
 		int							push_mess_client(int fd, int code);
 		void						forward_to_servers(int fd, const string& message, bool prefix);
 		void						forward_to_servers_2(int fd, const string& prefix, const string& message);
@@ -133,6 +147,7 @@ class IRC
 		void						forward_to_channel(int fd, const string& channel_name, const string& message);
 
 		void generate_map_codes();
+		void generate_map_cmd_stats();
 		void print_channels() const; //DEBUG
 };
 

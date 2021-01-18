@@ -207,7 +207,6 @@ cmd_nick(IRC& irc, int fd)
 
 			utils::print_line("Nickname changed " + clients[curr_client]->getName() + " -> " + this->arguments[0]);
 		}
-		
 		clients[curr_client]->setNickname(this->arguments[0]);
 	}
 

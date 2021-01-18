@@ -128,7 +128,6 @@ cmd_server(IRC& irc, int fd)
 		new_server = new Server(fd, this->arguments[0], atoi(this->arguments[1].c_str()), this->arguments[3]);
 	servers.push_back(new_server);
 
-
 // Вывод сообщения о созданном сервере
 	std::stringstream out_message;
 	out_message << "New server registered!"

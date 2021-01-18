@@ -16,15 +16,16 @@
 class Server
 {
 	private:
-		int					_fd_socket;
-		string				_server_name;
-		string				_host_name;
-		int					_hopcount;
-		string				_info;
-		vector<User*>		_users;
-		vector<Client*>		_clients;
+		int						_fd_socket;
+		string					_server_name;
+		string					_host_name;
+		int						_hopcount;
+		string					_info;
+		vector<User*>			_users;
+		vector<Client*>			_clients;
 		// vector<Channel>		_channels;
-		string				_buffer;
+		string					_buffer;
+		std::map<string, int>	map_cmd;
 
 		Server();
 		Server(const Server& other);
@@ -45,5 +46,6 @@ class Server
 		void				addClient(Client* new_client);
 		string 				get_line_break();
 		bool				find_line_break();
+		void				fill_map_cmd(string const & cmd_name);
 };
 

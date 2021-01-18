@@ -42,6 +42,8 @@ private:
 	void						user_create(Client* curr_client, vector<User*>& users, Server* curr_server);
 	int							user_check_errors(IRC& irc, int fd);
 
+	void						stats_m(IRC& irc, int fd, Client* client);
+
 	void						join_channel(IRC& irc, const string& name, const string& key, User* user, int fd);
 
 	vector<Client*>::iterator	find_fd(vector<Client*>& vect, int fd);
@@ -81,6 +83,7 @@ public:
 	int					cmd_privmsg(IRC& irc, int fd);
 	int					cmd_away(IRC& irc, int fd);
 	int					cmd_notice(IRC& irc, int fd);
+	int					cmd_stats(IRC& irc, int fd);
 
 	const string&		getCommand() const;
 	const string&		getMessage() const;
