@@ -38,7 +38,7 @@ public:
 	void				connection();
 	void				connection_server();
 	void				chat();
-	void				close_connection();
+	void				close_connectionion();
 	void				send_to_server();
 	void set_buffer(char const* buffer) { strcpy(this->buffer, buffer);};
 };

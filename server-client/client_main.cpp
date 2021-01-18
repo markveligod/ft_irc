@@ -13,7 +13,7 @@ int main(int ac, char **av)
 	client.connection();
 	while (1)
 		client.chat();
-	client.close_connection();
+	client.close_connectionion();
 
 	return (0);
 }

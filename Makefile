@@ -5,10 +5,10 @@ YELLOW=\033[1;33m
 CYAN=\033[1;36m
 RESET=\033[0m
 
-CC		= clang++
+CC		= clang++ 
 RM		= rm -rf
 DEBUG	= -g
-FLAGS	= -Wall -Wextra -Werror -MMD -I/usr/local/opt/openssl/include #-std=c++98
+FLAGS	= -Wall -Wextra -Werror -MMD -I/usr/local/opt/openssl/include -std=c++98
 SSL		= -lssl -lcrypto -L/usr/local/opt/openssl/lib
 INCLUDES= -I ./includes
 

@@ -361,17 +361,67 @@ _recv(int connection_type, int fd, char* response, size_t size, int flags)
 		n = SSL_read(_ssl, reinterpret_cast<void*>(response), size);
 	
 	if (n == 0 || n < 0)
-		this->close_connect(fd, n);
+		this->close_connection(fd, n);
 	return n;
 }
 
-void IRC::close_connect(int fd, int n)
+void IRC::close_connection(int fd, int n)
 {
 	this->delete_client(fd);
 	this->delete_user(fd);
 
 	utils::print_line((n == 0 ? "connection closed" : "message receiving failed"));
 	_array_fd_select.erase(fd);
+	close(fd);
+}
+
+void IRC::
+close_connection(User* user)
+{
+	if (!user) return;
+
+	int fd = user->getSocketFd();
+	Client* client = get_client(user);
+
+	if (!is_server(fd))
+	{
+		_array_fd_select.erase(fd);
+		close(fd);
+	}
+	
+	vector<User*>::iterator it1 = find(_users.begin(), _users.end(), user);
+	_users.erase(it1);
+
+	vector<Client*>::iterator it2 = find(_clients.begin(), _clients.end(), client);
+	_clients.erase(it2);
+
+	delete user;
+	delete client;
+
+	utils::print_line("connection closed");
+}
+
+void IRC::
+close_connection(Server* server)
+{
+	if (!server) return;
+
+	int fd = server->getSocketFd();
+	Client* client = get_client(server);
+
+	_array_fd_select.erase(fd);
+	close(fd);
+	
+	vector<Server*>::iterator it1 = find(_servers.begin(), _servers.end(), server);
+	_servers.erase(it1);
+
+	vector<Client*>::iterator it2 = find(_clients.begin(), _clients.end(), client);
+	_clients.erase(it2);
+
+	delete server;
+	delete client;
+
+	utils::print_line("connection closed");
 }
 
 /*
@@ -558,11 +608,32 @@ get_users() 				{ return _users; }
 vector<Client*>& IRC::
 get_clients()				{ return _clients; }
 
+Client* IRC::
+get_client(User* user)
+{
+	int i = find_name(_clients, user->getName());
+	return (i >= 0) ? _clients[i] : NULL;
+}
+
+Client* IRC::
+get_client(Server* server)
+{
+	int i = find_fd(_clients, server->getSocketFd());
+	return (i >= 0) ? _clients[i] : NULL;
+}
+
+User* IRC::
+get_user(Client *client)
+{
+	int i = IRC::find_name(_users, client->getName());
+	return (i >=0) ? _users[i] : NULL;
+}
+
 vector<Server*>& IRC::
 get_servers()				{ return _servers; }
 
 map<string, CmdStats> &IRC::
-get_map_cmd_stats()			{return map_cmd_stats; }
+get_map_cmd_stats()			{ return map_cmd_stats; }
 
 const string& IRC::
 get_server_name()			{ return _server_name; }
@@ -599,13 +670,6 @@ get_channel(string channel_name) {
 	return (it != channels.end())
 			? &(it->second)
 			: NULL;
-}
-
-User* IRC::
-get_user(Client *client)
-{
-	int i = IRC::find_name(_users, client->getName());
-	return (i >=0) ? _users[i] : NULL;
 }
 
 const string& IRC::

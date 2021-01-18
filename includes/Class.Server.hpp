@@ -23,7 +23,6 @@ class Server
 		string					_info;
 		vector<User*>			_users;
 		vector<Client*>			_clients;
-		// vector<Channel>		_channels;
 		string					_buffer;
 		std::map<string, int>	map_cmd;
 

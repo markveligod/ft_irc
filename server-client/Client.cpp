@@ -90,7 +90,7 @@ void	Client::send_to_server()
 	send(this->client, this->buffer, BUFFER_SIZE, 0);
 }
 
-void	Client::close_connection()
+void	Client::close_connectionion()
 {
 	close(this->client);
 	std::cout << "\nEnd\n";
