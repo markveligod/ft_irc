@@ -16,14 +16,15 @@
 #include "Class.Channel.hpp"
 #include "Class.Server.hpp"
 
-typedef std::map<string, Channel>			channel_map;
-typedef std::map<string, Channel>::iterator	channel_iterator;
+typedef std::map<string, Channel, utils::less>				channel_map;
+typedef std::map<string, Channel, utils::less>::iterator	channel_iterator;
 
 using std::map;
 using std::string;
 using std::vector;
 using std::pair;
 using std::queue;
+using utils::is_equal;
 
 class Channel;
 class Command;

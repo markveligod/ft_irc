@@ -54,7 +54,7 @@ nick_available(std::vector<T> vect, const std::string& nick)
 {
 	for (size_t i = 0; i < vect.size(); i++)
 	{
-		if (vect[i]->getName() == nick)
+		if (is_equal(vect[i]->getName(), nick))
 		{
 			utils::print_error(ERR_NICKNAME, "Nickname is already in use");
 			return false;

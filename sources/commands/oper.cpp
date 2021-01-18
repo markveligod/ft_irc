@@ -46,10 +46,6 @@ cmd_oper(IRC& irc, int fd)
 		string operator_mask = irc.get_operator_user();
 		string user_name = irc.get_user(fd)->getName().substr(0, n) + "*";
 
-		std::cout << "MASK " << operator_mask << std::endl;
-		std::cout << "NAME " << user_name << std::endl;
-		std::cout << "ARG " << arguments[0] << std::endl;
-
 		if (arguments[0] == operator_mask && user_name == operator_mask)
 		{
 			vec_users[pos]->setMode('o');

@@ -159,5 +159,17 @@ namespace utils
 		return (ss.str());
 	}
 
+	/*
+	**==========================
+	** is_equal - сравнивает без учета регистра
+	**==========================
+	*/
+
+	bool
+	is_equal(std::string s1, std::string s2)
+	{
+		utils::less comp;
+		return !(comp(s1, s2)) && !comp(s2, s1);
+	}	
 	
 } //namespace

@@ -12,14 +12,14 @@ using std::map;
 
 struct ModeChannel
 {
-	bool	private_mode;
-	bool	secret_mode;
-	bool	invite_only_mode;
-	bool	moderated_mode;
-	bool	limit_users_mode;
-	bool	key_mode;
-	bool	ban_mode;
-	bool	topic_only_oper_mode;
+	bool	p;	// private_mode
+	bool	s;	// secret_mode
+	bool	i;	// invite_only_mode
+	bool	t;	// topic_only_oper_mode
+	bool	m;	// moderated_mode
+	bool	l;	// limit_users_mode
+	bool	b;	// ban_mode
+	bool	k;	// key_mode
 
 	bool	a; // a - переключить флаг анонимного канала;
 	bool	n; // n - переключить отсутствие сообщений на канал от клиентов снаружи;
@@ -53,8 +53,9 @@ public:
 	const string&			getName() const;
 	const string&			get_key() const;
 	const string&			get_topic() const;
-	user_map&	get_users();
-	ModeChannel &			getModeChannel();
+	user_map&				get_users();
+	ModeChannel&			getModeChannel();
+	bool					getModeChannel(char mode);
 
 	void					set_topic(const string& topic);
 	void					set_operator(User* user);

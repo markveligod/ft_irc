@@ -19,7 +19,7 @@ server_available(vector<Server *> &servers, string const &server_name) const
 
 	while (v_begin != v_end)
 	{
-		if ((*v_begin)->getName() == server_name)
+		if (is_equal((*v_begin)->getName(), server_name))
 			return (0);
 		v_begin++;
 	}

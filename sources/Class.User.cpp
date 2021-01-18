@@ -15,7 +15,9 @@ ModeUser() : a(false),
 			 w(false),
 			 r(false),
 			 o(false),
-			 O(false) {}
+			 O(false),
+			 v(false),
+			 away_message(string()) {}
 
 ModeUser::
 ModeUser(const ModeUser& src) { *this = src; }
@@ -29,6 +31,8 @@ operator=(const ModeUser& src)
 	r = src.r;
 	o = src.o;
 	O = src.O;
+	v = src.v;
+	away_message = string();
 
 	return* this;
 }
@@ -172,6 +176,25 @@ getRealname() const						{ return (this->realname); }
 
 const ModeUser& User::
 getMode() const							{ return mode; }
+
+bool User::
+getMode(char m) const
+{
+	switch (m)
+	{	
+		case 'a': return mode.a;
+		case 'i': return mode.i;
+		case 'w': return mode.w;
+		case 'r': return mode.r;
+		case 'o': return mode.o;
+		case 'O': return mode.O;
+		case 'v': return mode.v;
+		default: return false;
+	}
+}
+
+const string& User::
+getAway() const							{ return mode.away_message; }
 
 size_t User::
 getChannelCount() const					{ return (this->channel_count); }

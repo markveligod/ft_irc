@@ -51,7 +51,6 @@ _socket() {
 
 	if ((_fd = socket(_sin_family, _type, _protocol)) < 0)
 		utils::exit_error(ERR_SOCKET, "Establishing socket error");
-	//fcntl(_fd, F_SETFL, O_NONBLOCK); //TODO с этим не работает подсоединение к серверу
 	return _fd;
 }
 
@@ -72,6 +71,7 @@ _connect() {
 
 	if ((res = connect(_fd, reinterpret_cast<struct sockaddr*>(&_addr), _addr_size)) < 0)
 		utils::exit_error(ERR_CONNECT_TO_SERVER, "Unable to connect to server");
+	fcntl(_fd, F_SETFL, O_NONBLOCK); //TODO с этим не работает подсоединение к серверу
 	return res;
 }
 
@@ -92,7 +92,7 @@ _accept() {
 
 	if ((client = accept(_fd, reinterpret_cast<struct sockaddr*>(&_addr), &_addr_size)) < 0)
 		utils::exit_error(ERR_ACCEPT, "Accepting error");
-	fcntl(client, F_SETFL, O_NONBLOCK); // TODO
+	// fcntl(client, F_SETFL, O_NONBLOCK); // TODO
 	return client;
 }
 

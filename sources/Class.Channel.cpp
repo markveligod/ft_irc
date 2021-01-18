@@ -34,8 +34,29 @@ get_topic() const									{ return _topic; }
 user_map& Channel::
 get_users()											{ return _users; }
 
-ModeChannel&	Channel::
+ModeChannel& Channel::
 getModeChannel() 									{ return (this->_mode);}
+
+bool Channel::
+getModeChannel(char mode)
+{
+	switch (mode)
+	{
+		case 'p': return _mode.p;
+		case 's': return _mode.s;
+		case 'i': return _mode.i;
+		case 't': return _mode.t;
+		case 'm': return _mode.m;
+		case 'l': return _mode.l;
+		case 'b': return _mode.b;
+		case 'k': return _mode.k;
+		case 'a': return _mode.a;
+		case 'n': return _mode.n;
+		case 'q': return _mode.q;
+		case 'r': return _mode.r;
+		default: return false;
+	}
+}
 
 void Channel::
 set_topic(const string& topic)						{ _topic = topic; }
@@ -84,22 +105,22 @@ is_banned(User* user) const
 }
 
 bool Channel::
-is_valid_key(const string& key) const				{ return key == _key; }
+is_valid_key(const string& key) const				{ return is_equal(key, _key); }
 
 bool Channel::
-is_private() const	 								{ return _mode.private_mode; }
+is_private() const	 								{ return _mode.p; }
 
 bool Channel::
-is_secret() const 									{ return _mode.secret_mode; }
+is_secret() const 									{ return _mode.s; }
 
 bool Channel::
-is_invite_only() const 								{ return _mode.invite_only_mode; }
+is_invite_only() const 								{ return _mode.i; }
 
 bool Channel::
-is_moderated() const 								{ return _mode.moderated_mode; }
+is_moderated() const 								{ return _mode.m; }
 
 bool Channel::
-is_topic_only_oper() const 							{ return _mode.topic_only_oper_mode; }
+is_topic_only_oper() const 							{ return _mode.t; }
 
 bool Channel::
 is_user_in_channel(User* user) const				{ return _users.count(user); }

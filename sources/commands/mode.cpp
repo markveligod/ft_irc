@@ -116,13 +116,13 @@ void change_mode_channel(Channel *chan, const char param, bool res)
 	*/
 	switch (param)
 	{
-		case 'i': chan->getModeChannel().invite_only_mode = res;
+		case 'i': chan->getModeChannel().i = res;
 			break;
-		case 'm': chan->getModeChannel().moderated_mode = res;
+		case 'm': chan->getModeChannel().m = res;
 			break;
-		case 'p': chan->getModeChannel().private_mode = res;
+		case 'p': chan->getModeChannel().p = res;
 			break;
-		case 's': chan->getModeChannel().secret_mode = res;
+		case 's': chan->getModeChannel().s = res;
 			break;
 		case 'a': chan->getModeChannel().a = res;
 			break;
@@ -132,7 +132,7 @@ void change_mode_channel(Channel *chan, const char param, bool res)
 			break;
 		case 'r': chan->getModeChannel().r = res;
 			break;
-		case 't': chan->getModeChannel().topic_only_oper_mode = res;
+		case 't': chan->getModeChannel().t = res;
 			break;
 		default:
 			break;

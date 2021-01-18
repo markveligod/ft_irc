@@ -22,6 +22,7 @@ struct ModeUser
 	bool o;
 	bool O;
 	bool v;
+	string away_message;
 
 	ModeUser();
 	ModeUser(const ModeUser&);
@@ -67,6 +68,8 @@ public:
 	const string&	getServername() const;
 	const string&	getRealname() const;
 	const ModeUser&	getMode() const;
+	bool			getMode(char mode) const;
+	const string&	getAway() const;
 	size_t			getChannelCount() const;
 	// int				getFd() const;
 	// int				getHopcount() const;

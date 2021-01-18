@@ -23,6 +23,7 @@
 										// which is mode +n or (b) not a chanop (or mode +v) on
 										// a channel which has mode +m set and is trying to send
 										// a PRIVMSG message to that channel.
+#define ERR_CANNOTSENDTOCHAN_MESS	" :Cannot send to channel"
 
 #define ERR_TOOMANYCHANNELS			405		// "<channel name> :You have joined too many channels"
 										// - Sent to a user when they have joined the maximum
@@ -45,8 +46,11 @@
 #define ERR_NOORIGIN_MESS			" :No origin specified"
 
 #define ERR_NORECIPIENT				411		// ":No recipient given (<command>)"
+#define ERR_NORECIPIENT_MESS		" :No recipient"
 
 #define ERR_NOTEXTTOSEND			412		// ":No text to send"
+#define ERR_NOTEXTTOSEND_MESS		" :No text to send"
+
 #define ERR_NOTOPLEVEL				413		// "<mask> :No toplevel domain specified"
 #define ERR_WILDTOPLEVEL			414		// "<mask> :Wildcard in toplevel domain"
 										// 412 - 414 are returned by PRIVMSG to indicate that
@@ -214,6 +218,7 @@
 #define RPL_NONE					300		// Dummy reply number. Not used.
 
 #define RPL_AWAY					301		// "<nick> :<away message>"
+#define RPL_AWAY_MESS				" :<away message>"
 
 #define RPL_USERHOST				302		// ":[<reply>{<space><reply>}]"
 										// - Reply format used by USERHOST to list replies to

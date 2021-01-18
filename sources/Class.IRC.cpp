@@ -6,7 +6,7 @@
 # define FD_CLIENT_SSL 3
 # define FD_SERVER_SSL 4
 
-# define COMM_COUNT 16
+# define COMM_COUNT 17
 
 # define CERTIFICATE "cert/cert.pem"
 # define PRIVATE_KEY "cert/key.pem"
@@ -134,7 +134,9 @@ do_command(Command* command, int fd)
 									"PING",
 									"PONG",
 									"MODE",
-									"KICK"};
+									"KICK",
+									"PRIVMSG"
+									};
 	doCommand	cmd_func[COMM_COUNT] = {&Command::cmd_nick,
 										&Command::cmd_pass,
 										&Command::cmd_user,
@@ -150,16 +152,15 @@ do_command(Command* command, int fd)
 										&Command::cmd_ping,
 										&Command::cmd_pong,
 										&Command::cmd_mode,
-										&Command::cmd_kick};
-
-	string comm = command->getCommand();
-	std::transform(comm.begin(), comm.end(), comm.begin(), toupper);
+										&Command::cmd_kick,
+										&Command::cmd_privmsg};
 
 	int i = IRC::find_fd(_clients, fd);
+	const string& comm = command->getCommand();
 
-	if (!(comm == "PASS"
+	if (!(is_equal(comm, "PASS")
 		|| (i >= 0 && _clients[i]->getPassword()
-			&& (comm == "NICK" || comm == "USER" || comm == "SERVER"))	// client entered correct pass
+			&& (is_equal(comm, "NICK") || is_equal(comm, "USER") || is_equal(comm, "SERVER")))	// client entered correct pass
 		|| IRC::find_fd(_servers, fd) >= 0								// client is registred as Server
 		|| IRC::find_fd(_users, fd) >= 0))								// client is registred as User
 	{
@@ -172,7 +173,7 @@ do_command(Command* command, int fd)
 
 	for (int i = 0; i < COMM_COUNT; i++)
 	{
-		if (cmd_name[i] == comm)
+		if (is_equal(cmd_name[i], comm))
 		{
 			utils::print_command(fd, command->getMessage());
 			result = (command->*(cmd_func[i]))(*this, fd);
@@ -383,21 +384,11 @@ ssl_connection(int fd)
 	if(!(_ssl = SSL_new(_ctx)))
 		utils::exit_error(1, "SSL: init failed\n");
 
-	int i = SSL_set_fd(_ssl, fd);
-	std::cout << "SSL_set_fd :" << i << std::endl;
-	if (i < 0)
+	if (SSL_set_fd(_ssl, fd) <= 0)
 		utils::exit_error(1, "SSL: SSL_set_fd failed\n");
 
-	i = SSL_accept(_ssl);
-	std::cout << "SSL_accept :" << i << std::endl;
-	if (i < 0)
+	if (SSL_accept(_ssl) < 0)		/* do SSL-protocol accept */
 		utils::exit_error(1, "SSL: SSL_accept failed\n");
-
-	// if (SSL_set_fd(_ssl, fd) <= 0)
-	// 	utils::exit_error(1, "SSL: SSL_set_fd failed\n");
-
-	// if (SSL_accept(_ssl) < 0)		/* do SSL-protocol accept */
-	// 	utils::exit_error(1, "SSL: SSL_accept failed\n");
 
 	return _ssl;
 }
@@ -480,7 +471,7 @@ check_buffer(int fd, const char* buffer)
 		while (ptr_server->find_line_break())
 		{
 			string temp_str = ptr_server->get_line_break();
-			if (temp_str == "CAP LS")
+			if (is_equal(temp_str, "CAP LS"))
 				continue;
 			temp_vec.push_back(temp_str);
 		}
@@ -493,7 +484,7 @@ check_buffer(int fd, const char* buffer)
 		while (ptr_client->find_line_break())
 		{
 			string temp_str = ptr_client->get_line_break();
-			if (temp_str == "CAP LS")
+			if (is_equal(temp_str, "CAP LS"))
 				continue;
 			temp_vec.push_back(temp_str);
 		}

@@ -18,7 +18,7 @@ int IRC::find_name(T& cont, const std::string& name)
 
 	while (v_begin != cont.end())
 	{
-		if ((*v_begin)->getName() == name)
+		if (is_equal((*v_begin)->getName(),name))
 			return (i);
 		v_begin++;
 		i++;
