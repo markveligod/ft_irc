@@ -70,7 +70,7 @@ IRC(string network_ip,
 	this->generate_map_codes();
 	utils::print_line("Constructor IRC done!");
 	utils::print_line("Socket local done!");
-	generate_map_cmd_stats();
+	//generate_map_cmd_stats();
 }
 
 IRC::
@@ -194,10 +194,11 @@ do_command(Command* command, int fd)
 	int client_el					= IRC::find_fd(_clients, fd);
 	int server_el					= IRC::find_fd(_servers, fd);
 
+	this->statistics.recieved(comm, command->getMessage());
 	if (server_el >= 0)
-		_servers[server_el]->getStatistics().recieved(comm, command->getMessage(), map_cmd_stats);
+		_servers[server_el]->getStatistics().recieved(comm, command->getMessage());
 	else if (client_el >= 0)
-		_clients[client_el]->getStatistics().recieved(comm, command->getMessage(), map_cmd_stats);
+		_clients[client_el]->getStatistics().recieved(comm, command->getMessage());
 
 	if (!(is_equal(comm, "PASS")
 		|| (client_el >= 0 && _clients[client_el]->getPassword()
@@ -279,7 +280,20 @@ check_fd_select()
 		if (FD_ISSET(it->first, &_fd_set_write))
 		{
 			// std::cout << "DEBUG: Сообщение отправлено клиенту: " << _command_queue.front().second.substr(0, _command_queue.front().second.size() - 1) << std::endl;
-			
+			int server_el = IRC::find_fd(_servers, it->first);
+			int client_el = IRC::find_fd(_clients, it->first);
+
+			if (server_el >= 0)
+			{
+				_servers[server_el]->getStatistics().sent(_command_queue.front().second);
+				_servers[server_el]->getStatistics().queued(_command_queue.front().second, false);
+			}
+			else
+			{
+				_clients[client_el]->getStatistics().sent(_command_queue.front().second);
+				_clients[client_el]->getStatistics().queued(_command_queue.front().second, false);
+			}
+
 			_send(it->second, it->first, _command_queue.front().second.c_str(), strlen(_command_queue.front().second.c_str()), 0);
 			_command_queue.pop();
 		}
@@ -594,10 +608,14 @@ push_cmd_queue(int fd, const string& str)
 {
 	int server_el = IRC::find_fd(_servers, fd);
 	int client_el = IRC::find_fd(_clients, fd);
+
 	if (server_el >= 0)
-		_servers[server_el]->getStatistics().sent(str);
+		_servers[server_el]->getStatistics().queued(str, true);
+	//_servers[server_el]->getStatistics().sent(str);
 	else
-		_clients[client_el]->getStatistics().sent(str);
+		_clients[client_el]->getStatistics().queued(str, true);
+	//_clients[client_el]->getStatistics().sent(str);
+
 	std::cout << CYAN << "QUEUE #" << fd << ": " << YELLOW << str.substr(0, str.size() - 2) << RESET << std::endl;
 	this->_command_queue.push(std::make_pair(fd, str));
 }
@@ -651,8 +669,8 @@ get_user(Client *client)
 vector<Server*>& IRC::
 get_servers()				{ return _servers; }
 
-map<string, CmdStats> &IRC::
-get_map_cmd_stats()			{ return map_cmd_stats; }
+// map<string, CmdStats> &IRC::
+// get_map_cmd_stats()			{ return map_cmd_stats; }
 
 Server* IRC::
 get_server(int fd)			{ return _servers[find_fd(_servers, fd)]; }
@@ -693,6 +711,9 @@ get_channel(string channel_name) {
 			? &(it->second)
 			: NULL;
 }
+
+Statistics & IRC::
+get_statistics()			{ return statistics; }
 
 const string& IRC::
 get_nickname(int fd)						{ return _users[find_fd(_users, fd)]->getName(); }
@@ -834,37 +855,6 @@ push_mess_client(int fd, int code)
 ** generate_map_codes - генерирует стандартные коды ошибок в мапу map_codes
 **==========================
 */
-
-
-void IRC::
-generate_map_cmd_stats()
-{
-	string cmd_name[COMM_COUNT] = {"NICK",
-								   "PASS",
-								   "USER",
-								   "SERVER",
-								   "JOIN",
-								   "OPER",
-								   "QUIT",
-								   "PART",
-								   "NAMES",
-								   "SQUIT",
-								   "WHO",
-								   "TOPIC",
-								   "PING",
-								   "PONG",
-								   "MODE",
-								   "KICK",
-								   "PRIVMSG",
-								   "AWAY",
-								   "NOTICE",
-								   "STATS"};
-
-	for (int i = 0; i < COMM_COUNT; i++)
-	{
-		map_cmd_stats.insert(std::make_pair<string, CmdStats>(cmd_name[i], CmdStats(cmd_name[i])));
-	}
-}
 
 void IRC::
 generate_map_codes()

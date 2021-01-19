@@ -63,6 +63,7 @@ class IRC
 		SSL_CTX*					_ctx;
 
 		map<int, string> 			map_codes;
+		Statistics					statistics;
 
 	public:
 		IRC();
@@ -121,7 +122,7 @@ class IRC
 		const Socket&				get_socket() const;
 		channel_map&				get_channels();
 		Channel*					get_channel(string channel_name);
-		map<string, CmdStats>&		get_map_cmd_stats();
+		Statistics &				get_statistics();
 		bool						is_empty_queue() const;
 		bool						is_server(int fd) const;
 		bool						is_server_operator(const User*) const;
@@ -146,11 +147,7 @@ class IRC
 		void						forward_to_channel(int fd, const string& channel_name, const string& message);
 
 		void generate_map_codes();
-		void generate_map_cmd_stats();
-		void statistics_recv(Command *command, int fd);
-		void statistics_sent(int fd, const string &str);
 		void print_channels() const; //DEBUG
-		map<string, CmdStats> map_cmd_stats;
 };
 
 #include "../Class.IRC.templates.cpp"
