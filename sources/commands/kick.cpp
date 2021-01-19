@@ -73,13 +73,15 @@ int Command::cmd_kick(IRC& irc, int fd)
 				continue;
 			}
 
-			chann->get_users().erase(usr);
-
 			string exit_message = (arguments.size() == 3) ? arguments[2] : oper->getName();
 			string mess_to_user = 		irc.full_name(oper)   + " KICK " + channels[i] + " " + usr->getName();
 			string mess_to_server =		":" + oper->getName() + " KICK " + channels[i] + " " + usr->getName();
 			irc.forward_to_channel(fd, channels[i], mess_to_user);
 			irc.forward_to_servers(fd, mess_to_server, true);
+			if (!irc.is_server(fd))
+				irc.push_cmd_queue(fd, mess_to_user + "\r\n");
+
+			chann->get_users().erase(usr);
 
 			if (chann->get_users().empty())
 				irc.get_channels().erase(channels[i]);
@@ -126,13 +128,16 @@ int Command::cmd_kick(IRC& irc, int fd)
 				continue;
 			}
 
-			chann->get_users().erase(usr);
-
 			string exit_message = (arguments.size() == 3) ? arguments[2] : oper->getName();
 			string mess_to_user = 		irc.full_name(oper)   + " KICK " + chann_name + " " + usr->getName();
 			string mess_to_server =		":" + oper->getName() + " KICK " + chann_name + " " + usr->getName();
 			irc.forward_to_channel(fd, chann_name, mess_to_user);
 			irc.forward_to_servers(fd, mess_to_server, true);
+
+			if (!irc.is_server(fd))
+				irc.push_cmd_queue(fd, mess_to_user + "\r\n");
+
+			chann->get_users().erase(usr);
 
 			if (chann->get_users().empty())
 				irc.get_channels().erase(chann_name);
