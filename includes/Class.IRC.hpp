@@ -97,6 +97,7 @@ class IRC
 		void 						close_connection(int fd, int n);
 		void 						close_connection(User* user);
 		void 						close_connection(Server* server);
+		void 						close_connection(Client* client);
 
 		vector<string> 				check_buffer(int fd, const char* buffer);
 
@@ -105,6 +106,7 @@ class IRC
 		User*						get_user(Client* client);
 		vector<User*>& 				get_users();
 		vector<Client*>& 			get_clients();
+		Client*						get_client(int fd);
 		Client*						get_client(User* user);
 		Client*						get_client(Server* user);
 		vector<Server*>& 			get_servers();

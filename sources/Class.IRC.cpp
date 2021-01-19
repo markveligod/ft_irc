@@ -384,7 +384,12 @@ void IRC::close_connection(int fd, int n)
 	if (is_server(fd))
 		close_connection(get_server(fd));
 	else
-		close_connection(get_user(fd));
+	{
+		if (get_user(fd))
+			close_connection(get_user(fd));
+		else
+			close_connection(get_client(fd));
+	}
 }
 
 void IRC::
@@ -392,45 +397,38 @@ close_connection(User* user)
 {
 	if (!user) return;
 
-	int fd = user->getSocketFd();
-	Client* client = get_client(user);
-
-	if (!is_server(fd))
-	{
-		_array_fd_select.erase(fd);
-		close(fd);
-	}
-	
 	vector<User*>::iterator it1 = find(_users.begin(), _users.end(), user);
 	_users.erase(it1);
-
-	vector<Client*>::iterator it2 = find(_clients.begin(), _clients.end(), client);
-	_clients.erase(it2);
-
 	delete user;
-	delete client;
 
-	utils::print_line("connection closed");
+	close_connection(get_client(user));
 }
 
 void IRC::
 close_connection(Server* server)
 {
 	if (!server) return;
-
-	int fd = server->getSocketFd();
-	Client* client = get_client(server);
-
-	_array_fd_select.erase(fd);
-	close(fd);
 	
 	vector<Server*>::iterator it1 = find(_servers.begin(), _servers.end(), server);
 	_servers.erase(it1);
+	delete server;
+
+	close_connection(get_client(server));
+}
+
+void IRC::
+close_connection(Client* client)
+{
+
+	int fd = client->getSocketFd();
+	if (!is_server(fd))
+	{
+		_array_fd_select.erase(fd);
+		close(fd);
+	}
 
 	vector<Client*>::iterator it2 = find(_clients.begin(), _clients.end(), client);
 	_clients.erase(it2);
-
-	delete server;
 	delete client;
 
 	utils::print_line("connection closed");
@@ -625,6 +623,9 @@ get_users() 				{ return _users; }
 
 vector<Client*>& IRC::
 get_clients()				{ return _clients; }
+
+Client* IRC::
+get_client(int fd)			{ return _clients[find_fd(_clients, fd)]; }
 
 Client* IRC::
 get_client(User* user)
