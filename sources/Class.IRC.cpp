@@ -368,8 +368,8 @@ _recv(int connection_type, int fd, char* response, size_t size, int flags)
 void IRC::close_connection(int fd, int n)
 {
 	if (n)
-	utils::print_line("message receiving failed");
-	
+		utils::print_line("message receiving failed");
+		
 	if (is_server(fd))
 		close_connection(get_server(fd));
 	else
