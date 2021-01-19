@@ -193,7 +193,7 @@ void push_info(IRC& irc, std::string mess)
 	for (size_t i = 0; i < vec_servers.size(); i++)
 		irc.forward_to_servers(vec_servers[i]->getSocketFd(), mess, true);
 	for (size_t i = 0; i < vec_users.size(); i++)
-		irc.push_cmd_queue(vec_users[i]->getSocketFd(), mess);
+		irc.push_cmd_queue(vec_users[i]->getSocketFd(), mess + "\r\n");
 }
 
 int Command::
@@ -223,7 +223,7 @@ cmd_mode(IRC& irc, int fd)
 		//режим канала
 		
 		//проверяем какие флаги нам подали
-		if (check_keys_of_channel_mod(this->arguments[1]))
+		if (check_keys_of_channel_mod(this->arguments[1]) && this->arguments.size() == 2)
 		{
 			//флаги для переключения
 
@@ -394,7 +394,7 @@ cmd_mode(IRC& irc, int fd)
 					if (this->arguments[1][0] == '+')
 					{
 						for (size_t i = 0; i < ch->getModeChannel()->ban_masks.size(); i++)
-							irc.push_cmd_queue(fd, ch->getModeChannel()->ban_masks[i]);
+							irc.push_cmd_queue(fd, ch->getModeChannel()->ban_masks[i] + "\r\n");
 					}
 					else
 						ch->getModeChannel()->ban_masks.clear();
@@ -405,7 +405,7 @@ cmd_mode(IRC& irc, int fd)
 					if (this->arguments[1][0] == '+')
 					{
 						for (size_t i = 0; i < ch->getModeChannel()->exception_masks.size(); i++)
-							irc.push_cmd_queue(fd, ch->getModeChannel()->exception_masks[i]);
+							irc.push_cmd_queue(fd, ch->getModeChannel()->exception_masks[i] + "\r\n");
 					}
 					else
 						ch->getModeChannel()->exception_masks.clear();
@@ -416,7 +416,7 @@ cmd_mode(IRC& irc, int fd)
 					if (this->arguments[1][0] == '+')
 					{
 						for (size_t i = 0; i < ch->getModeChannel()->invite_masks.size(); i++)
-							irc.push_cmd_queue(fd, ch->getModeChannel()->invite_masks[i]);
+							irc.push_cmd_queue(fd, ch->getModeChannel()->invite_masks[i] + "\r\n");
 					}
 					else
 						ch->getModeChannel()->invite_masks.clear();
