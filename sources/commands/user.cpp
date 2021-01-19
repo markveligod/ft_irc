@@ -122,10 +122,10 @@ cmd_user(IRC& irc, int fd)
 	// Если сообщение от сервера
 	if (server_el >= 0)
 	{
-		if (server_el_name <= 0)
+		if (server_el_name < 0)
 			arguments[2] = irc.get_server_name();
 		client_el = IRC::find_name(clients, this->prefix);
-		if (server_el_name <= 0)
+		if (server_el_name < 0)
 			this->user_create(clients[client_el], users, servers[server_el]);
 		else
 			this->user_create(clients[client_el], users, servers[server_el_name]);
