@@ -52,6 +52,7 @@ cmd_topic(IRC& irc, int fd)
 			string mess_to_user = 	irc.full_name(user) + " TOPIC " + chann->getName() + " :" + arguments[1];
 			string mess_to_server =	":" + user->getName() + " TOPIC " + chann->getName() + " :" + arguments[1];
 
+			irc.push_cmd_queue(fd, mess_to_user + "\r\n");
 			irc.forward_to_channel(fd,*chann, mess_to_user);
 			irc.forward_to_servers(fd, mess_to_server, true);
 		}
