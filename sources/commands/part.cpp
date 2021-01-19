@@ -64,7 +64,7 @@ leave_channel(IRC& irc, Channel& channel, int fd, string message)
 		user->dec_channel_count();
 		all_users.erase(user);
 		
-		string message1 = (":" + irc.full_name(user))
+		string message1 = (irc.full_name(user))
 							   + " PART " + channel.getName() + message;
 		string message2 =  ":" + user->getName()
 							   + " PART " + channel.getName() + message;

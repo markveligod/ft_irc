@@ -32,7 +32,7 @@ int Command::cmd_notice(IRC& irc, int fd)
 	{
 		string message1 = ":" + sender->getName() + " " + "NOTICE" + " " +
 							 recepients[i] + " " + ":" + arguments[1] + "\r\n";
-		string message2 = ":" + irc.full_name(sender) + " " + "NOTICE" + " " +
+		string message2 = irc.full_name(sender) + " " + "NOTICE" + " " +
 							 recepients[i] + " " + ":" + arguments[1] + "\r\n";
 
 		Channel* channel = irc.get_channel(recepients[i]);
