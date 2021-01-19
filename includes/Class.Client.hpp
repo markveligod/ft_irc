@@ -1,7 +1,7 @@
-#ifndef CLASS_CLIENT_HPP
-# define CLASS_CLIENT_HPP
+#pragma once
 
 #include "main.hpp"
+#include "Class.Statistics.hpp"
 
 using std::string;
 
@@ -15,7 +15,7 @@ protected:
 	bool					password;
 	string					buffer;
 	bool					is_server;
-	std::map<string, int>	map_cmd;
+	Statistics				statistics;
 
 public:
 	Client(string const &hostname = "", int socket_fd = 0, int hopcount = 0);
@@ -36,12 +36,9 @@ public:
 	const string&			getBuffer() const;
 	bool					getIsServer() const;
 	const string&			getHostname() const;
-	std::map<string, int> &	getMapCmd();
+	Statistics &			getStatistics();
 
 	bool					find_line_break();
 	string					get_line_break();
 	bool					isempty_buffer();
-	void					fill_map_cmd(string const & cmd_name);
 };
-
-#endif

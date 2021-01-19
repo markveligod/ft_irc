@@ -8,7 +8,7 @@ RESET=\033[0m
 CC		= clang++
 RM		= rm -rf
 DEBUG	= -g
-FLAGS	= -Wall -Wextra -Werror -MMD -I/usr/local/opt/openssl/include #-std=c++98
+FLAGS	= -Wall -Wextra -Werror -MMD -I/usr/local/opt/openssl/include -std=c++98
 SSL		= -lssl -lcrypto -L/usr/local/opt/openssl/lib
 INCLUDES= -I ./includes
 
@@ -33,6 +33,7 @@ SRCS		= main.cpp \
 			Class.User.cpp \
 			Class.Channel.cpp \
 			Class.Server.cpp \
+			Class.Statistics.cpp \
 
 COMMS		= nick.cpp \
 			join.cpp \

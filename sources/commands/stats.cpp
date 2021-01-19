@@ -49,8 +49,9 @@ stats_m(IRC& irc, int fd, Client* client)
 	{
 		if ((*it).second.count != 0)
 		{
-			client_command = client->getMapCmd().find((*it).first);
-			if (client_command != client->getMapCmd().end())
+			client_command = client->getStatistics().getMapCmd().find((*it).first);
+			//client_command = client->getMapCmd().find((*it).first);
+			if (client_command != client->getStatistics().getMapCmd().end())
 				curr_count = (*client_command).second;
 			else
 				curr_count = 0;
@@ -63,6 +64,38 @@ stats_m(IRC& irc, int fd, Client* client)
 		}
 		it++;
 	}
+}
+
+void Command::
+stats_l(IRC& irc, int fd, Client* client)
+{
+	vector<Server *> & servers	= irc.get_servers();
+	vector<User *> & users 		= irc.get_users();
+	int	user_el 				= irc.find_name(users, client->getName());
+	std::stringstream out_mess;
+	string fullname;
+
+	for (int i = 0; i != (int)servers.size(); i++)
+	{
+		if (servers[i]->getHopcount() == 1)
+		{
+			out_mess << servers[i]->getStatistics().getSentCount() << " "
+					 << servers[i]->getStatistics().getSentKBytes() << " "
+					 << servers[i]->getStatistics().getRecvCount() << " "
+					 << servers[i]->getStatistics().getRecvKBytes() << " "
+					 << servers[i]->getStatistics().getWorkingTime();
+			irc.push_cmd_queue(fd, irc.response_3(211, client->getName(), servers[i]->getName(), out_mess.str()));
+			out_mess.str("");
+		}
+	}
+	out_mess << client->getStatistics().getSentCount() << " "
+			 << client->getStatistics().getSentKBytes() << " "
+			 << client->getStatistics().getRecvCount() << " "
+			 << client->getStatistics().getRecvKBytes() << " "
+			 << client->getStatistics().getWorkingTime();
+	fullname = client->getName() + "!~" + (user_el >= 0 ? users[user_el]->getUsername() : "*") + "@" + LOCALHOST;
+	irc.push_cmd_queue(fd, irc.response_3(211, client->getName(), fullname, out_mess.str()));
+	out_mess.str("");
 }
 
 int Command::
@@ -84,6 +117,8 @@ cmd_stats(IRC& irc, int fd)
 
 	if (arguments.size() && arguments[0] == "m")
 		stats_m(irc, fd, clients[client_el]);
+	else if (arguments.size() && arguments[0] == "l")
+		stats_l(irc, fd, clients[client_el]);
 
 	irc.push_cmd_queue(fd, irc.response_3(RPL_ENDOFSTATS, clients[client_el]->getName(), arguments.size() ? arguments[0] : "*", ":End of STATS report"));
 	return (0);

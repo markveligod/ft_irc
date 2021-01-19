@@ -30,4 +30,5 @@ namespace utils
 	void print_command(int fd, std::string msg);
 	std::string int_to_str(int num);
 	bool is_equal(std::string s1, std::string s2);
+	unsigned long get_time();
 }

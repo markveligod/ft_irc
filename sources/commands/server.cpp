@@ -123,7 +123,10 @@ cmd_server(IRC& irc, int fd)
 
 // Создаем новый сервер
 	if (server_el < 0)
+	{
 		new_server = new Server(fd, this->arguments[0], atoi(this->arguments[1].c_str()), this->arguments[2]);
+		new_server->getStatistics() = clients[client_el]->getStatistics();
+	}
 	else
 		new_server = new Server(fd, this->arguments[0], atoi(this->arguments[1].c_str()), this->arguments[3]);
 	servers.push_back(new_server);
@@ -172,7 +175,7 @@ cmd_server(IRC& irc, int fd)
 			}
 		}
 		new_server->setBuffer(clients[client_el]->getBuffer());
-		irc.delete_client(fd);
+		//irc.delete_client(fd);
 		utils::print_line("DEBUG: Client deleted (as it is a new connection)");
 	}
 

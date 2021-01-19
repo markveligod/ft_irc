@@ -1,5 +1,4 @@
-#ifndef CLASS_USER_HPP
-# define CLASS_USER_HPP
+#pragma once
 
 #include "main.hpp"
 #include "Class.Client.hpp"
@@ -81,5 +80,3 @@ public:
 	void			inc_channel_count();
 	void			dec_channel_count();
 };
-
-#endif

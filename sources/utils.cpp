@@ -170,6 +170,16 @@ namespace utils
 	{
 		utils::less comp;
 		return !(comp(s1, s2)) && !comp(s2, s1);
-	}	
-	
+	}
+
+	unsigned long
+	get_time()
+	{
+		time_t seconds = time(NULL);
+		std::stringstream ss;
+
+		ss << seconds;
+		return (atoi(ss.str().c_str()));
+	}
+
 } //namespace

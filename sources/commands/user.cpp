@@ -136,7 +136,7 @@ cmd_user(IRC& irc, int fd)
 		arguments[2] = irc.get_server_name();
 		this->user_create(clients[client_el], users, NULL);
 	}
-
+	
 	User *curr_user = users[users.size() - 1];
 	std::stringstream out_message;
 	out_message << "NICK " << curr_user->getNickname() << " " << (curr_user->getHopcount() + 1) << "\r\n";

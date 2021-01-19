@@ -12,6 +12,7 @@
 #include "main.hpp"
 #include "Class.User.hpp"
 #include "Class.Channel.hpp"
+#include "Class.Statistics.hpp"
 
 class Server
 {
@@ -23,9 +24,8 @@ class Server
 		string					_info;
 		vector<User*>			_users;
 		vector<Client*>			_clients;
-		// vector<Channel>		_channels;
 		string					_buffer;
-		std::map<string, int>	map_cmd;
+		Statistics				statistics;
 
 		Server();
 		Server(const Server& other);
@@ -46,6 +46,6 @@ class Server
 		void				addClient(Client* new_client);
 		string 				get_line_break();
 		bool				find_line_break();
-		void				fill_map_cmd(string const & cmd_name);
+		Statistics &		getStatistics();
 };
 

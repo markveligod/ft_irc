@@ -66,13 +66,17 @@ nick_available(std::vector<T> vect, const std::string& nick)
 int Command::
 nick_check_errors(int fd, int serv_client, IRC& irc)
 {
-	std::vector<Client *> &clients = irc.get_clients();
-	// Если слишком много аргументов
+	std::vector<Client *> &clients	= irc.get_clients();
+	int		client_el 				= irc.find_fd(clients, fd);
+	string	nick_name				= (clients[client_el]->getName().empty() ? "*" : clients[client_el]->getName());
 
-	if (arguments.size() > 2)
+	// (Если слишком много аргументов) или (Если 2 аргумента от клиента) или (Если 1 аргумент от сервера (и нет префикса))
+	if (arguments.size() > 2 ||
+		(arguments.size() == 2 && serv_client < 0) ||
+		(serv_client >= 0 && arguments.size() == 1 && prefix.empty()))
 	{
 		utils::print_error(ERR_NEEDMOREPARAMS, "Too much arguments");
-		irc.push_cmd_queue(fd, irc.response_2(ERR_NEEDMOREPARAMS, fd, "NICK", " :Syntax error"));
+		irc.push_cmd_queue(fd, irc.response_3(ERR_NEEDMOREPARAMS, nick_name, "NICK", ":Syntax error"));
 		return (ERR_NEEDMOREPARAMS);
 	}
 
@@ -80,30 +84,14 @@ nick_check_errors(int fd, int serv_client, IRC& irc)
 	if (arguments.size() == 0)
 	{
 		utils::print_error(ERR_NONICKNAMEGIVEN, "No nickname");
-		irc.push_cmd_queue(fd, irc.response(ERR_NONICKNAMEGIVEN, fd, "*", ERR_NONICKNAMEGIVEN_MESS));
+		irc.push_cmd_queue(fd, irc.response_3(ERR_NONICKNAMEGIVEN, nick_name, "NICK", ":No nickname given"));
 		return (ERR_NONICKNAMEGIVEN);
-	}
-
-	// Если 2 аргумента от клиента
-	if (arguments.size() == 2 && serv_client < 0)
-	{
-		utils::print_error(ERR_NEEDMOREPARAMS, "Too much arguments");
-		irc.push_cmd_queue(fd, irc.response_2(ERR_NEEDMOREPARAMS, fd, "NICK", " :Syntax error"));
-		return (ERR_NEEDMOREPARAMS);
-	}
-
-	// Если 1 аргумент от сервера (и нет префикса)
-	if (serv_client >= 0 && arguments.size() == 1 && prefix.empty())
-	{
-		utils::print_error(ERR_NEEDMOREPARAMS, "Too few arguments");
-		irc.push_cmd_queue(fd, irc.response_2(ERR_NEEDMOREPARAMS, fd, "NICK", ERR_NEEDMOREPARAMS_MESS));
-		return (ERR_NEEDMOREPARAMS);
 	}
 
 	// Если ник невалидный
 	if (!this->nick_valid())
 	{
-		irc.push_cmd_queue(fd, irc.response(ERR_ERRONEUSNICKNAME, fd, arguments[0], ERR_ERRONEUSNICKNAME_MESS));
+		irc.push_cmd_queue(fd, irc.response_3(ERR_ERRONEUSNICKNAME, nick_name, arguments[0], ":Erroneus nickname"));
 		return (ERR_ERRONEUSNICKNAME);
 	}
 
@@ -111,7 +99,7 @@ nick_check_errors(int fd, int serv_client, IRC& irc)
 	if (IRC::find_name(clients, this->arguments[0]) >= 0 && serv_client >= 0)
 	{
 		utils::print_error(ERR_NICKCOLLISION, "Nick collision (this nickname already in use)");
-		irc.push_cmd_queue(fd, irc.response(ERR_NICKCOLLISION, fd, arguments[0], ERR_NICKCOLLISION_MESS));
+		irc.push_cmd_queue(fd, irc.response_3(ERR_NICKCOLLISION, nick_name, arguments[0], ":Nickname collision KILL"));
 		return (ERR_NICKCOLLISION);
 	}
 
@@ -119,7 +107,7 @@ nick_check_errors(int fd, int serv_client, IRC& irc)
 	if (IRC::find_name(clients, this->arguments[0]) >= 0 && serv_client < 0)
 	{
 		utils::print_error(ERR_NICKNAMEINUSE, "Nickname is already in use");
-		irc.push_cmd_queue(fd, irc.response(ERR_NICKNAMEINUSE, fd, arguments[0], ERR_NICKNAMEINUSE_MESS));
+		irc.push_cmd_queue(fd, irc.response_3(ERR_NICKNAMEINUSE, nick_name, arguments[0], ":Nickname already in use"));
 		return (ERR_NICKNAMEINUSE);
 	}
 
@@ -199,8 +187,9 @@ cmd_nick(IRC& irc, int fd)
 				prefix = clients[curr_client]->getName();
 			if ((curr_user = IRC::find_name(users, prefix)) >= 0)
 			{
+				string full_name = irc.full_name(users[curr_user]);
 				users[curr_user]->setNickname(arguments[0]);
-				irc.push_cmd_queue(fd, irc.full_name(users[curr_user]) + " NICK :" + this->arguments[0] + "\r\n");
+				irc.push_cmd_queue(fd, full_name + " NICK :" + this->arguments[0] + "\r\n");
 			}
 			out_mess << "NICK " << arguments[0];
 			irc.forward_to_servers_2(fd, prefix, out_mess.str());
