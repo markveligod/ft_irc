@@ -898,6 +898,7 @@ generate_map_codes()
 	map_codes.insert(std::make_pair<int, std::string>(474, " :Cannot join channel (+b)"));
 	map_codes.insert(std::make_pair<int, std::string>(475, " :Cannot join channel (+k)"));
 	map_codes.insert(std::make_pair<int, std::string>(481, " :Permission Denied- You're not an IRC operator"));
+	map_codes.insert(std::make_pair<int, std::string>(482, " :You're not channel operator"));
 	map_codes.insert(std::make_pair<int, std::string>(483, " :You cant kill a server!"));
 	map_codes.insert(std::make_pair<int, std::string>(491, " :No O-lines for your host"));
 	map_codes.insert(std::make_pair<int, std::string>(501, " :Unknown MODE flag"));

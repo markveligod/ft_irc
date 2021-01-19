@@ -203,7 +203,7 @@ cmd_mode(IRC& irc, int fd)
 	std::cout << "DEBUG: arg:\n";
 	for (size_t i = 0; i < this->arguments.size(); i++)
 		std::cout << "Index # " << i << " arg: " << this->arguments[i] << std::endl;
-	
+
 	// проверяем на соответствие количеству args
 	if (!this->check_args_number(2) && !this->check_args_number(3))
 		return (irc.push_mess_client(fd, ERR_NEEDMOREPARAMS));
@@ -213,11 +213,7 @@ cmd_mode(IRC& irc, int fd)
 	if (oper_user == NULL)
 		return (irc.push_mess_client(fd, ERR_USERSDONTMATCH));
 
-	//проверяем на наличие операторских прав
-	if (oper_user->getMode('o') == false)
-		return (irc.push_mess_client(fd, 300));
-
-	//проверяем в каком режими нам работать
+	//проверяем в каком режиме нам работать
 	if (this->arguments[0][0] == '#' || this->arguments[0][0] == '&')
 	{
 		//режим канала
@@ -232,6 +228,14 @@ cmd_mode(IRC& irc, int fd)
 			if (ch == NULL)
 				return (irc.push_mess_client(fd, ERR_NOSUCHCHANNEL));
 			
+			//проверяем, что oper_user находится в канале
+			user_map& users = ch->get_users();
+			if (!users.count(oper_user))
+				return (irc.push_mess_client(fd, ERR_NOSUCHNICK));
+			//проверяем на наличие операторских прав (в канале!, не на сервере)
+			if (!users[oper_user].o)
+				return (irc.push_mess_client(fd, ERR_CHANOPRIVSNEEDED));
+
 			//меняем моды для итераторной позиции канала
 			for (size_t i = 1; i < this->arguments[1].size(); i++)
 			{
