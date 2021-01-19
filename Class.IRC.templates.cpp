@@ -41,3 +41,18 @@ int IRC::find_fd(T& cont, int fd)
 	}
 	return (-1);
 }
+
+template <typename T>
+int IRC::find_fd_count(T &cont, int fd)
+{
+	typename T::const_iterator v_begin = cont.begin();
+	int i = 0;
+
+	while (v_begin != cont.end())
+	{
+		if ((*v_begin)->getSocketFd() == fd)
+			i++;
+		v_begin++;
+	}
+	return (i);
+}

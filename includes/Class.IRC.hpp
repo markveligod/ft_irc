@@ -15,6 +15,7 @@
 #include "Class.User.hpp"
 #include "Class.Channel.hpp"
 #include "Class.Server.hpp"
+#include "Class.Statistics.hpp"
 
 typedef std::map<string, Channel, utils::less>				channel_map;
 typedef std::map<string, Channel, utils::less>::iterator	channel_iterator;
@@ -28,17 +29,7 @@ using utils::is_equal;
 
 class Channel;
 class Command;
-
-struct CmdStats
-{
-	string				cmd_name;
-	int					count;
-	int					byte_count;
-	map<int, int>		fd_count;
-
-	CmdStats();
-	CmdStats(string cmd_name);
-};
+class Statistics;
 
 class IRC
 {
@@ -72,7 +63,6 @@ class IRC
 		SSL_CTX*					_ctx;
 
 		map<int, string> 			map_codes;
-		map<string, CmdStats>		map_cmd_stats;
 
 	public:
 		IRC();
@@ -138,6 +128,8 @@ class IRC
 		static int					find_fd(T& container, int fd);
 		template <typename T>
 		static int					find_name(T& container, const string& nickname);
+		template <typename T>
+		static int 					find_fd_count(T &cont, int fd);
 
 		void 						push_cmd_queue(int fd, const string& str);
 		string						full_name(const User*) const;
@@ -153,7 +145,10 @@ class IRC
 
 		void generate_map_codes();
 		void generate_map_cmd_stats();
+		void statistics_recv(Command *command, int fd);
+		void statistics_sent(int fd, const string &str);
 		void print_channels() const; //DEBUG
+		map<string, CmdStats> map_cmd_stats;
 };
 
 #include "../Class.IRC.templates.cpp"

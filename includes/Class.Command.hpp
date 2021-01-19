@@ -43,6 +43,7 @@ private:
 	int							user_check_errors(IRC& irc, int fd);
 
 	void						stats_m(IRC& irc, int fd, Client* client);
+	void						stats_l(IRC& irc, int fd, Client* client);
 
 	void						join_channel(IRC& irc, const string& name, const string& key, User* user, int fd);
 
@@ -87,4 +88,5 @@ public:
 
 	const string&		getCommand() const;
 	const string&		getMessage() const;
+	const string&		getPrefix() const;
 };

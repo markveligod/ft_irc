@@ -41,6 +41,7 @@
 #include <fcntl.h>
 #include <netdb.h>
 #include <csignal>
+#include <ctime>
 
 /*
 **==========================
@@ -89,3 +90,5 @@
 //#include "Class.Message.hpp"
 //#include "Class.User.hpp"
 #include "codes.hpp"
+
+#define COMM_COUNT 20

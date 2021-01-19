@@ -33,6 +33,7 @@ SRCS		= main.cpp \
 			Class.User.cpp \
 			Class.Channel.cpp \
 			Class.Server.cpp \
+			Class.Statistics.cpp \
 
 COMMS		= nick.cpp \
 			join.cpp \

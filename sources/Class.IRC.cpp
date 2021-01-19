@@ -6,10 +6,29 @@
 # define FD_CLIENT_SSL 3
 # define FD_SERVER_SSL 4
 
-# define COMM_COUNT 20
-
 # define CERTIFICATE "cert/cert.pem"
 # define PRIVATE_KEY "cert/key.pem"
+
+std::string g_cmd_name[COMM_COUNT] = {"NICK",
+									  "PASS",
+									  "USER",
+									  "SERVER",
+									  "JOIN",
+									  "OPER",
+									  "QUIT",
+									  "PART",
+									  "NAMES",
+									  "SQUIT",
+									  "WHO",
+									  "TOPIC",
+									  "PING",
+									  "PONG",
+									  "MODE",
+									  "KICK",
+									  "PRIVMSG",
+									  "AWAY",
+									  "NOTICE",
+									  "STATS"};
 
 /*
 ** ----------------------------------------------------------
@@ -171,28 +190,19 @@ do_command(Command* command, int fd)
 										&Command::cmd_stats
 										};
 
-	const string& comm = command->getCommand();
-	int client_el = IRC::find_fd(_clients, fd);
-	int server_el = IRC::find_fd(_servers, fd);
+	const string & comm 			= command->getCommand();
+	int client_el					= IRC::find_fd(_clients, fd);
+	int server_el					= IRC::find_fd(_servers, fd);
 
-
-	for (int i = 0; i < COMM_COUNT; i++)
-	{
-		if (is_equal(cmd_name[i], comm))
-		{
-			map_cmd_stats[cmd_name[i]].count++;
-			if (server_el < 0)
-				_clients[client_el]->fill_map_cmd(cmd_name[i]);
-			else
-				_servers[server_el]->fill_map_cmd(cmd_name[i]);
-			break;
-		}
-	}
+	if (server_el >= 0)
+		_servers[server_el]->getStatistics().recieved(comm, command->getMessage(), map_cmd_stats);
+	else if (client_el >= 0)
+		_clients[client_el]->getStatistics().recieved(comm, command->getMessage(), map_cmd_stats);
 
 	if (!(is_equal(comm, "PASS")
 		|| (client_el >= 0 && _clients[client_el]->getPassword()
 			&& (is_equal(comm, "NICK") || is_equal(comm, "USER") || is_equal(comm, "SERVER")))	// client entered correct pass
-		|| server_el >= 0								// client is registred as Server
+		|| IRC::find_fd(_servers, fd) >= 0								// client is registred as Server
 		|| IRC::find_fd(_users, fd) >= 0))								// client is registred as User
 	{
 		string message = ":" + _server_name + " " +
@@ -269,6 +279,7 @@ check_fd_select()
 		if (FD_ISSET(it->first, &_fd_set_write))
 		{
 			// std::cout << "DEBUG: Сообщение отправлено клиенту: " << _command_queue.front().second.substr(0, _command_queue.front().second.size() - 1) << std::endl;
+			
 			_send(it->second, it->first, _command_queue.front().second.c_str(), strlen(_command_queue.front().second.c_str()), 0);
 			_command_queue.pop();
 		}
@@ -289,7 +300,7 @@ check_fd_select()
 					it = _array_fd_select.begin();
 					continue;
 				}
-				buffer[n] = '\0';
+				buffer[n] = '\0';;
 				//получаем распарсенный вектор команд если нашли \r\n
 				vector<string> buffer_cmd = this->check_buffer(it->first, buffer);
 
@@ -583,6 +594,12 @@ check_buffer(int fd, const char* buffer)
 void IRC::
 push_cmd_queue(int fd, const string& str)
 {
+	int server_el = IRC::find_fd(_servers, fd);
+	int client_el = IRC::find_fd(_clients, fd);
+	if (server_el >= 0)
+		_servers[server_el]->getStatistics().sent(str);
+	else
+		_clients[client_el]->getStatistics().sent(str);
 	std::cout << CYAN << "QUEUE #" << fd << ": " << YELLOW << str.substr(0, str.size() - 2) << RESET << std::endl;
 	this->_command_queue.push(std::make_pair(fd, str));
 }
@@ -794,7 +811,7 @@ forward_to_channel(int fd, const string& channel_name, const string& message)
 string IRC::
 full_name(const User* user) const
 {
-	string fullname = ":" + user->getName() + "!" + user->getUsername() + "@" + user->getHostname();
+	string fullname = ":" + user->getName() + "!~" + user->getUsername() + "@" + user->getHostname();
 	return fullname;
 }
 

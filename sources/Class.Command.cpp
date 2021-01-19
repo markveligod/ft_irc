@@ -78,6 +78,9 @@ getCommand() const { return (this->command); }
 const string &Command::
 getMessage() const { return (this->message); }
 
+const string &Command::
+getPrefix() const { return (this->prefix); }
+
 bool Command::check_args_number(int n) const
 {
 	if ((int)this->arguments.size() != n)

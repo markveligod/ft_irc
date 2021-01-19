@@ -58,6 +58,9 @@ getInfo() const					{ return (this->_info); }
 const string& Server::
 getBuffer() const				{ return (this->_buffer); }
 
+Statistics & Server::
+getStatistics()					{ return (this->statistics); }
+
 // vector<Channel>& Server::
 // getChannels() 					{ return (this->_channels); }
 
@@ -72,12 +75,3 @@ addUser(User* new_user)			{ this->_users.push_back(new_user); }
 
 void Server::
 addClient(Client* new_client)	{ this->_clients.push_back(new_client); }
-
-void Server::
-fill_map_cmd(string const &cmd_name)
-{
-	if (map_cmd.count(cmd_name) == 0)
-		map_cmd.insert(std::make_pair<string, int>(cmd_name, 1));
-	else
-		map_cmd[cmd_name] = map_cmd[cmd_name] + 1;
-}
