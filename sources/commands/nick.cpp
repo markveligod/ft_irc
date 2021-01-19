@@ -187,9 +187,8 @@ cmd_nick(IRC& irc, int fd)
 				prefix = clients[curr_client]->getName();
 			if ((curr_user = IRC::find_name(users, prefix)) >= 0)
 			{
-				string full_name = irc.full_name(users[curr_user]);
+				irc.push_cmd_queue(fd, irc.full_name(users[curr_user]) + " NICK :" + this->arguments[0] + "\r\n");
 				users[curr_user]->setNickname(arguments[0]);
-				irc.push_cmd_queue(fd, full_name + " NICK :" + this->arguments[0] + "\r\n");
 			}
 			out_mess << "NICK " << arguments[0];
 			irc.forward_to_servers_2(fd, prefix, out_mess.str());
