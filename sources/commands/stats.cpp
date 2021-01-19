@@ -39,26 +39,25 @@
 void Command::
 stats_m(IRC& irc, int fd, Client* client)
 {
-	map<string, CmdStats>::iterator it = irc.get_map_cmd_stats().begin();
-	map<string, CmdStats>::iterator it_end = irc.get_map_cmd_stats().end();
-	map<string, int>::iterator client_command;
+	map<string, pair<int, unsigned long> >::iterator it		= irc.get_statistics().getMapCmd().begin();
+	map<string, pair<int, unsigned long> >::iterator it_end	= irc.get_statistics().getMapCmd().end();
+	map<string, pair<int, unsigned long> >::iterator client_command;
 	std::stringstream out_mess;
 	int curr_count;
 
 	while (it != it_end)
 	{
-		if ((*it).second.count != 0)
+		if ((*it).second.first != 0)
 		{
 			client_command = client->getStatistics().getMapCmd().find((*it).first);
-			//client_command = client->getMapCmd().find((*it).first);
 			if (client_command != client->getStatistics().getMapCmd().end())
-				curr_count = (*client_command).second;
+				curr_count = (*client_command).second.first;
 			else
 				curr_count = 0;
 
 			out_mess << curr_count << " "
-					 << (*it).second.byte_count << " "
-					 << (*it).second.count - curr_count;
+					 << (*it).second.second << " "
+					 << (*it).second.first - curr_count;
 			irc.push_cmd_queue(fd, irc.response_3(RPL_STATSCOMMANDS, client->getName(), (*it).first, out_mess.str()));
 			out_mess.str("");
 		}
@@ -69,9 +68,9 @@ stats_m(IRC& irc, int fd, Client* client)
 void Command::
 stats_l(IRC& irc, int fd, Client* client)
 {
-	vector<Server *> & servers	= irc.get_servers();
-	vector<User *> & users 		= irc.get_users();
-	int	user_el 				= irc.find_name(users, client->getName());
+	vector<Server *> & servers		= irc.get_servers();
+	vector<User *> & users 			= irc.get_users();
+	int	user_el 					= irc.find_name(users, client->getName());
 	std::stringstream out_mess;
 	string fullname;
 
@@ -79,7 +78,8 @@ stats_l(IRC& irc, int fd, Client* client)
 	{
 		if (servers[i]->getHopcount() == 1)
 		{
-			out_mess << servers[i]->getStatistics().getSentCount() << " "
+			out_mess << servers[i]->getStatistics().getQueueCount() << " "
+					 << servers[i]->getStatistics().getSentCount() << " "
 					 << servers[i]->getStatistics().getSentKBytes() << " "
 					 << servers[i]->getStatistics().getRecvCount() << " "
 					 << servers[i]->getStatistics().getRecvKBytes() << " "
@@ -88,7 +88,8 @@ stats_l(IRC& irc, int fd, Client* client)
 			out_mess.str("");
 		}
 	}
-	out_mess << client->getStatistics().getSentCount() << " "
+	out_mess << client->getStatistics().getQueueCount() << " "
+			 << client->getStatistics().getSentCount() << " "
 			 << client->getStatistics().getSentKBytes() << " "
 			 << client->getStatistics().getRecvCount() << " "
 			 << client->getStatistics().getRecvKBytes() << " "
