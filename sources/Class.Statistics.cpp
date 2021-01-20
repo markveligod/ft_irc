@@ -26,7 +26,7 @@ Statistics() :	sent_count(0),
 				recv_count(0),
 				sent_kbytes(0),
 				recv_kbytes(0),
-				start_time(utils::get_time()),
+				time_start(time(NULL)),
 				queue_count(0) {}
 
 Statistics::
@@ -34,10 +34,10 @@ Statistics(Statistics const &src) : sent_count(src.sent_count),
 									recv_count(src.recv_count),
 									sent_kbytes(src.sent_kbytes),
 									recv_kbytes(src.recv_kbytes),
-									start_time(src.start_time),
 									queue_count(src.queue_count)
 {
-	map_cmd = src.map_cmd;
+	time_start	= src.time_start;
+	map_cmd		= src.map_cmd;
 }
 
 Statistics &Statistics::
@@ -47,7 +47,7 @@ operator=(Statistics const &src)
 	recv_count	= src.recv_count;
 	sent_kbytes = src.sent_kbytes;
 	recv_kbytes = src.recv_kbytes;
-	start_time	= src.start_time;
+	time_start	= src.time_start;
 	queue_count = src.queue_count;
 	map_cmd		= src.map_cmd;
 
@@ -70,11 +70,26 @@ unsigned long Statistics::
 getRecvKBytes() const	{ return (this->recv_kbytes); }
 
 unsigned long Statistics::
-getWorkingTime() const	{ return (utils::get_time() - this->start_time); }
+getWorkingTime() const	
+{
+	time_t curr_time = time(NULL);
+	double diff = difftime(curr_time, time_start);
+
+	return ((unsigned long)diff);
+}
 
 map<string, pair<int, unsigned long> > &Statistics::
 getMapCmd()				{ return (this->map_cmd); }
 
+struct tm * Statistics::
+getWorkingTime_t() const {
+	time_t curr_time = time(NULL);
+	const time_t diff = difftime(curr_time, time_start);
+	struct tm *timeinfo;
+
+	timeinfo = localtime(&diff);
+	return (timeinfo);
+}
 
 void Statistics::
 queued(const string &str, bool add)

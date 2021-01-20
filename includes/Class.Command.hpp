@@ -44,6 +44,7 @@ private:
 
 	void						stats_m(IRC& irc, int fd, Client* client);
 	void						stats_l(IRC& irc, int fd, Client* client);
+	void						stats_u(IRC& irc, int fd, Client* client);
 
 	void						join_channel(IRC& irc, const string& name, const string& key, User* user, int fd);
 	void						leave_channel(IRC& irc, Channel& channels, int fd, string message);
