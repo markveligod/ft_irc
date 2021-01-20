@@ -205,19 +205,29 @@ push_info(IRC& irc, std::string mess)
 int Command::
 cmd_mode(IRC& irc, int fd)
 {
+	
 	std::cout << "\nDEBUG: prefix: " << this->prefix << std::endl;
 	std::cout << "DEBUG: arg:\n";
 	for (size_t i = 0; i < this->arguments.size(); i++)
 		std::cout << "Index # " << i << " arg: " << this->arguments[i] << std::endl;
 
-	// проверяем на соответствие количеству args
-	if (!this->check_args_number(2) && !this->check_args_number(3))
-		return (irc.push_mess_client(fd, ERR_NEEDMOREPARAMS));
-
 	//Находим клиента который обратился по команде MODE
 	User* oper_user = (prefix.size()) ? irc.get_user(prefix) : irc.get_user(fd);
 	if (oper_user == NULL)
 		return (irc.push_mess_client(fd, ERR_USERSDONTMATCH));
+
+	//костыль если нам подают один аргумент с названием канала
+	if ((this->arguments[0][0] == '#' || this->arguments[0][0] == '&') && this->arguments.size() == 1)
+	{
+		if (prefix.size() == 0)
+			push_info(irc, ":" + oper_user->getNickname() + " MODE " + this->arguments[0] + " +");
+		return (0);
+	}
+
+	// проверяем на соответствие количеству args
+	if (!this->check_args_number(2) && !this->check_args_number(3))
+		return (irc.push_mess_client(fd, ERR_NEEDMOREPARAMS));
+
 
 	//проверяем в каком режиме нам работать
 	if (this->arguments[0][0] == '#' || this->arguments[0][0] == '&')
@@ -439,7 +449,7 @@ cmd_mode(IRC& irc, int fd)
 	else
 	{
 		if (arguments.size() < 3)
-			return (irc.push_mess_client(fd, ERR_USERSDONTMATCH));
+			return (irc.push_mess_client(fd, ERR_NEEDMOREPARAMS));
 		//режим пользователя
 		std::cout << "\nDEBUG: Режим пользователя DONE!\n";
 		
