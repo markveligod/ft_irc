@@ -231,6 +231,9 @@ do_command(Command* command, int fd)
 			return (result);
 		}
 	}
+	if(is_numeric_response(*command))
+		return 0;
+	
 	this->push_cmd_queue(fd, this->response(ERR_UNKNOWNCOMMAND, fd, comm, ERR_UNKNOWNCOMMAND_MESS));
 	return 0;
 }
@@ -731,6 +734,31 @@ response_2(int response_code, int fd, string command, string message)
 					+ message
 					+ "\r\n";
 	return response;
+}
+
+bool IRC::
+is_numeric_response(const Command& command)
+{
+	if (										// пересылаем сообщения
+		command.getCommand() == "256" ||
+		command.getCommand() == "257" ||
+		command.getCommand() == "258" ||
+		command.getCommand() == "259" ||
+		command.getCommand() == "259"
+	)
+	{
+		const vector<string>& args = command.getArgs();
+		User* usr;
+
+		if (!args.empty() && ((usr = get_user(args[0]))))
+		{
+			push_cmd_queue(usr->getSocketFd(), command.getMessage() + "\r\n");
+			return true;
+		}
+	}
+	if (command.getCommand() == "421")			// игнорируем сообщение "Неизвестная команда"
+		return true;
+	return false;
 }
 
 string IRC::

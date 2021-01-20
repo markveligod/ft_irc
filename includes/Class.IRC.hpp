@@ -129,6 +129,7 @@ class IRC
 		bool						is_empty_queue() const;
 		bool						is_server(int fd) const;
 		bool						is_server_operator(const User*) const;
+		bool						is_numeric_response(const Command& command);
 
 		template <typename T>
 		static int					find_fd(T& container, int fd);
