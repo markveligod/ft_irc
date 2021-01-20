@@ -42,6 +42,7 @@ private:
 	void						user_create(Client* curr_client, vector<User*>& users, Server* curr_server);
 	int							user_check_errors(IRC& irc, int fd);
 
+	int							stats_check_errors(IRC &irc, int fd);
 	void						stats_m(IRC& irc, int fd, Client* client);
 	void						stats_l(IRC& irc, int fd, Client* client);
 	void						stats_u(IRC& irc, int fd, Client* client);

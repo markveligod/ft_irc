@@ -116,6 +116,36 @@ stats_l(IRC& irc, int fd, Client* client)
 }
 
 int Command::
+stats_check_errors(IRC &irc, int fd)
+{
+	vector<Client *> &clients = irc.get_clients();
+	vector<Server *> &servers = irc.get_servers();
+	int server_el = IRC::find_fd(servers, fd);
+
+
+	if (arguments.size() != 1 && arguments.size() != 2)
+	{
+		irc.push_cmd_queue(fd, irc.response_3(ERR_NEEDMOREPARAMS, "*", command, ":Syntax error"));
+		return (0);
+	}
+	// если сообщение от сервера
+	if (server_el >= 0)
+	{
+		if (prefix.empty())
+		{
+			irc.push_cmd_queue(fd, irc.response_3(ERR_NEEDMOREPARAMS, servers[server_el]->getName(), command, ":Syntax error"));
+			return (0);
+		}
+		if (irc.find_name(clients, prefix) < 0)
+		{
+			irc.push_cmd_queue(fd, irc.response_3(ERR_NEEDMOREPARAMS, prefix, command, ":Syntax error"));
+			return (0);
+		}
+	}
+	return (1);
+}
+
+int Command::
 cmd_stats(IRC& irc, int fd)
 {
 	vector<Client*>& clients					= irc.get_clients();
@@ -123,15 +153,12 @@ cmd_stats(IRC& irc, int fd)
 	int server_el								= IRC::find_fd(servers, fd);
 	int client_el								= IRC::find_fd(clients, fd);
 
+	if (stats_check_errors(irc, fd) != 1)
+		return (0);
+
 	// если сообщение от сервера
 	if (server_el >= 0)
-	{
-		if (prefix.empty())
-			return (0);
 		client_el = irc.find_name(clients, prefix);
-		if (client_el < 0)
-			return (0);
-	}
 
 	if  (arguments.size() == 1 || 
 		(arguments.size() == 2 && arguments[1] == irc.get_server_name()))
