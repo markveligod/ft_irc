@@ -73,15 +73,19 @@ find_fd(vector<Client*>& vect, int fd)
 */
 
 const string& Command::
-getCommand() const { return (this->command); }
+getCommand() const			{ return (this->command); }
 
 const string &Command::
-getMessage() const { return (this->message); }
+getMessage() const			{ return (this->message); }
 
 const string &Command::
-getPrefix() const { return (this->prefix); }
+getPrefix() const			{ return (this->prefix); }
 
-bool Command::check_args_number(int n) const
+const vector<string>& Command::
+getArgs() const				{ return this->arguments; }
+
+bool Command::
+check_args_number(int n) const
 {
 	if ((int)this->arguments.size() != n)
 		return false;
