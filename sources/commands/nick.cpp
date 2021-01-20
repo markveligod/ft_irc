@@ -88,7 +88,7 @@ cmd_nick(IRC& irc, int fd)
 				irc.push_cmd_queue(fd, irc.full_name(users[curr_user]) + " NICK :" + this->arguments[0] + "\r\n");
 				users[curr_user]->setNickname(arguments[0]);
 			}
-			out_mess << "NICK " << arguments[0];
+			out_mess << ":" << prefix << " " << "NICK " << arguments[0];
 			irc.forward_to_servers(fd, out_mess.str());
 
 			utils::print_line("Nickname changed " + clients[curr_client]->getName() + " -> " + this->arguments[0]);

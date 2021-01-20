@@ -438,24 +438,26 @@ cmd_mode(IRC& irc, int fd)
 	}
 	else
 	{
+		if (arguments.size() < 3)
+			return (irc.push_mess_client(fd, ERR_NEEDMOREPARAMS));
 		//режим пользователя
 		std::cout << "\nDEBUG: Режим пользователя DONE!\n";
 		
 		//проверяем поступившие ключи от оператора
-		if (!check_keys_of_users_mod(this->arguments[1]))
+		if (!check_keys_of_users_mod(this->arguments[2]))
 			return (irc.push_mess_client(fd, ERR_UNKNOWNMODE));
 
 		//пытаемся найти пользователя которому необходимо изменить моды
-		User* _user = irc.get_user(this->arguments[0]);
+		User* _user = irc.get_user(this->arguments[1]);
 		if (_user == NULL)
 			return (irc.push_mess_client(fd, ERR_USERSDONTMATCH));
 		
 		//меняем юзеру параметры
-		change_param_of_users_mod(_user, this->arguments[1][1], ((this->arguments[1][0] == '+') ? true : false));
+		change_param_of_users_mod(_user, this->arguments[2][1], ((this->arguments[2][0] == '+') ? true : false));
 
 		// если нет префикса шлем уведомление клиентам и серверам об изменение мода
 		if (prefix.size() == 0)
-			push_info(irc, ":" + oper_user->getNickname() + " MODE " + this->arguments[0] + " " + this->arguments[1] /*+ " " + this->arguments[2]*/);
+			push_info(irc, ":" + oper_user->getNickname() + " MODE " + this->arguments[0] + " " + this->arguments[1] + " " + this->arguments[2]);
 		std::cout << "\nDEBUG: param: " << this->arguments[1] << " DONE!\n";
 	}
 	

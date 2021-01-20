@@ -172,6 +172,7 @@ do_command(Command* command, int fd)
 									"STATS",
 									"TIME",
 									"ERROR",
+									"ADMIN",
 									};
 	doCommand	cmd_func[COMM_COUNT] = {&Command::cmd_nick,
 										&Command::cmd_pass,
@@ -194,7 +195,8 @@ do_command(Command* command, int fd)
 										&Command::cmd_notice,
 										&Command::cmd_stats,
 										&Command::cmd_time,
-										&Command::cmd_error
+										&Command::cmd_error,
+										&Command::cmd_admin,
 										};
 
 	const string & comm 			= command->getCommand();
@@ -265,7 +267,10 @@ void IRC::
 do_select()
 {
 	if ((_select_res = select(FD_SETSIZE, &_fd_set_read, &_fd_set_write, NULL, NULL)) < 0)
+	{
 		utils::print_error(ERR_SELECT, "SELECT");
+		perror("Select");
+	}
 }
 
 /*

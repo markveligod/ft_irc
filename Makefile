@@ -56,7 +56,8 @@ COMMS		= nick.cpp \
 			notice.cpp \
 			stats.cpp \
 			time.cpp \
-			error.cpp
+			error.cpp \
+			admin.cpp
 
 
 SRC			= $(addprefix $(SRC_DIR), $(SRCS))
