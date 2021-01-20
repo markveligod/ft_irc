@@ -37,6 +37,19 @@
 */
 
 void Command::
+stats_u(IRC& irc, int fd, Client* client)
+{
+	char buffer[20];
+	struct tm *work_time = irc.get_statistics().getWorkingTime_t();
+	std::stringstream out_mess;
+
+	work_time->tm_hour -= 3;
+	strftime(buffer, 20, "days %X", work_time);
+	out_mess << ":Server Up " << work_time->tm_yday << " " << buffer;
+	irc.push_cmd_queue(fd, irc.response_3(RPL_STATSCOMMANDS, client->getName(), "", out_mess.str()));
+}
+
+void Command::
 stats_m(IRC& irc, int fd, Client* client)
 {
 	map<string, pair<int, unsigned long> >::iterator it		= irc.get_statistics().getMapCmd().begin();
@@ -120,6 +133,8 @@ cmd_stats(IRC& irc, int fd)
 		stats_m(irc, fd, clients[client_el]);
 	else if (arguments.size() && arguments[0] == "l")
 		stats_l(irc, fd, clients[client_el]);
+	else if (arguments.size() && arguments[0] == "u")
+		stats_u(irc, fd, clients[client_el]);
 
 	irc.push_cmd_queue(fd, irc.response_3(RPL_ENDOFSTATS, clients[client_el]->getName(), arguments.size() ? arguments[0] : "*", ":End of STATS report"));
 	return (0);

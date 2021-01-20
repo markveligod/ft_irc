@@ -24,7 +24,7 @@ class Statistics
 		int										recv_count;
 		unsigned long							sent_kbytes;
 		unsigned long 							recv_kbytes;
-		unsigned long							start_time;
+		time_t									time_start;
 		int										queue_count;
 		map<string, pair<int, unsigned long> >	map_cmd;		// cmd_name - count - bytes
 
@@ -45,5 +45,6 @@ class Statistics
 		unsigned long		getSentKBytes() const;
 		unsigned long		getRecvKBytes() const;
 		unsigned long		getWorkingTime() const;
+		struct tm * 		getWorkingTime_t() const;
 		map<string, pair<int, unsigned long> >& getMapCmd();
 };

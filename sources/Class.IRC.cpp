@@ -712,7 +712,7 @@ get_channel(string channel_name) {
 }
 
 Statistics & IRC::
-get_statistics()			{ return statistics; }
+get_statistics()							{ return statistics; }
 
 const string& IRC::
 get_nickname(int fd)						{ return _users[find_fd(_users, fd)]->getName(); }
@@ -746,12 +746,13 @@ string IRC::
 response_3(int response_code, string name, string command, string message)
 {
 	string code 		= utils::int_to_str(response_code);
+	command = command.size() ? command + " " : command;
 
 	string response = ":"
 					+ _server_name + " "
 					+ code + " "
 					+ name + " "
-					+ command + " "
+					+ command
 					+ message
 					+ "\r\n";
 	return response;
