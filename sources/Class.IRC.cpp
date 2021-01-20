@@ -739,12 +739,15 @@ response_2(int response_code, int fd, string command, string message)
 bool IRC::
 is_numeric_response(const Command& command)
 {
-	if (										// пересылаем сообщения
+	if ( // пересылаем сообщения
 		command.getCommand() == "256" ||
 		command.getCommand() == "257" ||
 		command.getCommand() == "258" ||
 		command.getCommand() == "259" ||
-		command.getCommand() == "259"
+		command.getCommand() == "259" ||
+		command.getCommand() == "211" ||
+		command.getCommand() == "212" ||
+		command.getCommand() == "219"
 	)
 	{
 		const vector<string>& args = command.getArgs();

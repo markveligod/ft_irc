@@ -101,22 +101,26 @@ stats_l(IRC& irc, int fd, Client* client)
 			out_mess.str("");
 		}
 	}
-	out_mess << client->getStatistics().getQueueCount() << " "
-			 << client->getStatistics().getSentCount() << " "
-			 << client->getStatistics().getSentKBytes() << " "
-			 << client->getStatistics().getRecvCount() << " "
-			 << client->getStatistics().getRecvKBytes() << " "
-			 << client->getStatistics().getWorkingTime();
-	fullname = client->getName() + "!~" + (user_el >= 0 ? users[user_el]->getUsername() : "*") + "@" + LOCALHOST;
-	irc.push_cmd_queue(fd, irc.response_3(211, client->getName(), fullname, out_mess.str()));
-	out_mess.str("");
+	if (client->getHopcount() == 0)
+	{
+		out_mess << client->getStatistics().getQueueCount() << " "
+				<< client->getStatistics().getSentCount() << " "
+				<< client->getStatistics().getSentKBytes() << " "
+				<< client->getStatistics().getRecvCount() << " "
+				<< client->getStatistics().getRecvKBytes() << " "
+				<< client->getStatistics().getWorkingTime();
+		fullname = client->getName() + "!~" + (user_el >= 0 ? users[user_el]->getUsername() : "*") + "@" + LOCALHOST;
+		irc.push_cmd_queue(fd, irc.response_3(211, client->getName(), fullname, out_mess.str()));
+		out_mess.str("");
+	}
 }
 
 int Command::
 cmd_stats(IRC& irc, int fd)
 {
 	vector<Client*>& clients					= irc.get_clients();
-	int server_el								= IRC::find_fd(irc.get_servers(), fd);
+	vector<Server*>& servers					= irc.get_servers();
+	int server_el								= IRC::find_fd(servers, fd);
 	int client_el								= IRC::find_fd(clients, fd);
 
 	// если сообщение от сервера
@@ -129,13 +133,25 @@ cmd_stats(IRC& irc, int fd)
 			return (0);
 	}
 
-	if (arguments.size() && arguments[0] == "m")
-		stats_m(irc, fd, clients[client_el]);
-	else if (arguments.size() && arguments[0] == "l")
-		stats_l(irc, fd, clients[client_el]);
-	else if (arguments.size() && arguments[0] == "u")
-		stats_u(irc, fd, clients[client_el]);
+	if  (arguments.size() == 1 || 
+		(arguments.size() == 2 && arguments[1] == irc.get_server_name()))
+	{
+		if (arguments[0] == "m")
+			stats_m(irc, fd, clients[client_el]);
+		else if (arguments[0] == "l")
+			stats_l(irc, fd, clients[client_el]);
+		else if (arguments[0] == "u")
+			stats_u(irc, fd, clients[client_el]);
+		irc.push_cmd_queue(fd, irc.response_3(RPL_ENDOFSTATS, clients[client_el]->getName(), arguments[0], ":End of STATS report"));
+	}
+	else if (arguments.size() == 2)
+	{
+		server_el = IRC::find_name(servers, arguments[1]);
+		if (server_el < 0)
+			irc.push_cmd_queue(fd, irc.response_3(ERR_NOSUCHSERVER, clients[client_el]->getName(), arguments[1], ":No such server"));
+		else
+			irc.push_cmd_queue(servers[server_el]->getSocketFd(), (prefix.empty() ? ":" + clients[client_el]->getName() + " " : "") + message + "\r\n");
+	}
 
-	irc.push_cmd_queue(fd, irc.response_3(RPL_ENDOFSTATS, clients[client_el]->getName(), arguments.size() ? arguments[0] : "*", ":End of STATS report"));
 	return (0);
 }
