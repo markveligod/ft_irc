@@ -836,6 +836,17 @@ forward_to_channel(int fd, const string& channel_name, const string& message)
 	forward_to_channel(fd, channel, message);
 }
 
+void IRC::
+forward_to_all_channels(User* user, const string& message)
+{
+	for (channel_iterator it = _channels.begin(); it != _channels.end(); it++)
+	{
+		user_map users = it->second.get_users();
+		if (users.count(user))
+			forward_to_channel(user->getSocketFd(), it->first, message);
+	}
+}
+
 string IRC::
 full_name(const User* user) const
 {

@@ -45,9 +45,13 @@ cmd_nick(IRC& irc, int fd)
 			clients[curr_client]->setNickname(arguments[0]);
 
 			if ((curr_user = IRC::find_name(users, prefix)) >= 0)
+			{
+				irc.push_cmd_queue(fd, irc.full_name(users[curr_user]) + " NICK :" + this->arguments[0]);
+				irc.forward_to_all_channels(users[curr_user], irc.full_name(users[curr_user]) + " NICK :" + this->arguments[0]);
 				users[curr_user]->setNickname(arguments[0]);
+			}
 
-			utils::print_line("Nickname for client changed from " + clients[curr_client]->getName() + " to " + this->arguments[0]);
+			utils::print_line("Nickname for client changed from " + prefix + " to " + this->arguments[0]);
 			out_mess << ":" << prefix << " NICK " << arguments[0];
 			irc.forward_to_servers(fd, out_mess.str());
 		}
@@ -85,7 +89,8 @@ cmd_nick(IRC& irc, int fd)
 				prefix = clients[curr_client]->getName();
 			if ((curr_user = IRC::find_name(users, prefix)) >= 0)
 			{
-				irc.push_cmd_queue(fd, irc.full_name(users[curr_user]) + " NICK :" + this->arguments[0] + "\r\n");
+				irc.push_cmd_queue(fd, irc.full_name(users[curr_user]) + " NICK :" + this->arguments[0]);
+				irc.forward_to_all_channels(users[curr_user], irc.full_name(users[curr_user]) + " NICK :" + this->arguments[0]);
 				users[curr_user]->setNickname(arguments[0]);
 			}
 			out_mess << ":" << prefix << " " << "NICK " << arguments[0];
@@ -200,6 +205,7 @@ nick_check_errors(int fd, int serv_client, IRC& irc)
 
 	return (0);
 }
+
 
 //User *user = irc.get_user(clients[curr_client]);
 //irc.push_cmd_queue(fd, irc.full_name(user) + " NICK :" + this->arguments[0] + "\r\n");

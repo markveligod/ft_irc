@@ -148,6 +148,7 @@ class IRC
 		void						forward_to_clients(IRC& irc, const string& message);
 		void						forward_to_channel(int fd, Channel& channel, const string& message);
 		void						forward_to_channel(int fd, const string& channel_name, const string& message);
+		void						forward_to_all_channels(User* user, const string& message);
 
 		void generate_map_codes();
 		void print_channels() const; //DEBUG
