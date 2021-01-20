@@ -12,35 +12,42 @@ using std::string;
 
 Command::Command(const string& str) : message(str)
 {
-	std::istringstream	ss(str);
-	string				word;
 	string				last_arg;
+	char *				tok;
+	size_t				last_pos;
+	char *char_str = new char[str.length() + 1];
 
-	getline(ss, word, ' ');
-	if (word[0] == ':')
+	strcpy(char_str, str.c_str());
+	tok = strtok(char_str, " ");
+
+	if (tok[0] == ':')
 	{
-		this->prefix = word.substr(1, word.length());
-		getline(ss, this->command, ' ');
+		prefix = static_cast<std::string>(&tok[1]);
+		tok = strtok(NULL, " ");
+		command = tok == NULL ? "" : static_cast<std::string>(tok);
 	}
 	else
 	{
-		this->prefix = string();
-		this->command = word;
+		prefix = "";
+		command = static_cast<std::string>(tok);
+	}
+	std::cout << "Prefix: " << prefix << std::endl
+			  << "Command: " << command << std::endl; // DEBUG
+	while (tok != NULL && (tok = strtok(NULL, " ")) != NULL)
+	{
+		if (tok[0] == ':')
+			break;
+		this->arguments.push_back(static_cast<std::string>(tok));
+		std::cout << "Argument: " << tok << std::endl; // DEBUG
 	}
 
-	while (getline(ss, word, ' '))
+	if ((last_pos = str.find(" :")) != std::string::npos)
 	{
-		if (word[0] == ':')
-		{
-			last_arg = word.substr(1, word.length());
-			break;
-		}
-		this->arguments.push_back(word);
+		this->arguments.push_back(str.substr(last_pos + 2, str.size() - last_pos - 2));
+		std::cout << "Argument: " << str.substr(last_pos + 2, str.size() - last_pos - 2) << std::endl; // DEBUG
 	}
-	while (getline(ss, word, ' '))
-		last_arg = last_arg + ' ' + word;
-	if (!(last_arg.empty()))
-	this->arguments.push_back(last_arg);
+
+	delete [] char_str;
 }
 
 Command::~Command() {}

@@ -87,6 +87,7 @@
 
 #include "utils.hpp"
 #include "ctime"
+#include "string.h"
 //#include "Class.Client.hpp"
 //#include "Class.Message.hpp"
 //#include "Class.User.hpp"

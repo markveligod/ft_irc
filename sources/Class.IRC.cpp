@@ -209,6 +209,12 @@ do_command(Command* command, int fd)
 	else if (client_el >= 0)
 		_clients[client_el]->getStatistics().recieved(comm, command->getMessage());
 
+	if (comm == "")
+	{
+		this->push_cmd_queue(fd, "ERROR :Prefix without command\r\n");
+		return 0;
+	}
+
 	if (!(is_equal(comm, "PASS")
 		|| (client_el >= 0 && _clients[client_el]->getPassword()
 			&& (is_equal(comm, "NICK") || is_equal(comm, "USER") || is_equal(comm, "SERVER")))	// client entered correct pass
@@ -339,7 +345,8 @@ check_fd_select()
 				//получаем распарсенный вектор команд если нашли \r\n
 				vector<string> buffer_cmd = this->check_buffer(it->first, buffer);
 
-				utils::print_message(it->first, buffer_cmd);
+				if (buffer_cmd.size())
+					utils::print_message(it->first, buffer_cmd);
 
 				for (size_t i = 0; i < buffer_cmd.size(); i++)
 				{
