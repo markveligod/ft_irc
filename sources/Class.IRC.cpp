@@ -31,6 +31,7 @@ std::string g_cmd_name[COMM_COUNT] = {"NICK",
 									  "STATS",
 									  "TIME",
 									  "ERROR",
+									  "WALLOPS",
 									  };
 
 /*
@@ -173,6 +174,7 @@ do_command(Command* command, int fd)
 									"TIME",
 									"ERROR",
 									"ADMIN",
+									"WALLOPS",
 									};
 	doCommand	cmd_func[COMM_COUNT] = {&Command::cmd_nick,
 										&Command::cmd_pass,
@@ -197,6 +199,7 @@ do_command(Command* command, int fd)
 										&Command::cmd_time,
 										&Command::cmd_error,
 										&Command::cmd_admin,
+										&Command::cmd_wallops,
 										};
 
 	const string & comm 			= command->getCommand();
@@ -471,8 +474,9 @@ close_connection(Server* server)
 	_array_fd_select.erase(fd);
 	close(fd);
 	
-	vector<Server*>::iterator it1 = find(_servers.begin(), _servers.end(), server);
-	_servers.erase(it1);
+	vector<Server*>::iterator it = find(_servers.begin(), _servers.end(), server);
+	if (it != _servers.end())
+		_servers.erase(it);
 	delete server;
 }
 
@@ -797,7 +801,8 @@ is_numeric_response(const Command& command)
 			return true;
 		}
 	}
-	if (command.getCommand() == "421")			// игнорируем сообщение "Неизвестная команда"
+	if (command.getCommand() == "421" ||			// игнорируем сообщение "Неизвестная команда"
+		command.getCommand() == "451")				// игнорируем сообщение "Вы не зарегистрированы"
 		return true;
 	return false;
 }
@@ -1055,16 +1060,18 @@ delete_user(User* usr)
 	delete_client(get_client(usr));
 	delete_user_from_channels(usr, string(" :"));
 
-	vector<User*>::iterator it1 = find(_users.begin(), _users.end(), usr);
-	_users.erase(it1);
+	vector<User*>::iterator it = find(_users.begin(), _users.end(), usr);
+	if (it != _users.end())
+		_users.erase(it);
 	delete usr;
 }
 
 void IRC::
 delete_client(Client* clnt)
 {
-	vector<Client*>::iterator it2 = find(_clients.begin(), _clients.end(), clnt);
-	_clients.erase(it2);
+	vector<Client*>::iterator it = find(_clients.begin(), _clients.end(), clnt);
+	if (it != _clients.end())
+		_clients.erase(it);
 	delete clnt;
 }
 

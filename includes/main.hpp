@@ -93,7 +93,7 @@
 //#include "Class.User.hpp"
 #include "codes.hpp"
 
-#define COMM_COUNT 23
+#define COMM_COUNT 24
 
 #define ADMINME			" :Ум и красота - leweather"
 #define ADMINLOC1		" :Веселый озорник - ckakuna"

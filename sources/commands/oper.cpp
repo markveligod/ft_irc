@@ -51,8 +51,8 @@ cmd_oper(IRC& irc, int fd)
 			string mode_mess = " MODE " + usr->getName() + " :+o\r\n";
 
 			usr->setMode('o', true);
+			irc.push_cmd_queue(fd, ":" + irc.get_server_name() + mode_mess);
 			irc.push_cmd_queue(fd, irc.response(RPL_YOUREOPER, fd, command, RPL_YOUREOPER_MESS));
-			irc.push_cmd_queue(fd, irc.get_server_name() + mode_mess);
 
 			irc.forward_to_servers(fd, usr->getName() + mode_mess);
 		}
