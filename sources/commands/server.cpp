@@ -12,6 +12,88 @@
 */
 
 int Command::
+cmd_server(IRC& irc, int fd)
+{
+	vector<Client *>& clients	= irc.get_clients();
+	vector<Server*>&  servers 	= irc.get_servers();
+	vector<User *>&   users		= irc.get_users();
+	int				  client_el	= IRC::find_fd(clients, fd);
+	int				  server_el = IRC::find_fd(servers, fd);
+	int				  error;
+	Server*			  new_server;
+
+	if ((error = this->server_check_errors(irc, fd)) != 1)
+		return (error);
+
+
+// Создаем новый сервер
+	if (server_el < 0)
+	{
+		new_server = new Server(fd, this->arguments[0], atoi(this->arguments[1].c_str()), this->arguments[2]);
+		new_server->getStatistics() = clients[client_el]->getStatistics();
+	}
+	else
+		new_server = new Server(fd, this->arguments[0], atoi(this->arguments[1].c_str()), this->arguments[3]);
+	servers.push_back(new_server);
+
+// Вывод сообщения о созданном сервере
+	std::stringstream out_message;
+	out_message << "New server registered!"
+				<< "\n\t  Server name: " << new_server->getName()
+				<< "\n\t  Hopcount: " << new_server->getHopcount()
+				<< "\n\t  Info: " << new_server->getInfo();
+	utils::print_line(out_message.str());
+	out_message.str("");
+
+
+// ОТПРАВКИ СООБЩЕНИЙ
+
+	// Если сообщение от клиента (еще не зареганного сервера)
+	if (server_el < 0)
+	{
+		if (clients[client_el]->getIsServer() == false)
+			irc.push_cmd_queue(fd, "PASS 123\r\nSERVER " + irc.get_server_name() + " 1 info\r\n");
+		for (int i = 0; i < (int)servers.size() - 1; i++)
+		{
+			out_message << ":" << irc.get_server_name() << " SERVER "
+						<< servers[i]->getName() << " "
+						<< (servers[i]->getHopcount() + 1) << " "
+						<< 0 << " :"
+						<< servers[i]->getInfo() << "\r\n";
+			irc.push_cmd_queue(fd, out_message.str());
+			out_message.str("");
+		}
+		for (int i = 0; i < (int)users.size(); i++)
+		{
+			if (users[i]->getSocketFd() != fd)
+			{
+				out_message << "NICK "
+							<< users[i]->getName() << " "
+							<< (users[i]->getHopcount() + 1) << "\r\n";
+				out_message << ":" << users[i]->getName() << " USER "
+							<< users[i]->getUsername() << " "
+							<< users[i]->getHostname() << " "
+							<< users[i]->getServername() << " :"
+							<< users[i]->getRealname() << "\r\n";
+				irc.push_cmd_queue(fd, out_message.str());
+				out_message.str("");
+			}
+		}
+		new_server->setBuffer(clients[client_el]->getBuffer());
+		//irc.delete_client(fd);
+		utils::print_line("DEBUG: Client deleted (as it is a new connection)");
+	}
+
+	out_message << ":" << irc.get_server_name() <<
+				  " SERVER " + new_server->getName() <<
+				  " " << (new_server->getHopcount() + 1) << " " <<
+				  (new_server->getHopcount() + 1) << " " << new_server->getInfo();
+	irc.forward_to_servers(fd, out_message.str());
+
+	return (0);
+}
+
+int Command::
 server_available(vector<Server *> &servers, string const &server_name) const
 {
 	std::vector<Server *>::iterator v_begin = servers.begin();
@@ -106,84 +188,3 @@ server_check_errors(IRC& irc, int fd) const
 	return (1);
 }
 
-int Command::
-cmd_server(IRC& irc, int fd)
-{
-	vector<Client *>& clients	= irc.get_clients();
-	vector<Server*>&  servers 	= irc.get_servers();
-	vector<User *>&   users		= irc.get_users();
-	int				  client_el	= IRC::find_fd(clients, fd);
-	int				  server_el = IRC::find_fd(servers, fd);
-	int				  error;
-	Server*			  new_server;
-
-	if ((error = this->server_check_errors(irc, fd)) != 1)
-		return (error);
-
-
-// Создаем новый сервер
-	if (server_el < 0)
-	{
-		new_server = new Server(fd, this->arguments[0], atoi(this->arguments[1].c_str()), this->arguments[2]);
-		new_server->getStatistics() = clients[client_el]->getStatistics();
-	}
-	else
-		new_server = new Server(fd, this->arguments[0], atoi(this->arguments[1].c_str()), this->arguments[3]);
-	servers.push_back(new_server);
-
-// Вывод сообщения о созданном сервере
-	std::stringstream out_message;
-	out_message << "New server registered!"
-				<< "\n\t  Server name: " << new_server->getName()
-				<< "\n\t  Hopcount: " << new_server->getHopcount()
-				<< "\n\t  Info: " << new_server->getInfo();
-	utils::print_line(out_message.str());
-	out_message.str("");
-
-
-// ОТПРАВКИ СООБЩЕНИЙ
-
-	// Если сообщение от клиента (еще не зареганного сервера)
-	if (server_el < 0)
-	{
-		if (clients[client_el]->getIsServer() == false)
-			irc.push_cmd_queue(fd, "PASS 123\r\nSERVER " + irc.get_server_name() + " 1 info\r\n");
-		for (int i = 0; i < (int)servers.size() - 1; i++)
-		{
-			out_message << ":" << irc.get_server_name() << " SERVER "
-						<< servers[i]->getName() << " "
-						<< (servers[i]->getHopcount() + 1) << " "
-						<< 0 << " :"
-						<< servers[i]->getInfo() << "\r\n";
-			irc.push_cmd_queue(fd, out_message.str());
-			out_message.str("");
-		}
-		for (int i = 0; i < (int)users.size(); i++)
-		{
-			if (users[i]->getSocketFd() != fd)
-			{
-				out_message << "NICK "
-							<< users[i]->getName() << " "
-							<< (users[i]->getHopcount() + 1) << "\r\n";
-				out_message << ":" << users[i]->getName() << " USER "
-							<< users[i]->getUsername() << " "
-							<< users[i]->getHostname() << " "
-							<< users[i]->getServername() << " :"
-							<< users[i]->getRealname() << "\r\n";
-				irc.push_cmd_queue(fd, out_message.str());
-				out_message.str("");
-			}
-		}
-		new_server->setBuffer(clients[client_el]->getBuffer());
-		//irc.delete_client(fd);
-		utils::print_line("DEBUG: Client deleted (as it is a new connection)");
-	}
-
-	out_message << ":" << irc.get_server_name() <<
-				  " SERVER " + new_server->getName() <<
-				  " " << (new_server->getHopcount() + 1) << " " <<
-				  (new_server->getHopcount() + 1) << " " << new_server->getInfo();
-	irc.forward_to_servers_2(fd, "", out_message.str());
-
-	return (0);
-}

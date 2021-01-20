@@ -71,7 +71,8 @@
 **		флаг "только для приглашения";
 */
 
-bool check_keys_of_users_mod(std::string arg)
+bool
+check_keys_of_users_mod(std::string arg)
 {
 	// проверяем размер
 	if (arg.size() != 2)
@@ -83,7 +84,8 @@ bool check_keys_of_users_mod(std::string arg)
 	return (false);
 }
 
-bool check_keys_of_channel_mod(std::string arg)
+bool
+check_keys_of_channel_mod(std::string arg)
 {
 	
 	char temp[10] = {'a', 'i', 'm', 'n', 'q', 'p', 's', 'r', 't', '\0'};
@@ -105,7 +107,8 @@ bool check_keys_of_channel_mod(std::string arg)
 	return (true);
 }
 
-bool check_keys_of_channel_mod_2(std::string arg)
+bool
+check_keys_of_channel_mod_2(std::string arg)
 {
 	char temp[9] = {'O', 'o', 'v', 'k', 'l', 'b', 'e', 'I', '\0'};
 	
@@ -125,7 +128,8 @@ bool check_keys_of_channel_mod_2(std::string arg)
 	return (false);
 }
 
-void change_param_of_users_mod(User *user, const char mod, bool param)
+void
+change_param_of_users_mod(User *user, const char mod, bool param)
 {
 	switch (mod)
 	{
@@ -146,7 +150,8 @@ void change_param_of_users_mod(User *user, const char mod, bool param)
 	}
 }
 
-void change_param_of_channel_mod(Channel *ch, const char mod, bool param)
+void
+change_param_of_channel_mod(Channel *ch, const char mod, bool param)
 {
 	/*
 	**	a - переключить флаг анонимного канала;
@@ -184,14 +189,15 @@ void change_param_of_channel_mod(Channel *ch, const char mod, bool param)
 	}
 }
 
-void push_info(IRC& irc, std::string mess)
+void
+push_info(IRC& irc, std::string mess)
 {
 	std::vector<Server *> vec_servers = irc.get_servers();
 	std::vector<User *> vec_users = irc.get_users();
 	std::cout << "\nDEBUG: mess: " << mess << std::endl;
 
 	for (size_t i = 0; i < vec_servers.size(); i++)
-		irc.forward_to_servers(vec_servers[i]->getSocketFd(), mess, true);
+		irc.forward_to_servers(vec_servers[i]->getSocketFd(), mess);
 	for (size_t i = 0; i < vec_users.size(); i++)
 		irc.push_cmd_queue(vec_users[i]->getSocketFd(), mess + "\r\n");
 }
@@ -436,20 +442,20 @@ cmd_mode(IRC& irc, int fd)
 		std::cout << "\nDEBUG: Режим пользователя DONE!\n";
 		
 		//проверяем поступившие ключи от оператора
-		if (!check_keys_of_users_mod(this->arguments[2]))
+		if (!check_keys_of_users_mod(this->arguments[1]))
 			return (irc.push_mess_client(fd, ERR_UNKNOWNMODE));
 
 		//пытаемся найти пользователя которому необходимо изменить моды
-		User* _user = irc.get_user(this->arguments[1]);
+		User* _user = irc.get_user(this->arguments[0]);
 		if (_user == NULL)
 			return (irc.push_mess_client(fd, ERR_USERSDONTMATCH));
 		
 		//меняем юзеру параметры
-		change_param_of_users_mod(_user, this->arguments[2][1], ((this->arguments[2][0] == '+') ? true : false));
+		change_param_of_users_mod(_user, this->arguments[1][1], ((this->arguments[1][0] == '+') ? true : false));
 
 		// если нет префикса шлем уведомление клиентам и серверам об изменение мода
 		if (prefix.size() == 0)
-			push_info(irc, ":" + oper_user->getNickname() + " MODE " + this->arguments[0] + " " + this->arguments[1] + " " + this->arguments[2]);
+			push_info(irc, ":" + oper_user->getNickname() + " MODE " + this->arguments[0] + " " + this->arguments[1] /*+ " " + this->arguments[2]*/);
 		std::cout << "\nDEBUG: param: " << this->arguments[1] << " DONE!\n";
 	}
 	

@@ -47,7 +47,6 @@ private:
 
 	void						join_channel(IRC& irc, const string& name, const string& key, User* user, int fd);
 	void						leave_channel(IRC& irc, Channel& channels, int fd, string message);
-	void						delete_user_from_channels(IRC& irc, int fd, User* user);
 
 	vector<Client*>::iterator	find_fd(vector<Client*>& vect, int fd);
 	User*						find_user(user_map& users, int fd);
@@ -87,6 +86,7 @@ public:
 	int					cmd_notice(IRC& irc, int fd);
 	int					cmd_stats(IRC& irc, int fd);
 	int					cmd_time(IRC& irc, int fd);
+	int					cmd_error(IRC& irc, int fd);
 
 	const string&		getCommand() const;
 	const string&		getMessage() const;

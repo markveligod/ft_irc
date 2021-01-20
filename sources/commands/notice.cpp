@@ -47,7 +47,7 @@ int Command::cmd_notice(IRC& irc, int fd)
 					&& (!in_channel || !(mode_user.o || mode_user.v)))))	// модерируемый канал и пользователь не в канале или не имеет право говорить
 			{
 
-				irc.forward_to_servers(fd, message1, true);
+				irc.forward_to_servers(fd, message1);
 				irc.forward_to_channel(fd, recepients[i], message2);
 			}
 			continue;

@@ -68,7 +68,7 @@ int Command::cmd_privmsg(IRC& irc, int fd)
 			else
 			{
 				irc.forward_to_channel(fd, recepients[i], message);
-				irc.forward_to_servers(fd, message, true);
+				irc.forward_to_servers(fd, message);
 			}
 			continue;
 		}

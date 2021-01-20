@@ -11,6 +11,54 @@
 ** =============================================================
 */
 
+int Command::
+cmd_user(IRC& irc, int fd)
+{
+	vector<Client*>& clients	= irc.get_clients();
+	vector<User*>& users 		= irc.get_users();
+	vector<Server*>& servers 	= irc.get_servers();
+	int server_el				= IRC::find_fd(servers, fd);
+	int server_el_name			= irc.find_name(servers, arguments[2]);
+	int client_el				= IRC::find_fd(clients, fd);
+	int error;
+
+	if ((error = user_check_errors(irc, fd)) != 1)
+		return (error);
+
+	if (arguments[0][0] == '~')
+		arguments[0] = arguments[0].substr(1, arguments[0].size());
+
+	// Если сообщение от сервера
+	if (server_el >= 0)
+	{
+		if (server_el_name < 0)
+			arguments[2] = irc.get_server_name();
+		client_el = IRC::find_name(clients, this->prefix);
+		if (server_el_name < 0)
+			this->user_create(clients[client_el], users, servers[server_el]);
+		else
+			this->user_create(clients[client_el], users, servers[server_el_name]);
+	}
+	else
+	{
+		arguments[1] = clients[client_el]->getHostname();
+		arguments[2] = irc.get_server_name();
+		this->user_create(clients[client_el], users, NULL);
+	}
+	
+	User *curr_user = users[users.size() - 1];
+	std::stringstream out_message;
+	out_message << "NICK " << curr_user->getNickname() << " " << (curr_user->getHopcount() + 1) << "\r\n";
+	out_message << ":" << curr_user->getNickname() << " USER "
+				<< curr_user->getUsername() << " "
+				<< curr_user->getHostname() << " "
+				<< curr_user->getServername() << " :"
+				<< curr_user->getRealname();
+	irc.forward_to_servers(fd, out_message.str());
+
+	return 0;
+}
+
 void Command::
 user_create(Client* curr_client, vector<User*>& users, Server* curr_server)
 {
@@ -100,52 +148,4 @@ user_check_errors(IRC& irc, int fd)
 		return (0);
 	}
 	return (1);
-}
-
-int Command::
-cmd_user(IRC& irc, int fd)
-{
-	vector<Client*>& clients	= irc.get_clients();
-	vector<User*>& users 		= irc.get_users();
-	vector<Server*>& servers 	= irc.get_servers();
-	int server_el				= IRC::find_fd(servers, fd);
-	int server_el_name			= irc.find_name(servers, arguments[2]);
-	int client_el				= IRC::find_fd(clients, fd);
-	int error;
-
-	if ((error = user_check_errors(irc, fd)) != 1)
-		return (error);
-
-	if (arguments[0][0] == '~')
-		arguments[0] = arguments[0].substr(1, arguments[0].size());
-
-	// Если сообщение от сервера
-	if (server_el >= 0)
-	{
-		if (server_el_name < 0)
-			arguments[2] = irc.get_server_name();
-		client_el = IRC::find_name(clients, this->prefix);
-		if (server_el_name < 0)
-			this->user_create(clients[client_el], users, servers[server_el]);
-		else
-			this->user_create(clients[client_el], users, servers[server_el_name]);
-	}
-	else
-	{
-		arguments[1] = clients[client_el]->getHostname();
-		arguments[2] = irc.get_server_name();
-		this->user_create(clients[client_el], users, NULL);
-	}
-	
-	User *curr_user = users[users.size() - 1];
-	std::stringstream out_message;
-	out_message << "NICK " << curr_user->getNickname() << " " << (curr_user->getHopcount() + 1) << "\r\n";
-	out_message << ":" << curr_user->getNickname() << " USER "
-				<< curr_user->getUsername() << " "
-				<< curr_user->getHostname() << " "
-				<< curr_user->getServername() << " :"
-				<< curr_user->getRealname();
-	irc.forward_to_servers_2(fd, "", out_message.str());
-
-	return 0;
 }

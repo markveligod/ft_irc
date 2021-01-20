@@ -12,7 +12,8 @@
 ** =====================================================================
 */
 
-int Command::cmd_time(IRC& irc, int fd)
+int Command::
+cmd_time(IRC& irc, int fd)
 {
 	if (arguments.size() > 1)												// слишком много аргуменотов
 	{

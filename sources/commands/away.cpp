@@ -35,7 +35,7 @@ int Command::cmd_away(IRC& irc, int fd)
 		if (!irc.is_server(fd))
 			irc.push_cmd_queue(fd, replay);
 		
-		irc.forward_to_servers(fd, forward + " :-a", true);
+		irc.forward_to_servers(fd, forward + " :-a");
 	}
 
 	if (arguments.size() == 1)
@@ -48,7 +48,7 @@ int Command::cmd_away(IRC& irc, int fd)
 		if (!irc.is_server(fd))
 			irc.push_cmd_queue(fd, replay);
 
-		irc.forward_to_servers(fd, forward + " :+a", true);
+		irc.forward_to_servers(fd, forward + " :+a");
 	}
 	return 0;
 }

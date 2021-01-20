@@ -21,74 +21,23 @@
 ** =====================================================================
 */
 
-int Command::cmd_quit(IRC& irc, int fd)
+int Command::
+cmd_quit(IRC& irc, int fd)
 {
 	User* user = (!prefix.empty()) ? irc.get_user(prefix) : irc.get_user(fd);
 
 	if (user) // если от клиента
 	{
-		delete_user_from_channels(irc, fd, user);
-
-		string quit_mess = ":" + user->getName() +
-							" QUIT :" +
+		string quit_mess = " QUIT :" +
 							(arguments.size() == 1 ? arguments[0] : "Client closed connection");
 		
-		// отправляем всем серверам информацию о том что клиент вышел
-		irc.forward_to_servers(fd, quit_mess, true);
+		irc.forward_to_servers(fd, ":" + user->getName() + quit_mess);	// отправляем всем серверам информацию о том что клиент вышел
 		
-		//закрываем соединение, если сообщение от клиента
-		if (!is_server(irc, fd))
-			irc.close_connection(user);
+		irc.delete_user_from_channels(user, quit_mess);
+		irc.close_connection(user);										// удаляет юзера и клиента и векторов _users, _clients
 	}
 	else
-		irc.close_connection(irc.get_client(fd));
+		irc.close_connection(fd, 0);
 	
 	return (0);
-}
-
-void Command::
-delete_user_from_channels(IRC& irc, int fd, User* user)
-{
-	channel_map& map_channels = irc.get_channels();
-
-	//удаляем юзера со всех каналов текущего сервера
-	channel_map::iterator it_channels = map_channels.begin();
-
-	while (it_channels != map_channels.end())
-	{
-		user_map& chann_users = it_channels->second.get_users();	// список пользователей канала
-
-		if (chann_users.count(user))
-		{
-			chann_users.erase(user);
-			if (chann_users.size() == 0) // если канал пуст удалить его из мапы
-			{
-				map_channels.erase(it_channels);
-				it_channels = map_channels.begin();
-				continue;
-			}
-			else //иначе отправить всем пользователем канал сообщение о выходе юзера
-			{
-				string quit_mess = irc.full_name(user) +
-									" QUIT :" +
-									(arguments.size() == 1 ? arguments[0] : "Client closed connection");
-
-				irc.forward_to_channel(fd, it_channels->first, quit_mess);
-			}
-		}
-		// удаляем из бан списка
-		vector<User*>::iterator it_ban_start = it_channels->second.getVecBanned().begin();
-		vector<User*>::iterator it_ban_end = it_channels->second.getVecBanned().end();
-
-		while (it_ban_start != it_ban_end)
-		{
-			if ((*it_ban_start)->getNickname() == user->getNickname())
-			{
-				it_channels->second.getVecBanned().erase(it_ban_start);
-				break;
-			}
-			++it_ban_start;
-		}
-		++it_channels;
-	}
 }

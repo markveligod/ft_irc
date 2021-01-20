@@ -75,7 +75,7 @@ leave_channel(IRC& irc, Channel& channel, int fd, string message)
 		if (!irc.is_server(fd))
 			irc.push_cmd_queue(fd, message1 + "\r\n");
 		irc.forward_to_channel(fd, channel, message1);
-		irc.forward_to_servers(fd, message2, true);
+		irc.forward_to_servers(fd, message2);
 	}
 	else
 		irc.push_cmd_queue(fd, irc.response(RPL_ENDOFNAMES, fd, channel.getName(), RPL_ENDOFNAMES_MESS));

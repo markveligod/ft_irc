@@ -77,7 +77,7 @@ int Command::cmd_kick(IRC& irc, int fd)
 			string mess_to_user = 		irc.full_name(oper)   + " KICK " + channels[i] + " " + usr->getName();
 			string mess_to_server =		":" + oper->getName() + " KICK " + channels[i] + " " + usr->getName();
 			irc.forward_to_channel(fd, channels[i], mess_to_user);
-			irc.forward_to_servers(fd, mess_to_server, true);
+			irc.forward_to_servers(fd, mess_to_server);
 			if (!irc.is_server(fd))
 				irc.push_cmd_queue(fd, mess_to_user + "\r\n");
 
@@ -132,7 +132,7 @@ int Command::cmd_kick(IRC& irc, int fd)
 			string mess_to_user = 		irc.full_name(oper)   + " KICK " + chann_name + " " + usr->getName();
 			string mess_to_server =		":" + oper->getName() + " KICK " + chann_name + " " + usr->getName();
 			irc.forward_to_channel(fd, chann_name, mess_to_user);
-			irc.forward_to_servers(fd, mess_to_server, true);
+			irc.forward_to_servers(fd, mess_to_server);
 
 			if (!irc.is_server(fd))
 				irc.push_cmd_queue(fd, mess_to_user + "\r\n");

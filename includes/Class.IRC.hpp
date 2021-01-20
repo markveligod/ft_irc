@@ -95,10 +95,12 @@ class IRC
 		void						delete_user(int fd);
 		void						delete_client(int fd);
 		void						delete_channel(string channel_name);
+		void						delete_client(Client* clnt);
+		void						delete_user(User* user);
+		void						delete_user_from_channels(User* user, const string& quit_mess);
 		void 						close_connection(int fd, int n);
 		void 						close_connection(User* user);
 		void 						close_connection(Server* server);
-		void 						close_connection(Client* client);
 
 		vector<string> 				check_buffer(int fd, const char* buffer);
 
@@ -112,6 +114,7 @@ class IRC
 		Client*						get_client(Server* user);
 		vector<Server*>& 			get_servers();
 		Server*						get_server(int fd);
+		Server*						get_server(const string& name) const;
 		const string& 				get_server_name();
 		const string& 				get_server_name(int fd);
 		const string&				get_nickname(int fd);
@@ -140,8 +143,7 @@ class IRC
 		string						response_2(int response_code, int fd, string command, string message);
 		string						response_3(int response_code, string name, string command, string message);
 		int							push_mess_client(int fd, int code);
-		void						forward_to_servers(int fd, const string& message, bool prefix);
-		void						forward_to_servers_2(int fd, const string& prefix, const string& message);
+		void						forward_to_servers(int fd, const string& message);
 		void						forward_to_clients(IRC& irc, const string& message);
 		void						forward_to_channel(int fd, Channel& channel, const string& message);
 		void						forward_to_channel(int fd, const string& channel_name, const string& message);
