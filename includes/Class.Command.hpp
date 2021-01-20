@@ -47,13 +47,13 @@ private:
 	void						stats_u(IRC& irc, int fd, Client* client);
 
 	void						join_channel(IRC& irc, const string& name, const string& key, User* user, int fd);
+	void						leave_channel(IRC& irc, Channel& channels, int fd, string message);
 
 	vector<Client*>::iterator	find_fd(vector<Client*>& vect, int fd);
 	User*						find_user(user_map& users, int fd);
 	bool						check_args_number(int n) const;
 	bool						check_password(const Client& client) const;
 	bool						check_nickname(const Client& client) const;
-	void						leave_channel(IRC& irc, Channel& channels, int fd, string message);
 	void						send_channel_users(IRC& irc, int fd, User* user, Channel& channel);
 	bool						is_channel_visible(IRC& irc, int fd, const string& channel_name);
 	bool						is_server(IRC& irc, int fd);
@@ -86,8 +86,12 @@ public:
 	int					cmd_away(IRC& irc, int fd);
 	int					cmd_notice(IRC& irc, int fd);
 	int					cmd_stats(IRC& irc, int fd);
+	int					cmd_time(IRC& irc, int fd);
+	int					cmd_error(IRC& irc, int fd);
+	int					cmd_admin(IRC& irc, int fd);
 
 	const string&		getCommand() const;
 	const string&		getMessage() const;
 	const string&		getPrefix() const;
+	const vector<string>& getArgs() const;
 };

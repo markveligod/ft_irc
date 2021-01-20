@@ -28,7 +28,10 @@ std::string g_cmd_name[COMM_COUNT] = {"NICK",
 									  "PRIVMSG",
 									  "AWAY",
 									  "NOTICE",
-									  "STATS"};
+									  "STATS",
+									  "TIME",
+									  "ERROR",
+									  };
 
 /*
 ** ----------------------------------------------------------
@@ -166,7 +169,10 @@ do_command(Command* command, int fd)
 									"PRIVMSG",
 									"AWAY",
 									"NOTICE",
-									"STATS"
+									"STATS",
+									"TIME",
+									"ERROR",
+									"ADMIN",
 									};
 	doCommand	cmd_func[COMM_COUNT] = {&Command::cmd_nick,
 										&Command::cmd_pass,
@@ -187,7 +193,10 @@ do_command(Command* command, int fd)
 										&Command::cmd_privmsg,
 										&Command::cmd_away,
 										&Command::cmd_notice,
-										&Command::cmd_stats
+										&Command::cmd_stats,
+										&Command::cmd_time,
+										&Command::cmd_error,
+										&Command::cmd_admin,
 										};
 
 	const string & comm 			= command->getCommand();
@@ -222,6 +231,9 @@ do_command(Command* command, int fd)
 			return (result);
 		}
 	}
+	if(is_numeric_response(*command))
+		return 0;
+	
 	this->push_cmd_queue(fd, this->response(ERR_UNKNOWNCOMMAND, fd, comm, ERR_UNKNOWNCOMMAND_MESS));
 	return 0;
 }
@@ -258,7 +270,10 @@ void IRC::
 do_select()
 {
 	if ((_select_res = select(FD_SETSIZE, &_fd_set_read, &_fd_set_write, NULL, NULL)) < 0)
+	{
 		utils::print_error(ERR_SELECT, "SELECT");
+		perror("Select");
+	}
 }
 
 /*
@@ -404,27 +419,7 @@ void IRC::close_connection(int fd, int n)
 void IRC::
 close_connection(User* user)
 {
-	if (!user) return;
-
-	int fd = user->getSocketFd();
-	Client* client = get_client(user);
-
-	if (!is_server(fd))
-	{
-		_array_fd_select.erase(fd);
-		close(fd);
-	}
-	
-	vector<User*>::iterator it1 = find(_users.begin(), _users.end(), user);
-	_users.erase(it1);
-
-	vector<Client*>::iterator it2 = find(_clients.begin(), _clients.end(), client);
-	_clients.erase(it2);
-
-	delete user;
-	delete client;
-
-	utils::print_line("connection closed");
+	delete_user(user);
 }
 
 void IRC::
@@ -432,22 +427,15 @@ close_connection(Server* server)
 {
 	if (!server) return;
 
+	delete_client(get_client(server));
+	
 	int fd = server->getSocketFd();
-	Client* client = get_client(server);
-
 	_array_fd_select.erase(fd);
 	close(fd);
 	
 	vector<Server*>::iterator it1 = find(_servers.begin(), _servers.end(), server);
 	_servers.erase(it1);
-
-	vector<Client*>::iterator it2 = find(_clients.begin(), _clients.end(), client);
-	_clients.erase(it2);
-
 	delete server;
-	delete client;
-
-	utils::print_line("connection closed");
 }
 
 /*
@@ -639,10 +627,13 @@ get_user(int fd)
 }
 
 vector<User*>& IRC::
-get_users() 				{ return _users; }
+get_users() 								{ return _users; }
 
 vector<Client*>& IRC::
-get_clients()				{ return _clients; }
+get_clients()								{ return _clients; }
+
+Client* IRC::
+get_client(int fd)							{ return _clients[find_fd(_clients, fd)]; }
 
 Client* IRC::
 get_client(User* user)
@@ -666,37 +657,40 @@ get_user(Client *client)
 }
 
 vector<Server*>& IRC::
-get_servers()				{ return _servers; }
+get_servers()								{ return _servers; }
 
 // map<string, CmdStats> &IRC::
 // get_map_cmd_stats()			{ return map_cmd_stats; }
 
 Server* IRC::
-get_server(int fd)			{ return _servers[find_fd(_servers, fd)]; }
+get_server(int fd)							{ return _servers[find_fd(_servers, fd)]; }
+
+Server* IRC::
+get_server(const string& name) const		{ return _servers[find_name(_servers, name)]; }
 
 const string& IRC::
-get_server_name()			{ return _server_name; }
+get_server_name()							{ return _server_name; }
 
 const string& IRC::
-get_server_name(int fd)		{ return _servers[find_fd(_servers, fd)]->getName(); }
+get_server_name(int fd)						{ return _servers[find_fd(_servers, fd)]->getName(); }
 
 int IRC::
-get_localhost_port() const	{ return _localhost.get_port(); }
+get_localhost_port() const					{ return _localhost.get_port(); }
 
 const string& IRC::
-get_localhost_pass() const	{ return _localhost_pass; }
+get_localhost_pass() const					{ return _localhost_pass; }
 
 const string& IRC::
-get_operator_user() const	{ return _operator_user; }
+get_operator_user() const					{ return _operator_user; }
 
 const string& IRC::
-get_operator_pass() const	{ return _operator_pass; }
+get_operator_pass() const					{ return _operator_pass; }
 
 const Socket& IRC::
-get_socket() const			{ return _localhost; }
+get_socket() const							{ return _localhost; }
 
 channel_map& IRC::
-get_channels()				{ return _channels; }
+get_channels()								{ return _channels; }
 
 Channel* IRC::
 get_channel(string channel_name) {
@@ -742,6 +736,31 @@ response_2(int response_code, int fd, string command, string message)
 	return response;
 }
 
+bool IRC::
+is_numeric_response(const Command& command)
+{
+	if (										// пересылаем сообщения
+		command.getCommand() == "256" ||
+		command.getCommand() == "257" ||
+		command.getCommand() == "258" ||
+		command.getCommand() == "259" ||
+		command.getCommand() == "259"
+	)
+	{
+		const vector<string>& args = command.getArgs();
+		User* usr;
+
+		if (!args.empty() && ((usr = get_user(args[0]))))
+		{
+			push_cmd_queue(usr->getSocketFd(), command.getMessage() + "\r\n");
+			return true;
+		}
+	}
+	if (command.getCommand() == "421")			// игнорируем сообщение "Неизвестная команда"
+		return true;
+	return false;
+}
+
 string IRC::
 response_3(int response_code, string name, string command, string message)
 {
@@ -777,33 +796,20 @@ response(int response_code, int client_fd, string message_prefix, string message
 }
 
 void IRC::
-forward_to_servers_2(int fd, const string& prefix, const string& message)
+forward_to_servers(int fd, const string& message)
 {
-	string forward_mess = prefix.empty() ? (message)
-										 : (":" + prefix + " " + message);
-	
+	std::cout << "DEBUG: |" << message << "|\n";
 	for (size_t i = 0; i < _servers.size(); i++)
 	{
 		if (_servers[i]->getSocketFd() != fd && _servers[i]->getHopcount() == 1)
-			push_cmd_queue(_servers[i]->getSocketFd(), forward_mess + "\r\n");
-	}
-}
-
-void IRC::
-forward_to_servers(int fd, const string& message, bool prefix)
-{
-	string forward_mess = prefix ? message : (":" + get_nickname(fd) + " " + message);
-	
-	for (size_t i = 0; i < _servers.size(); i++)
-	{
-		if (_servers[i]->getSocketFd() != fd && _servers[i]->getHopcount() == 1)
-			push_cmd_queue(_servers[i]->getSocketFd(), forward_mess + "\r\n");
+			push_cmd_queue(_servers[i]->getSocketFd(), message + "\r\n");
 	}
 }
 
 void IRC::
 forward_to_clients(IRC& irc, const string& message)
-{	
+{
+	std::cout << "DEBUG: |" << message << "|\n";
 	for (size_t i = 0; i < _clients.size(); i++)
 	{
 		if (!irc.is_server(_clients[i]->getSocketFd()))
@@ -814,6 +820,7 @@ forward_to_clients(IRC& irc, const string& message)
 void IRC::
 forward_to_channel(int fd, Channel& channel, const string& message)
 {
+	std::cout << "DEBUG: |" << message << "|\n";
 	user_map& users = channel.get_users();
 
 	for (user_iterator it = users.begin(); it != users.end(); it++)
@@ -828,6 +835,17 @@ forward_to_channel(int fd, const string& channel_name, const string& message)
 {
 	Channel& channel = _channels[channel_name];
 	forward_to_channel(fd, channel, message);
+}
+
+void IRC::
+forward_to_all_channels(User* user, const string& message)
+{
+	for (channel_iterator it = _channels.begin(); it != _channels.end(); it++)
+	{
+		user_map users = it->second.get_users();
+		if (users.count(user))
+			forward_to_channel(user->getSocketFd(), it->first, message);
+	}
 }
 
 string IRC::
@@ -897,7 +915,8 @@ generate_map_codes()
 	map_codes.insert(std::make_pair<int, std::string>(473, " :Cannot join channel (+i)"));
 	map_codes.insert(std::make_pair<int, std::string>(474, " :Cannot join channel (+b)"));
 	map_codes.insert(std::make_pair<int, std::string>(475, " :Cannot join channel (+k)"));
-	map_codes.insert(std::make_pair<int, std::string>(481, " :Permission Denied- You're not an IRC operator"));
+	map_codes.insert(std::make_pair<int, std::string>(481, " :Permission Denied - You're not an IRC operator"));
+	map_codes.insert(std::make_pair<int, std::string>(482, " :You're not channel operator"));
 	map_codes.insert(std::make_pair<int, std::string>(483, " :You cant kill a server!"));
 	map_codes.insert(std::make_pair<int, std::string>(491, " :No O-lines for your host"));
 	map_codes.insert(std::make_pair<int, std::string>(501, " :Unknown MODE flag"));
@@ -988,3 +1007,65 @@ void IRC::print_channels() const {
 	}
 }
 
+
+void IRC::
+delete_user(User* usr)
+{
+	delete_client(get_client(usr));
+	delete_user_from_channels(usr, string(" :"));
+
+	vector<User*>::iterator it1 = find(_users.begin(), _users.end(), usr);
+	_users.erase(it1);
+	delete usr;
+}
+
+void IRC::
+delete_client(Client* clnt)
+{
+	vector<Client*>::iterator it2 = find(_clients.begin(), _clients.end(), clnt);
+	_clients.erase(it2);
+	delete clnt;
+}
+
+
+void IRC::
+delete_user_from_channels(User* user, const string& quit_mess)
+{
+	int fd = user->getSocketFd();
+	channel_map& _channels = get_channels();
+
+	//удаляем юзера со всех каналов текущего сервера
+	channel_map::iterator it_channels = _channels.begin();
+
+	while (it_channels != _channels.end())
+	{
+		user_map& chann_users = it_channels->second.get_users();	// список пользователей канала
+
+		if (chann_users.count(user))
+		{
+			chann_users.erase(user);
+			if (chann_users.size() == 0) // если канал пуст удалить его из мапы
+			{
+				_channels.erase(it_channels);
+				it_channels = _channels.begin();
+				continue;
+			}
+			else //иначе отправить всем пользователем канал сообщение о выходе юзера
+				forward_to_channel(fd, it_channels->first, full_name(user) + quit_mess);
+		}
+		// удаляем из бан списка
+		vector<User*>::iterator it_ban_start = it_channels->second.getVecBanned().begin();
+		vector<User*>::iterator it_ban_end = it_channels->second.getVecBanned().end();
+
+		while (it_ban_start != it_ban_end)
+		{
+			if ((*it_ban_start)->getNickname() == user->getNickname())
+			{
+				it_channels->second.getVecBanned().erase(it_ban_start);
+				break;
+			}
+			++it_ban_start;
+		}
+		++it_channels;
+	}
+}

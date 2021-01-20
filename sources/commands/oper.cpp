@@ -25,12 +25,12 @@
 int Command::
 cmd_oper(IRC& irc, int fd)
 {
-	std::vector<User*>& vec_users = irc.get_users();
-	int pos;
-
 	if (!this->check_args_number(2))
 		return (irc.push_mess_client(fd, ERR_NEEDMOREPARAMS));
-	if ((pos = irc.find_fd(vec_users, fd)) == -1)
+
+	User* usr = irc.get_user(fd);
+
+	if (!usr)
 		return (irc.push_mess_client(fd, ERR_NOTREGISTERED));
 
 	/*	юзер для оператора добавлен в виде prefix*
@@ -44,12 +44,17 @@ cmd_oper(IRC& irc, int fd)
 		size_t n = irc.get_operator_user().size() - 1;
 
 		string operator_mask = irc.get_operator_user();
-		string user_name = irc.get_user(fd)->getName().substr(0, n) + "*";
+		string user_name = usr->getName().substr(0, n) + "*";
 
 		if (arguments[0] == operator_mask && user_name == operator_mask)
 		{
-			vec_users[pos]->setMode('o', true);
+			string mode_mess = " MODE " + usr->getName() + " :+o\r\n";
+
+			usr->setMode('o', true);
 			irc.push_cmd_queue(fd, irc.response(RPL_YOUREOPER, fd, command, RPL_YOUREOPER_MESS));
+			irc.push_cmd_queue(fd, irc.get_server_name() + mode_mess);
+
+			irc.forward_to_servers(fd, usr->getName() + mode_mess);
 		}
 		else
 			irc.push_cmd_queue(fd, irc.response(ERR_NOOPERHOST, fd, command, ERR_NOOPERHOST_MESS));

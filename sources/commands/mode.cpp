@@ -71,7 +71,8 @@
 **		флаг "только для приглашения";
 */
 
-bool check_keys_of_users_mod(std::string arg)
+bool
+check_keys_of_users_mod(std::string arg)
 {
 	// проверяем размер
 	if (arg.size() != 2)
@@ -83,7 +84,8 @@ bool check_keys_of_users_mod(std::string arg)
 	return (false);
 }
 
-bool check_keys_of_channel_mod(std::string arg)
+bool
+check_keys_of_channel_mod(std::string arg)
 {
 	
 	char temp[10] = {'a', 'i', 'm', 'n', 'q', 'p', 's', 'r', 't', '\0'};
@@ -105,7 +107,8 @@ bool check_keys_of_channel_mod(std::string arg)
 	return (true);
 }
 
-bool check_keys_of_channel_mod_2(std::string arg)
+bool
+check_keys_of_channel_mod_2(std::string arg)
 {
 	char temp[9] = {'O', 'o', 'v', 'k', 'l', 'b', 'e', 'I', '\0'};
 	
@@ -125,7 +128,8 @@ bool check_keys_of_channel_mod_2(std::string arg)
 	return (false);
 }
 
-void change_param_of_users_mod(User *user, const char mod, bool param)
+void
+change_param_of_users_mod(User *user, const char mod, bool param)
 {
 	switch (mod)
 	{
@@ -146,7 +150,8 @@ void change_param_of_users_mod(User *user, const char mod, bool param)
 	}
 }
 
-void change_param_of_channel_mod(Channel *ch, const char mod, bool param)
+void
+change_param_of_channel_mod(Channel *ch, const char mod, bool param)
 {
 	/*
 	**	a - переключить флаг анонимного канала;
@@ -184,14 +189,15 @@ void change_param_of_channel_mod(Channel *ch, const char mod, bool param)
 	}
 }
 
-void push_info(IRC& irc, std::string mess)
+void
+push_info(IRC& irc, std::string mess)
 {
 	std::vector<Server *> vec_servers = irc.get_servers();
 	std::vector<User *> vec_users = irc.get_users();
 	std::cout << "\nDEBUG: mess: " << mess << std::endl;
 
 	for (size_t i = 0; i < vec_servers.size(); i++)
-		irc.forward_to_servers(vec_servers[i]->getSocketFd(), mess, true);
+		irc.forward_to_servers(vec_servers[i]->getSocketFd(), mess);
 	for (size_t i = 0; i < vec_users.size(); i++)
 		irc.push_cmd_queue(vec_users[i]->getSocketFd(), mess + "\r\n");
 }
@@ -199,25 +205,31 @@ void push_info(IRC& irc, std::string mess)
 int Command::
 cmd_mode(IRC& irc, int fd)
 {
+	
 	std::cout << "\nDEBUG: prefix: " << this->prefix << std::endl;
 	std::cout << "DEBUG: arg:\n";
 	for (size_t i = 0; i < this->arguments.size(); i++)
 		std::cout << "Index # " << i << " arg: " << this->arguments[i] << std::endl;
-	
-	// проверяем на соответствие количеству args
-	if (!this->check_args_number(2) && !this->check_args_number(3))
-		return (irc.push_mess_client(fd, ERR_NEEDMOREPARAMS));
 
 	//Находим клиента который обратился по команде MODE
 	User* oper_user = (prefix.size()) ? irc.get_user(prefix) : irc.get_user(fd);
 	if (oper_user == NULL)
 		return (irc.push_mess_client(fd, ERR_USERSDONTMATCH));
 
-	//проверяем на наличие операторских прав
-	if (oper_user->getMode('o') == false)
-		return (irc.push_mess_client(fd, 300));
+	//костыль если нам подают один аргумент с названием канала
+	if ((this->arguments[0][0] == '#' || this->arguments[0][0] == '&') && this->arguments.size() == 1)
+	{
+		if (prefix.size() == 0)
+			push_info(irc, ":" + oper_user->getNickname() + " MODE " + this->arguments[0] + " +");
+		return (0);
+	}
 
-	//проверяем в каком режими нам работать
+	// проверяем на соответствие количеству args
+	if (!this->check_args_number(2) && !this->check_args_number(3))
+		return (irc.push_mess_client(fd, ERR_NEEDMOREPARAMS));
+
+
+	//проверяем в каком режиме нам работать
 	if (this->arguments[0][0] == '#' || this->arguments[0][0] == '&')
 	{
 		//режим канала
@@ -232,6 +244,14 @@ cmd_mode(IRC& irc, int fd)
 			if (ch == NULL)
 				return (irc.push_mess_client(fd, ERR_NOSUCHCHANNEL));
 			
+			//проверяем, что oper_user находится в канале
+			user_map& users = ch->get_users();
+			if (!users.count(oper_user))
+				return (irc.push_mess_client(fd, ERR_NOSUCHNICK));
+			//проверяем на наличие операторских прав (в канале!, не на сервере)
+			if (!users[oper_user].o)
+				return (irc.push_mess_client(fd, ERR_CHANOPRIVSNEEDED));
+
 			//меняем моды для итераторной позиции канала
 			for (size_t i = 1; i < this->arguments[1].size(); i++)
 			{
@@ -428,6 +448,8 @@ cmd_mode(IRC& irc, int fd)
 	}
 	else
 	{
+		if (arguments.size() < 3)
+			return (irc.push_mess_client(fd, ERR_NEEDMOREPARAMS));
 		//режим пользователя
 		std::cout << "\nDEBUG: Режим пользователя DONE!\n";
 		

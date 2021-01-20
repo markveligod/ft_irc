@@ -19,7 +19,8 @@
 ** ====================================================================
 */
 
-int Command::cmd_join(IRC& irc, int fd)
+int Command::
+cmd_join(IRC& irc, int fd)
 {
 	if (arguments.empty())
 	{
@@ -70,12 +71,12 @@ join_channel(IRC& irc,
 			irc.push_cmd_queue(fd, mess_to_user + "\r\n");
 		
 		irc.forward_to_channel(fd, channel_name, mess_to_user);
-		irc.forward_to_servers(fd, mess_to_server, true);
+		irc.forward_to_servers(fd, mess_to_server);
 		
 		if (!is_server(irc, fd))
 		{
 			channels[channel_name].set_operator(user);
-			irc.forward_to_servers(fd, mode_message, true);
+			irc.forward_to_servers(fd, mode_message);
 		}
 
 		utils::print_line("Channel " + channel_name + " created");
@@ -116,7 +117,7 @@ join_channel(IRC& irc,
 				send_topic(irc, fd, channel_name, channel.get_topic());	// отправляем Топик
 		}
 		irc.forward_to_channel(fd, channel_name, mess_to_user);
-		irc.forward_to_servers(fd, mess_to_server, true);
+		irc.forward_to_servers(fd, mess_to_server);
 
 
 		// std::cout << "DEBUG Channel members list:\n";

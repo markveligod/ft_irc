@@ -20,6 +20,90 @@
 ** =====================================================================
 */
 
+int Command::
+cmd_nick(IRC& irc, int fd)
+{
+	std::vector<Client*>&	clients 	= irc.get_clients();
+	std::vector<User*>&		users 		= irc.get_users();
+	std::vector<Server*>&	servers		= irc.get_servers();
+	int						client_el	= IRC::find_fd(clients, fd);
+	int						server_el	= IRC::find_fd(servers, fd);
+	int						curr_client = -1;
+	int						curr_user	= -1;
+	int						error;
+	std::stringstream		out_mess;
+
+	if ((error = nick_check_errors(fd, server_el, irc)) != 0)
+		return (error);
+
+	// Если это от сервера
+	if (server_el >= 0)
+	{
+		if (arguments.size() == 1)			// Изменение никнейма существующего клиента
+		{
+			curr_client = IRC::find_name(clients, prefix);
+			clients[curr_client]->setNickname(arguments[0]);
+
+			if ((curr_user = IRC::find_name(users, prefix)) >= 0)
+			{
+				irc.push_cmd_queue(fd, irc.full_name(users[curr_user]) + " NICK :" + this->arguments[0]);
+				irc.forward_to_all_channels(users[curr_user], irc.full_name(users[curr_user]) + " NICK :" + this->arguments[0]);
+				users[curr_user]->setNickname(arguments[0]);
+			}
+
+			utils::print_line("Nickname for client changed from " + prefix + " to " + this->arguments[0]);
+			out_mess << ":" << prefix << " NICK " << arguments[0];
+			irc.forward_to_servers(fd, out_mess.str());
+		}
+		else if (arguments.size() == 2)		// Создание нового клиента
+		{
+			if (!prefix.empty())
+			{
+				prefix = "";
+				utils::print_error(0, "DEBUG Ignoring prefix (message from server with both prefix and hopcount).");
+			}
+
+			Client *new_client = new Client(fd, this->arguments[0], "" ,std::atoi(this->arguments[1].c_str()));
+			clients.push_back(new_client);
+			servers[server_el]->addClient(new_client);
+			utils::print_line("New client created");
+			curr_client = clients.size() - 1;
+			//out_mess << "NICK " << arguments[0] << " " << (clients[curr_client]->getHopcount() + 1) << "\r\n";
+		}
+	}
+
+	// Если это от клиента
+	else if (client_el >= 0)
+	{
+		curr_client = client_el;
+		if (!this->prefix.empty())
+			curr_client = IRC::find_name(clients, this->prefix);
+
+		// этот клиент еще не зарегестрирован
+		if (clients[curr_client]->getName().empty())
+			utils::print_line("Nickname for client set -> " + this->arguments[0]);
+		// уже зарегестрирован
+		else
+		{
+			if (prefix.empty())
+				prefix = clients[curr_client]->getName();
+			if ((curr_user = IRC::find_name(users, prefix)) >= 0)
+			{
+				irc.push_cmd_queue(fd, irc.full_name(users[curr_user]) + " NICK :" + this->arguments[0]);
+				irc.forward_to_all_channels(users[curr_user], irc.full_name(users[curr_user]) + " NICK :" + this->arguments[0]);
+				users[curr_user]->setNickname(arguments[0]);
+			}
+			out_mess << ":" << prefix << " " << "NICK " << arguments[0];
+			irc.forward_to_servers(fd, out_mess.str());
+
+			utils::print_line("Nickname changed " + clients[curr_client]->getName() + " -> " + this->arguments[0]);
+		}
+		clients[curr_client]->setNickname(this->arguments[0]);
+	}
+
+	return 0;
+}
+
 bool Command::
 nick_valid() const
 {
@@ -122,84 +206,6 @@ nick_check_errors(int fd, int serv_client, IRC& irc)
 	return (0);
 }
 
-int Command::
-cmd_nick(IRC& irc, int fd)
-{
-	std::vector<Client*>&	clients 	= irc.get_clients();
-	std::vector<User*>&		users 		= irc.get_users();
-	std::vector<Server*>&	servers		= irc.get_servers();
-	int						client_el	= IRC::find_fd(clients, fd);
-	int						server_el	= IRC::find_fd(servers, fd);
-	int						curr_client = -1;
-	int						curr_user	= -1;
-	int						error;
-	std::stringstream		out_mess;
-
-	if ((error = nick_check_errors(fd, server_el, irc)) != 0)
-		return (error);
-
-	// Если это от сервера
-	if (server_el >= 0)
-	{
-		if (arguments.size() == 1)			// Изменение никнейма существующего клиента
-		{
-			curr_client = IRC::find_name(clients, prefix);
-			clients[curr_client]->setNickname(arguments[0]);
-
-			if ((curr_user = IRC::find_name(users, prefix)) >= 0)
-				users[curr_user]->setNickname(arguments[0]);
-
-			utils::print_line("Nickname for client changed from " + clients[curr_client]->getName() + " to " + this->arguments[0]);
-			out_mess << "NICK " << arguments[0];
-			irc.forward_to_servers_2(fd, prefix, out_mess.str());
-		}
-		else if (arguments.size() == 2)		// Создание нового клиента
-		{
-			if (!prefix.empty())
-			{
-				prefix = "";
-				utils::print_error(0, "DEBUG Ignoring prefix (message from server with both prefix and hopcount).");
-			}
-
-			Client *new_client = new Client(fd, this->arguments[0], "" ,std::atoi(this->arguments[1].c_str()));
-			clients.push_back(new_client);
-			servers[server_el]->addClient(new_client);
-			utils::print_line("New client created");
-			curr_client = clients.size() - 1;
-			//out_mess << "NICK " << arguments[0] << " " << (clients[curr_client]->getHopcount() + 1) << "\r\n";
-		}
-	}
-
-	// Если это от клиента
-	else if (client_el >= 0)
-	{
-		curr_client = client_el;
-		if (!this->prefix.empty())
-			curr_client = IRC::find_name(clients, this->prefix);
-
-		// этот клиент еще не зарегестрирован
-		if (clients[curr_client]->getName().empty())
-			utils::print_line("Nickname for client set -> " + this->arguments[0]);
-		// уже зарегестрирован
-		else
-		{
-			if (prefix.empty())
-				prefix = clients[curr_client]->getName();
-			if ((curr_user = IRC::find_name(users, prefix)) >= 0)
-			{
-				irc.push_cmd_queue(fd, irc.full_name(users[curr_user]) + " NICK :" + this->arguments[0] + "\r\n");
-				users[curr_user]->setNickname(arguments[0]);
-			}
-			out_mess << "NICK " << arguments[0];
-			irc.forward_to_servers_2(fd, prefix, out_mess.str());
-
-			utils::print_line("Nickname changed " + clients[curr_client]->getName() + " -> " + this->arguments[0]);
-		}
-		clients[curr_client]->setNickname(this->arguments[0]);
-	}
-
-	return 0;
-}
 
 //User *user = irc.get_user(clients[curr_client]);
 //irc.push_cmd_queue(fd, irc.full_name(user) + " NICK :" + this->arguments[0] + "\r\n");

@@ -34,28 +34,55 @@
 ** =====================================================================
 */
 
-template<typename T>
-void del_vec(IRC& irc, std::vector<T*>& vec, int fd)
+int Command::
+cmd_squit(IRC& irc, int fd)
 {
-	int pos;
-	while((pos = irc.find_fd(vec, fd)) != -1)
-    {
-        T* out = vec[pos];
-        delete out;
-        vec.erase(vec.begin() + pos);
-    }
-}
+    std::vector<Server*>& servers = irc.get_servers();
+    std::vector<User*>& users = irc.get_users();
+	User* usr = (!prefix.empty()) ? irc.get_user(prefix) : irc.get_user(fd);
+	if (!usr) return 1;
 
-int Command::cmd_squit(IRC& irc, int fd)
-{
-    std::vector<Server*>& vec_servers = irc.get_servers();
-    std::vector<Client*>& vec_clients = irc.get_clients();
-    std::vector<User*>& vec_users = irc.get_users();
+	if (!usr->getMode('o'))
+		return (irc.push_mess_client(fd, ERR_NOPRIVILEGES));
 
-    if (!this->check_args_number(2))
+	if (!this->check_args_number(2))
 		return (irc.push_mess_client(fd, ERR_NEEDMOREPARAMS));
-    del_vec(irc, vec_servers, fd);
-	del_vec(irc, vec_clients, fd);
-	del_vec(irc, vec_users, fd);
-    return (0);
+
+	int pos;
+	if ((pos = irc.find_name(irc.get_servers(), arguments[0])) < 0)
+		return (irc.push_mess_client(fd, ERR_NOSUCHSERVER));
+
+	string quit_server_name = arguments[0];		// имя отключаемого сервера
+	Server* srvr = irc.get_server(arguments[0]);// отлючаемый сервер
+
+	for (size_t i = 0; i < users.size(); i++)
+	{
+		if ((srvr->getHopcount() == 1								// если удаяемы сервер подключен к нам напрямую
+				&& users[i]->getSocketFd() == srvr->getSocketFd())	// то удаляем всех пользователей в цепочке серверов (по fd)
+			|| users[i]->getServername() == quit_server_name)
+			irc.delete_user(users[i]);								// удаляем пользователя из всех каналов, из _users и из _clients 
+	}
+
+	string quit_msg1 = ":" + irc.get_server_name() +
+								" WALLOPS :Received SQUIT " +
+								arguments[0] +
+								" from " +
+								usr->getName() + ": " +
+								arguments[1];
+
+	irc.forward_to_servers(fd, quit_msg1);
+
+	string quit_msg2 = ":" + quit_server_name +
+								" SQUIT " +
+								quit_server_name + " :" +
+								arguments[1] +
+								" (SQUIT from " +
+								usr->getName() + ")";
+
+	irc.forward_to_servers(fd, quit_msg2);
+
+	irc.close_connection(servers[pos]);
+	return (0);
 }
+
+// squit ft_irc.net/1084 :uhodi sorry  

@@ -54,7 +54,7 @@ cmd_topic(IRC& irc, int fd)
 
 			irc.push_cmd_queue(fd, mess_to_user + "\r\n");
 			irc.forward_to_channel(fd,*chann, mess_to_user);
-			irc.forward_to_servers(fd, mess_to_server, true);
+			irc.forward_to_servers(fd, mess_to_server);
 		}
 	}
 	return 0;

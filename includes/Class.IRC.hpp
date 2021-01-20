@@ -95,6 +95,9 @@ class IRC
 		void						delete_user(int fd);
 		void						delete_client(int fd);
 		void						delete_channel(string channel_name);
+		void						delete_client(Client* clnt);
+		void						delete_user(User* user);
+		void						delete_user_from_channels(User* user, const string& quit_mess);
 		void 						close_connection(int fd, int n);
 		void 						close_connection(User* user);
 		void 						close_connection(Server* server);
@@ -106,10 +109,12 @@ class IRC
 		User*						get_user(Client* client);
 		vector<User*>& 				get_users();
 		vector<Client*>& 			get_clients();
+		Client*						get_client(int fd);
 		Client*						get_client(User* user);
 		Client*						get_client(Server* user);
 		vector<Server*>& 			get_servers();
 		Server*						get_server(int fd);
+		Server*						get_server(const string& name) const;
 		const string& 				get_server_name();
 		const string& 				get_server_name(int fd);
 		const string&				get_nickname(int fd);
@@ -124,6 +129,7 @@ class IRC
 		bool						is_empty_queue() const;
 		bool						is_server(int fd) const;
 		bool						is_server_operator(const User*) const;
+		bool						is_numeric_response(const Command& command);
 
 		template <typename T>
 		static int					find_fd(T& container, int fd);
@@ -138,11 +144,11 @@ class IRC
 		string						response_2(int response_code, int fd, string command, string message);
 		string						response_3(int response_code, string name, string command, string message);
 		int							push_mess_client(int fd, int code);
-		void						forward_to_servers(int fd, const string& message, bool prefix);
-		void						forward_to_servers_2(int fd, const string& prefix, const string& message);
+		void						forward_to_servers(int fd, const string& message);
 		void						forward_to_clients(IRC& irc, const string& message);
 		void						forward_to_channel(int fd, Channel& channel, const string& message);
 		void						forward_to_channel(int fd, const string& channel_name, const string& message);
+		void						forward_to_all_channels(User* user, const string& message);
 
 		void generate_map_codes();
 		void print_channels() const; //DEBUG

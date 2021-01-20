@@ -35,7 +35,6 @@ private:
 	string 		hostname;
 	string 		servername;
 	string 		realname;
-	// Client*		client;
 	ModeUser	mode;
 	size_t		channel_count;
 

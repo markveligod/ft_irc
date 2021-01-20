@@ -92,4 +92,10 @@
 //#include "Class.User.hpp"
 #include "codes.hpp"
 
-#define COMM_COUNT 20
+#define COMM_COUNT 23
+
+#define ADMINME			" :Ум и красота - leweather"
+#define ADMINLOC1		" :Веселый озорник - ckakuna"
+#define ADMINLOC2		" :Еще есть - pdemocri"
+#define ADMINEMAIL		" :Email-a у нас нет:("
+

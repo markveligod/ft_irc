@@ -20,18 +20,6 @@
 ** =================================================================
 */
 
-bool Command::
-pass(string password, string local_pass)
-{
-    if (password == local_pass)
-	{
-		utils::print_line("Correct password");
-		return true;
-	}
-	utils::print_error(ERR_PASSWORD, "Incorrect password set");
-	return false;
-}
-
 int	Command::
 cmd_pass(IRC& irc, int fd)
 {
@@ -55,4 +43,16 @@ cmd_pass(IRC& irc, int fd)
 	res = this->pass(this->arguments[0], irc.get_localhost_pass());
 	clients[i]->setPassword(res);
 	return (res == false ? ERR_PASSWDMISMATCH : 0);	// в документации нет такой ошибки
+}
+
+bool Command::
+pass(string password, string local_pass)
+{
+    if (password == local_pass)
+	{
+		utils::print_line("Correct password");
+		return true;
+	}
+	utils::print_error(ERR_PASSWORD, "Incorrect password set");
+	return false;
 }
