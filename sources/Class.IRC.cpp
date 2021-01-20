@@ -254,9 +254,15 @@ init_fd_select()
 	FD_ZERO(&_fd_set_write);
 	for (map<int, int>::iterator it = _array_fd_select.begin(); it != _array_fd_select.end(); it++)
 		FD_SET(it->first, &_fd_set_read);
-	if (!_command_queue.empty())
+	while (!_command_queue.empty())
 	{
-		FD_SET(_command_queue.front().first, &_fd_set_write);
+		if (_array_fd_select.count(_command_queue.front().first))
+		{
+			FD_SET(_command_queue.front().first, &_fd_set_write);
+			break;
+		}
+		else
+			_command_queue.pop();
 	}
 }
 
@@ -409,16 +415,41 @@ void IRC::close_connection(int fd, int n)
 {
 	if (n)
 		utils::print_line("message receiving failed");
+
+	if (_array_fd_select.count(fd))
+	{
+		Client* user;
+
+		if (is_server(fd))
+			close_connection(get_server(fd));
+		else if ((user = get_user(fd)))
+			close_connection(get_user(fd));
+		else if ((user = get_client(fd)))
+			close_connection(get_client(fd));
+		else
+		{
+			_array_fd_select.erase(fd);
+			close(fd);
+		}
 		
-	if (is_server(fd))
-		close_connection(get_server(fd));
-	else
-		close_connection(get_user(fd));
+	}	
 }
+
+void IRC::
+close_connection(Client* client)
+{
+	int fd = client->getSocketFd();
+	_array_fd_select.erase(fd);
+	delete_client(client);
+}
+
 
 void IRC::
 close_connection(User* user)
 {
+	int fd = user->getSocketFd();
+	if (!is_server(fd))
+		_array_fd_select.erase(fd);
 	delete_user(user);
 }
 
@@ -1036,13 +1067,14 @@ delete_user_from_channels(User* user, const string& quit_mess)
 	//удаляем юзера со всех каналов текущего сервера
 	channel_map::iterator it_channels = _channels.begin();
 
-	while (it_channels != _channels.end())
+	while (it_channels != _channels.end() && user->getChannelCount())
 	{
 		user_map& chann_users = it_channels->second.get_users();	// список пользователей канала
 
 		if (chann_users.count(user))
 		{
 			chann_users.erase(user);
+			user->dec_channel_count();
 			if (chann_users.size() == 0) // если канал пуст удалить его из мапы
 			{
 				_channels.erase(it_channels);

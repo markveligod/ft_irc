@@ -99,6 +99,7 @@ class IRC
 		void						delete_user(User* user);
 		void						delete_user_from_channels(User* user, const string& quit_mess);
 		void 						close_connection(int fd, int n);
+		void 						close_connection(Client* client);
 		void 						close_connection(User* user);
 		void 						close_connection(Server* server);
 
