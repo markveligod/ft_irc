@@ -28,7 +28,9 @@ std::string g_cmd_name[COMM_COUNT] = {"NICK",
 									  "PRIVMSG",
 									  "AWAY",
 									  "NOTICE",
-									  "STATS"};
+									  "STATS",
+									  "TIME",
+									  };
 
 /*
 ** ----------------------------------------------------------
@@ -166,7 +168,8 @@ do_command(Command* command, int fd)
 									"PRIVMSG",
 									"AWAY",
 									"NOTICE",
-									"STATS"
+									"STATS",
+									"TIME"
 									};
 	doCommand	cmd_func[COMM_COUNT] = {&Command::cmd_nick,
 										&Command::cmd_pass,
@@ -187,7 +190,8 @@ do_command(Command* command, int fd)
 										&Command::cmd_privmsg,
 										&Command::cmd_away,
 										&Command::cmd_notice,
-										&Command::cmd_stats
+										&Command::cmd_stats,
+										&Command::cmd_time
 										};
 
 	const string & comm 			= command->getCommand();

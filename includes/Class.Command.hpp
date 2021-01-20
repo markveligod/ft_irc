@@ -86,6 +86,7 @@ public:
 	int					cmd_away(IRC& irc, int fd);
 	int					cmd_notice(IRC& irc, int fd);
 	int					cmd_stats(IRC& irc, int fd);
+	int					cmd_time(IRC& irc, int fd);
 
 	const string&		getCommand() const;
 	const string&		getMessage() const;
