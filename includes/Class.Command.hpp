@@ -91,6 +91,7 @@ public:
 	int					cmd_error(IRC& irc, int fd);
 	int					cmd_admin(IRC& irc, int fd);
 	int					cmd_wallops(IRC& irc, int fd);
+	int					cmd_connect(IRC& irc, int fd);
 
 	const string&		getCommand() const;
 	const string&		getMessage() const;

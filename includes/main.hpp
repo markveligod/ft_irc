@@ -72,7 +72,7 @@
 
 #define SERVERNAME "ft_irc.net"
 #define LOCALHOST "127.0.0.1"
-#define DEF_PORT "0"
+#define DEF_PORT "6667"
 #define BUFFER_SIZE	512
 #define DEF_PASS "123"
 #define FD_REQUEST 1
@@ -93,7 +93,10 @@
 //#include "Class.User.hpp"
 #include "codes.hpp"
 
-#define COMM_COUNT 24
+#define COMM_COUNT 25
+
+#define OPER_MASK "op*"
+#define OPER_PASS "pass"
 
 #define ADMINME			" :Ум и красота - leweather"
 #define ADMINLOC1		" :Веселый озорник - ckakuna"
