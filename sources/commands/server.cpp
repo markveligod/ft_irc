@@ -127,14 +127,14 @@ server_check_errors(IRC& irc, int fd) const
 	if (server_el >= 0 && arguments.size() != 4)
 	{
 		utils::print_error(ERR_NEEDMOREPARAMS, "Invalid number of parameters");
-		irc.push_cmd_queue(fd, irc.response_2(ERR_NEEDMOREPARAMS, fd, "* SERVER", ERR_NEEDMOREPARAMS_MESS));
+		irc.push_cmd_queue(fd, irc.response_3(ERR_NEEDMOREPARAMS, "*", "SERVER", ERR_NEEDMOREPARAMS_MESS));
 		return (ERR_NEEDMOREPARAMS);
 	}
 
 	if (server_el < 0 && arguments.size() != 3)
 	{
 		utils::print_error(ERR_NEEDMOREPARAMS, "Invalid number of parameters");
-		irc.push_cmd_queue(fd, irc.response_2(ERR_NEEDMOREPARAMS, fd, "* SERVER", ERR_NEEDMOREPARAMS_MESS));
+		irc.push_cmd_queue(fd, irc.response_3(ERR_NEEDMOREPARAMS, "*", "SERVER", ERR_NEEDMOREPARAMS_MESS));
 		return (ERR_NEEDMOREPARAMS);
 	}
 
@@ -184,7 +184,6 @@ server_check_errors(IRC& irc, int fd) const
 		return 0;
 	}
 		
-
 	return (1);
 }
 

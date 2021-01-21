@@ -74,7 +74,7 @@ user_create(Client* curr_client, vector<User*>& users, Server* curr_server)
 	std::cout << "RealName: " << curr_user->getRealname() << std::endl;
 	std::cout << "NickName: " << curr_user->getNickname() << std::endl;
 	std::cout << "HopCount: " << curr_user->getHopcount() << std::endl;
-	//(void)curr_server;
+
 	if (curr_server != NULL)
 	{
 		curr_server->addUser(curr_user);
@@ -92,8 +92,6 @@ user_check_errors(IRC& irc, int fd)
 	int client_el				= IRC::find_fd(clients, fd);
 	int i;
 
-	if (!(this->check_args_number(4)))
-		return (ERR_NEEDMOREPARAMS);
 	// Если пришло от сервера
 	if (server_el >= 0)
 	{
@@ -103,6 +101,12 @@ user_check_errors(IRC& irc, int fd)
 			utils::print_error(0, "Empty prefix");
 			irc.push_cmd_queue(fd, "ERROR :Empty prefix\r\n");
 			return (0);
+		}
+		if (arguments.size() != 4)
+		{
+			utils::print_error(ERR_NEEDMOREPARAMS, "Invalid number of parameters");
+			irc.push_cmd_queue(fd, irc.response_3(ERR_NEEDMOREPARAMS, prefix, "USER", ":Syntax error"));
+			return (ERR_NEEDMOREPARAMS);
 		}
 		// Если нет клиента с ником - префиксом
 		if ((i = irc.find_name(clients, this->prefix)) < 0)
@@ -122,7 +126,7 @@ user_check_errors(IRC& irc, int fd)
 		if (irc.find_name(users, this->prefix) >= 0)
 		{
 			utils::print_error(ERR_ALREADYREGISTRED, "Already registered");
-			irc.push_cmd_queue(fd, irc.response(ERR_ALREADYREGISTRED, fd, arguments[0], ERR_ALREADYREGISTRED_MESS));
+			irc.push_cmd_queue(fd, irc.response_3(ERR_ALREADYREGISTRED, prefix, "", ":Connection already registered"));
 			return (ERR_ALREADYREGISTRED);
 		}
 	}
@@ -137,8 +141,14 @@ user_check_errors(IRC& irc, int fd)
 		if (irc.find_name(users, clients[client_el]->getName()) >= 0)
 		{
 			utils::print_error(ERR_ALREADYREGISTRED, "Already registered");
-			irc.push_cmd_queue(fd, irc.response(ERR_ALREADYREGISTRED, fd, arguments[0], ERR_ALREADYREGISTRED_MESS));
+			irc.push_cmd_queue(fd, irc.response_3(ERR_ALREADYREGISTRED, clients[client_el]->getName(), "", ":Connection already registered"));
 			return (ERR_ALREADYREGISTRED);
+		}
+		if (arguments.size() != 4)
+		{
+			utils::print_error(ERR_NEEDMOREPARAMS, "Invalid number of parameters");
+			irc.push_cmd_queue(fd, irc.response_3(ERR_NEEDMOREPARAMS, clients[client_el]->getName(), "USER", ":Syntax error"));
+			return (ERR_NEEDMOREPARAMS);
 		}
 	}
 	else

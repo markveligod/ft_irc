@@ -138,7 +138,7 @@
 										// - Returned by the server by numerous commands to
 										// indicate to the client that it didn't supply enough
 										// parameters.
-#define ERR_NEEDMOREPARAMS_MESS		" :Not enough parameters"
+#define ERR_NEEDMOREPARAMS_MESS		":Not enough parameters"
 
 #define ERR_ALREADYREGISTRED		462		// ":You may not reregister"
 										// - Returned by the server to any link which tries to
