@@ -47,6 +47,8 @@ private:
 	void						stats_l(IRC& irc, int fd, Client* client);
 	void						stats_u(IRC& irc, int fd, Client* client);
 
+	int							info_chek_errors(IRC &irc, int fd, int server_el, int client_el);
+
 	void						join_channel(IRC& irc, const string& name, const string& key, User* user, int fd);
 	void						leave_channel(IRC& irc, Channel& channels, int fd, string message);
 
@@ -92,6 +94,7 @@ public:
 	int					cmd_admin(IRC& irc, int fd);
 	int					cmd_wallops(IRC& irc, int fd);
 	int					cmd_connect(IRC& irc, int fd);
+	int					cmd_info(IRC& irc, int fd);
 
 	const string&		getCommand() const;
 	const string&		getMessage() const;

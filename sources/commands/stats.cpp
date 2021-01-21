@@ -148,10 +148,10 @@ stats_check_errors(IRC &irc, int fd)
 int Command::
 cmd_stats(IRC& irc, int fd)
 {
-	vector<Client*>& clients					= irc.get_clients();
-	vector<Server*>& servers					= irc.get_servers();
-	int server_el								= IRC::find_fd(servers, fd);
-	int client_el								= IRC::find_fd(clients, fd);
+	vector<Client*>& clients	= irc.get_clients();
+	vector<Server*>& servers	= irc.get_servers();
+	int server_el				= IRC::find_fd(servers, fd);
+	int client_el				= IRC::find_fd(clients, fd);
 
 	if (stats_check_errors(irc, fd) != 1)
 		return (0);

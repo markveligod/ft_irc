@@ -1,26 +1,5 @@
 #include "Class.Statistics.hpp"
 
-std::string cmd_name[COMM_COUNT] = {"NICK",
-									  "PASS",
-									  "USER",
-									  "SERVER",
-									  "JOIN",
-									  "OPER",
-									  "QUIT",
-									  "PART",
-									  "NAMES",
-									  "SQUIT",
-									  "WHO",
-									  "TOPIC",
-									  "PING",
-									  "PONG",
-									  "MODE",
-									  "KICK",
-									  "PRIVMSG",
-									  "AWAY",
-									  "NOTICE",
-									  "STATS"};
-
 Statistics::
 Statistics() :	sent_count(0),
 				recv_count(0),
@@ -81,6 +60,18 @@ getWorkingTime() const
 map<string, pair<int, unsigned long> > &Statistics::
 getMapCmd()				{ return (this->map_cmd); }
 
+string const Statistics::
+getStartDate() const
+{
+	char buffer[100];
+	struct tm *work_time = localtime(&time_start);
+	std::stringstream ss;
+
+	strftime(buffer, 100, "%a %b %d %Y at %H:%M:%S", work_time);
+	ss << buffer;
+	return (ss.str());
+}
+
 struct tm * Statistics::
 getWorkingTime_t() const {
 	time_t curr_time = time(NULL);
@@ -121,9 +112,9 @@ recieved(string const & comm, string const &message)
 
 	for (int i = 0; i < COMM_COUNT; i++)
 	{
-		if (utils::is_equal(cmd_name[i], comm))
+		if (utils::is_equal(g_cmd_name[i], comm))
 		{
-			fillMapCmd(cmd_name[i], message.size() * 8);
+			fillMapCmd(g_cmd_name[i], message.size() * 8);
 			recv_count += 1;
 			recv_kbytes += message.size() * 8;
 			flag = true;

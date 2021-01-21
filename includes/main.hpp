@@ -85,6 +85,9 @@
 **==========================
 */
 
+#define COMM_COUNT 26
+extern std::string g_cmd_name[COMM_COUNT];
+
 #include "utils.hpp"
 #include "ctime"
 #include "string.h"
@@ -92,8 +95,6 @@
 //#include "Class.Message.hpp"
 //#include "Class.User.hpp"
 #include "codes.hpp"
-
-#define COMM_COUNT 25
 
 #define OPER_MASK "op*"
 #define OPER_PASS "pass"
