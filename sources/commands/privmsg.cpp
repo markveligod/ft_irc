@@ -54,7 +54,7 @@ int Command::cmd_privmsg(IRC& irc, int fd)
 		Channel* channel = irc.get_channel(recepients[i]);
 		if (channel)
 		{
-			bool in_channel = !channel->is_user_in_channel(sender);
+			bool in_channel = channel->is_user_in_channel(sender);
 			ModeUser mode_user = in_channel ? channel->get_users()[sender] : ModeUser();
 
 			if ((channel->getModeChannel('n') && !in_channel)			// пользователь не в канале и запрет в канале прием сообщений извне

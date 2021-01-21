@@ -32,6 +32,7 @@ std::string g_cmd_name[COMM_COUNT] = {"NICK",
 									  "TIME",
 									  "ERROR",
 									  "WALLOPS",
+									  "CONNECT",
 									  };
 
 /*
@@ -64,9 +65,12 @@ IRC(string network_ip,
 	_host_name = LOCALHOST;
 	_operator_user = operator_user;
 	_operator_pass = operator_pass;
-	_network_ip = network_ip;
-	_network_port = std::atoi(network_port.c_str());
-	_network_pass = network_pass;
+	_network_ip.push_back(network_ip);
+	std::cout << "DEBUG: _network_ip: " << network_ip << std::endl;
+	_network_port.push_back(std::atoi(network_port.c_str()));
+	std::cout << "DEBUG: _network_port: " << network_port << std::endl;
+	_network_pass.push_back(network_pass);
+	std::cout << "DEBUG: _network_pass: " << network_pass << std::endl;
 	_localhost_pass = localhost_pass;
 	int port = std::atoi(localhost_port.c_str());
 	_localhost = Socket(LOCALHOST, port);
@@ -113,24 +117,50 @@ create_socket_local()
 	utils::print_line("Socket ssl local listen...");
 }
 
+// void IRC::
+// create_socket_network(std::vector<std::string> network)
+// {
+// 	size_t n = _network_ip.size() - 1;
+
+// 	_network.push_back(Socket(_network_ip[n].c_str(), _network_port[n]));
+// 	utils::print_line("Socket network done!");
+// 	int fd = _network[n]._socket();
+// 	utils::print_line("Socket network FD done!");
+// 	_network[n]._connect();
+// 	utils::print_line("Socket network connection!");
+
+// 	_array_fd_select[fd] = FD_CLIENT;
+// 	_clients.push_back(new Client(network[0], fd));
+// 	//_servers.push_back(new Server(fd, network[0] + "/" + network[1], 1, "info"));
+// 	utils::print_line("Trying to connect to server!\nServer name: " +
+// 					  network[0] + "/" + network[1] +
+// 					  "\nHopcount: 1\nInfo: info");
+// 	push_cmd_queue(fd, "PASS " + _network_pass[n] + "\r\nSERVER " + _server_name + " 1 info\r\n");
+// 	_clients[0]->setIsServer(true);
+// 
 void IRC::
-create_socket_network(std::vector<std::string> network)
+create_socket_network()				// network_ip, _network_port и network_pass добавили заранееe
 {
-	_network = Socket(_network_ip.c_str(), _network_port);
+	size_t n = _network_ip.size() - 1;
+
+	_network.push_back(Socket(_network_ip[n].c_str(), _network_port[n]));
 	utils::print_line("Socket network done!");
-	int fd = _network._socket();
+
+	int fd = _network[n]._socket();
 	utils::print_line("Socket network FD done!");
-	_network._connect();
+
+	_network[n]._connect();
 	utils::print_line("Socket network connection!");
 
 	_array_fd_select[fd] = FD_CLIENT;
-	_clients.push_back(new Client(network[0], fd));
-	//_servers.push_back(new Server(fd, network[0] + "/" + network[1], 1, "info"));
+	_clients.push_back(new Client(_network_ip[n], fd));
+	
 	utils::print_line("Trying to connect to server!\nServer name: " +
-					  network[0] + "/" + network[1] +
+					  _network_ip[n] + "/" + _network_ip[n] +
 					  "\nHopcount: 1\nInfo: info");
-	push_cmd_queue(fd, "PASS " + _network_pass + "\r\nSERVER " + _server_name + " 1 info\r\n");
-	_clients[0]->setIsServer(true);
+
+	push_cmd_queue(fd, "PASS " + _network_pass[n] + "\r\nSERVER " + _server_name + " 1 info\r\n");
+	_clients[_clients.size() - 1]->setIsServer(true);
 }
 
 /*
@@ -175,6 +205,7 @@ do_command(Command* command, int fd)
 									"ERROR",
 									"ADMIN",
 									"WALLOPS",
+									"CONNECT",
 									};
 	doCommand	cmd_func[COMM_COUNT] = {&Command::cmd_nick,
 										&Command::cmd_pass,
@@ -200,6 +231,7 @@ do_command(Command* command, int fd)
 										&Command::cmd_error,
 										&Command::cmd_admin,
 										&Command::cmd_wallops,
+										&Command::cmd_connect,
 										};
 
 	const string & comm 			= command->getCommand();
@@ -530,6 +562,27 @@ ssl_connection(int fd)
 	return _ssl;
 }
 
+void IRC::
+add_network_ip(const string& ip)
+{
+	_network_ip.push_back(ip);
+	std::cout << "DEBUG: _network_ip: " << ip << std::endl;
+}
+
+void IRC::
+add_network_port(const string& port)		
+{
+	_network_port.push_back(std::atoi(port.c_str()));
+	std::cout << "DEBUG: _network_port: " << port << std::endl;
+}
+
+void IRC::
+add_network_pass(const string& pass)
+{
+	_network_pass.push_back(pass);
+	std::cout << "DEBUG: _network_pass: " << pass << std::endl;
+}
+
 /*
 ** ===========================utils PART=============================
 ** ------------------------------------------------------------------
@@ -716,6 +769,9 @@ get_server_name()							{ return _server_name; }
 const string& IRC::
 get_server_name(int fd)						{ return _servers[find_fd(_servers, fd)]->getName(); }
 
+size_t IRC::
+get_server_count()							{ return _network_ip.size(); }
+
 int IRC::
 get_localhost_port() const					{ return _localhost.get_port(); }
 
@@ -750,6 +806,9 @@ get_channel(string channel_name) {
 Statistics & IRC::
 get_statistics()							{ return statistics; }
 
+vector<Socket>& IRC::
+get_network()								{ return _network; }
+
 const string& IRC::
 get_nickname(int fd)						{ return _users[find_fd(_users, fd)]->getName(); }
 
@@ -781,7 +840,7 @@ response_2(int response_code, int fd, string command, string message)
 bool IRC::
 is_numeric_response(const Command& command)
 {
-	if ( // пересылаем сообщения
+	if ( 								// пересылаем сообщения
 		command.getCommand() == "256" ||
 		command.getCommand() == "257" ||
 		command.getCommand() == "258" ||
@@ -789,8 +848,9 @@ is_numeric_response(const Command& command)
 		command.getCommand() == "259" ||
 		command.getCommand() == "211" ||
 		command.getCommand() == "212" ||
-		command.getCommand() == "219"
-	)
+		command.getCommand() == "219" ||
+		command.getCommand() == "421"
+		)
 	{
 		const vector<string>& args = command.getArgs();
 		User* usr;

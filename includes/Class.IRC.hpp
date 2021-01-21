@@ -37,10 +37,10 @@ class IRC
 		string						_server_name;
 		string						_host_name;
 
-		Socket						_network;
-		string						_network_ip;
-		int							_network_port;
-		string						_network_pass;
+		vector<Socket>				_network;
+		vector<string>				_network_ip;
+		vector<int>					_network_port;
+		vector<string>				_network_pass;
 
 		Socket						_localhost;
 		Socket						_localhost_ssl;
@@ -67,18 +67,21 @@ class IRC
 
 	public:
 		IRC();
+
 		IRC(string network_ip,
 			string network_port,
 			string network_pass,
 			string localhost_port,
 			string localhost_pass,
-			string operator_user = "op*",
-			string operator_pass = "pass");
+			string operator_user = OPER_MASK,
+			string operator_pass = OPER_PASS);
+
 		~IRC();
 
 		IRC&						operator=(const IRC& other);
 
-		void						create_socket_network(std::vector<std::string> network);
+		// void						create_socket_network(std::vector<std::string> network);
+		void						create_socket_network();
 		void						create_socket_local();
 		void						init_fd_select();
 		void						do_select();
@@ -92,6 +95,10 @@ class IRC
 		int 						_send(int, int, const char*, size_t, int);
 		int 						_recv(int, int, char*, size_t, int);
 		
+		void						add_network_ip(const string& ip);
+		void						add_network_port(const string& port);
+		void						add_network_pass(const string& pass);
+
 		void						delete_user(int fd);
 		void						delete_client(int fd);
 		void						delete_channel(string channel_name);
@@ -118,6 +125,7 @@ class IRC
 		Server*						get_server(const string& name) const;
 		const string& 				get_server_name();
 		const string& 				get_server_name(int fd);
+		size_t						get_server_count();
 		const string&				get_nickname(int fd);
 		int							get_localhost_port() const;
 		const string&				get_localhost_pass() const;
@@ -127,6 +135,7 @@ class IRC
 		channel_map&				get_channels();
 		Channel*					get_channel(string channel_name);
 		Statistics &				get_statistics();
+		vector<Socket>&				get_network();
 		bool						is_empty_queue() const;
 		bool						is_server(int fd) const;
 		bool						is_server_operator(const User*) const;

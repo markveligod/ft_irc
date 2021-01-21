@@ -13,7 +13,7 @@ void terminate_server(int signal)
 
 int main(int ac, char **av)
 {
-	std::vector<std::string> network;
+	vector<string> network;
 	g_exit = 0;
 
 	if (ac != 3 && ac != 4)
@@ -35,10 +35,10 @@ int main(int ac, char **av)
 	}
 	
 	IRC server(network[0], network[1], network[2], (ac == 4) ? av[2] : av[1], (ac == 4) ? av[3] : av[2]);
-	IRC server_ssl(network[0], network[1], network[2], (ac == 4) ? av[2] : av[1]	, (ac == 4) ? av[3] : av[2]);
 	signal(SIGINT, terminate_server);
 	if (ac == 4)
-		server.create_socket_network(network);
+		// server.create_socket_network();
+		server.create_socket_network();
 
 	server.init_ssl();
 	server.init_ctx();

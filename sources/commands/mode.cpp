@@ -220,7 +220,26 @@ cmd_mode(IRC& irc, int fd)
 	if ((this->arguments[0][0] == '#' || this->arguments[0][0] == '&') && this->arguments.size() == 1)
 	{
 		if (prefix.size() == 0)
-			push_info(irc, ":" + oper_user->getNickname() + " MODE " + this->arguments[0] + " +");
+		{
+			if (!irc.get_channels().count(arguments[0]))
+				return (irc.push_mess_client(fd, ERR_NOSUCHCHANNEL));
+
+			string mode_mess = ":" + oper_user->getNickname() + " MODE " + this->arguments[0] + " +";
+		
+			ModeChannel* mode = irc.get_channels()[arguments[0]].getModeChannel();
+			if (mode->p)  mode_mess + "p";
+			if (mode->s)  mode_mess + "s";
+			if (mode->i)  mode_mess + "i";
+			if (mode->t)  mode_mess + "t";
+			if (mode->m)  mode_mess + "m";
+			if (mode->l)  mode_mess + "l";
+			if (mode->k)  mode_mess + "k";
+			if (mode->a)  mode_mess + "a";
+			if (mode->n)  mode_mess + "n";
+			if (mode->p)  mode_mess + "p";
+			
+			push_info(irc, mode_mess);
+		}
 		return (0);
 	}
 
