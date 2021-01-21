@@ -85,15 +85,12 @@
 **==========================
 */
 
-#define COMM_COUNT 26
+#define COMM_COUNT 27
 extern std::string g_cmd_name[COMM_COUNT];
 
 #include "utils.hpp"
 #include "ctime"
 #include "string.h"
-//#include "Class.Client.hpp"
-//#include "Class.Message.hpp"
-//#include "Class.User.hpp"
 #include "codes.hpp"
 
 #define OPER_MASK "op*"
@@ -104,3 +101,4 @@ extern std::string g_cmd_name[COMM_COUNT];
 #define ADMINLOC2		" :Еще есть - pdemocri"
 #define ADMINEMAIL		" :Email-a у нас нет:("
 
+#define VERSION			"BANDA_IRC-1.0"

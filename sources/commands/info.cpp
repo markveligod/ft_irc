@@ -2,6 +2,43 @@
 #include "Class.IRC.hpp"
 
 int Command::
+cmd_info(IRC &irc, int fd)
+{
+	vector<Client*>& clients	= irc.get_clients();
+	vector<Server*>& servers	= irc.get_servers();
+	int server_el				= IRC::find_fd(servers, fd);
+	int client_el				= IRC::find_fd(clients, fd);
+	string client_name;
+	std::stringstream ss;
+
+	if (info_chek_errors(irc, fd, server_el, client_el) != 1)
+		return (0);
+
+	client_name = prefix.empty() ? clients[client_el]->getName() : prefix;
+
+	if (arguments.size() == 0 ||
+		(arguments.size() == 1 && arguments[0] == irc.get_server_name()))
+	{
+		irc.push_cmd_queue(fd, irc.response_3(RPL_INFO, client_name, "", ":BANDA_IRC-1.0"));
+		ss << __DATE__ << " at " << __TIME__;
+		irc.push_cmd_queue(fd, irc.response_3(RPL_INFO, client_name, ":Birth Date:", ss.str()));
+		irc.push_cmd_queue(fd, irc.response_3(RPL_INFO, client_name, ":Online since", irc.get_statistics().getStartDate()));
+		irc.push_cmd_queue(fd, irc.response_3(RPL_ENDOFINFO, client_name, "", ":End of INFO list"));
+	}
+	else if (arguments.size() == 1)
+	{
+		server_el = IRC::find_name(servers, arguments[0]);
+		if (server_el < 0)
+			irc.push_cmd_queue(fd, irc.response_3(ERR_NOSUCHSERVER, client_name, arguments[0], ":No such server"));
+		else
+			irc.push_cmd_queue(servers[server_el]->getSocketFd(), (prefix.empty() ? ":" + client_name + " " : "") + message + "\r\n");
+	}
+
+	return (1);
+}
+
+
+int Command::
 info_chek_errors(IRC &irc, int fd, int server_el, int client_el)
 {
 	vector<Client*>& clients	= irc.get_clients();
@@ -44,41 +81,5 @@ info_chek_errors(IRC &irc, int fd, int server_el, int client_el)
 			return (0);
 		}
 	}
-	return (1);
-}
-
-int Command::
-cmd_info(IRC &irc, int fd)
-{
-	vector<Client*>& clients	= irc.get_clients();
-	vector<Server*>& servers	= irc.get_servers();
-	int server_el				= IRC::find_fd(servers, fd);
-	int client_el				= IRC::find_fd(clients, fd);
-	string client_name;
-	std::stringstream ss;
-
-	if (info_chek_errors(irc, fd, server_el, client_el) != 1)
-		return (0);
-
-	client_name = prefix.empty() ? clients[client_el]->getName() : prefix;
-
-	if (arguments.size() == 0 ||
-		(arguments.size() == 1 && arguments[0] == irc.get_server_name()))
-	{
-		irc.push_cmd_queue(fd, irc.response_3(RPL_INFO, client_name, "", ":BANDA_IRC 1.0"));
-		ss << __DATE__ << " at " << __TIME__;
-		irc.push_cmd_queue(fd, irc.response_3(RPL_INFO, client_name, ":Birth Date:", ss.str()));
-		irc.push_cmd_queue(fd, irc.response_3(RPL_INFO, client_name, ":Online since", irc.get_statistics().getStartDate()));
-		irc.push_cmd_queue(fd, irc.response_3(RPL_ENDOFINFO, client_name, "", ":End of INFO list"));
-	}
-	else if (arguments.size() == 1)
-	{
-		server_el = IRC::find_name(servers, arguments[0]);
-		if (server_el < 0)
-			irc.push_cmd_queue(fd, irc.response_3(ERR_NOSUCHSERVER, client_name, arguments[0], ":No such server"));
-		else
-			irc.push_cmd_queue(servers[server_el]->getSocketFd(), (prefix.empty() ? ":" + client_name + " " : "") + message + "\r\n");
-	}
-
 	return (1);
 }

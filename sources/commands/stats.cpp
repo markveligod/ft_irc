@@ -46,7 +46,7 @@ stats_u(IRC& irc, int fd, Client* client)
 	work_time->tm_hour -= 3;
 	strftime(buffer, 20, "days %X", work_time);
 	out_mess << ":Server Up " << work_time->tm_yday << " " << buffer;
-	irc.push_cmd_queue(fd, irc.response_3(RPL_STATSCOMMANDS, client->getName(), "", out_mess.str()));
+	irc.push_cmd_queue(fd, irc.response_3(RPL_STATSUPTIME, client->getName(), "", out_mess.str()));
 }
 
 void Command::
