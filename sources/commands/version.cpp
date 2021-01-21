@@ -3,9 +3,9 @@
 
 /*
 ** -----------------------------------------------------------------------
-** Команда: SQUIT
+** Команда: VERSION
 ** -----------------------------------------------------------------------
-** Параметры: <server> <comment> 
+** Параметры: [<server>]
 ** -----------------------------------------------------------------------
 **	The VERSION message is used  to  query  the  version  of  the  server
 **	program.  An optional parameter <server> is used to query the version

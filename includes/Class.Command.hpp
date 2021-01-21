@@ -49,8 +49,11 @@ private:
 
 	int							info_chek_errors(IRC &irc, int fd, int server_el, int client_el);
 	int							version_check_errors(IRC &irc, int fd, int server_el, int client_el);
+	int							links_check_errors(IRC &irc, int fd, int server_el, int client_el);
+	vector<Server *>			find_by_mask(string const &str_mask, IRC &irc, bool &our_server);
+	vector<Server *>			links_find(IRC &irc, int fd, string const & mask,  string const & our_servername, bool & our_server);
 
-	void						join_channel(IRC& irc, const string& name, const string& key, User* user, int fd);
+	void						join_channel(IRC &irc, const string &name, const string &key, User *user, int fd);
 	void						leave_channel(IRC& irc, Channel& channels, int fd, string message);
 
 	vector<Client*>::iterator	find_fd(vector<Client*>& vect, int fd);
@@ -97,6 +100,7 @@ public:
 	int						cmd_connect(IRC& irc, int fd);
 	int						cmd_info(IRC& irc, int fd);
 	int						cmd_version(IRC& irc, int fd);
+	int						cmd_links(IRC& irc, int fd);
 
 	const string&			getCommand() const;
 	const string&			getMessage() const;

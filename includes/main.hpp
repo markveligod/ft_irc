@@ -78,6 +78,7 @@
 #define FD_REQUEST 1
 #define FD_COMMIT 2
 #define MAX_MESSAGE_LEN 510
+#define INFO "BANDA IRC server"
 
 /*
 **==========================
@@ -85,7 +86,7 @@
 **==========================
 */
 
-#define COMM_COUNT 27
+#define COMM_COUNT 28
 extern std::string g_cmd_name[COMM_COUNT];
 
 #include "utils.hpp"
