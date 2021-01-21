@@ -136,14 +136,6 @@ find_by_mask(string const &str_mask, IRC &irc, bool &our_server)
 		}
 	}
 
-
-	// DEBUG
-	std::cout << "\n\nMASK SERVERS " << mask_servers.size() << "\n";
-	for (it = mask_servers.begin(); it != mask_servers.end(); it++)
-	{
-		std::cout << (*it)->getName() << std::endl;
-	}
-
 	delete [] mask;
 	return (mask_servers);
 }
