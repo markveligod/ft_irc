@@ -469,23 +469,23 @@ cmd_mode(IRC& irc, int fd)
 	}
 	else
 	{
-		if (_arguments.size() < 3)
+		if (_arguments.size() == 3)
 		{
-			irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, oper_name, _arguments[1], ERR_NEEDMOREPARAMS_MESS));
-			return;
+			this->_arguments[0] = this->_arguments[1];
+			this->_arguments[1] = this->_arguments[2];
 		}
 		//режим пользователя
 		std::cout << "\nDEBUG: Режим пользователя DONE!\n";
 		
 		//проверяем поступившие ключи от оператора
-		if (!check_keys_of_users_mod(_arguments[2]))
+		if (!check_keys_of_users_mod(_arguments[1]))
 		{
 			irc.push_cmd_queue(fd, irc.response(ERR_UNKNOWNMODE, oper_name, _arguments[1], ERR_UNKNOWNMODE_MESS));
 			return;
 		}
 
 		//пытаемся найти пользователя которому необходимо изменить моды
-		User* _user = irc.get_user(_arguments[1]);
+		User* _user = irc.get_user(_arguments[0]);
 		if (_user == NULL)
 		{
 			irc.push_cmd_queue(fd, irc.response(ERR_USERSDONTMATCH, oper_name, _arguments[1], ERR_USERSDONTMATCH_MESS));
@@ -493,12 +493,12 @@ cmd_mode(IRC& irc, int fd)
 		}
 		
 		//меняем юзеру параметры
-		change_param_of_users_mod(_user, _arguments[2][1], ((_arguments[2][0] == '+') ? true : false));
+		change_param_of_users_mod(_user, _arguments[1][1], ((_arguments[1][0] == '+') ? true : false));
 
 		// если нет префикса шлем уведомление клиентам и серверам об изменение мода
 		if (_prefix.size() == 0)
 		{
-			string mode_mess = " MODE " + chan_name + " " + _arguments[1] + " " + _arguments[2];
+			string mode_mess = " MODE " + chan_name + " " + _arguments[0] + " " + _arguments[1];
 			irc.forward_to_servers(fd, ":" + oper_name + mode_mess);
 			irc.forward_to_channel(fd, chan_name, irc.fullname(oper_user) + mode_mess);
 		}
