@@ -70,7 +70,8 @@ _connect() {
 	int res = 0;
 
 	if ((res = connect(_fd, reinterpret_cast<struct sockaddr*>(&_addr), _addr_size)) < 0)
-		utils::exit_error(ERR_CONNECT_TO_SERVER, "Unable to connect to server");
+		utils::print_error(ERR_CONNECT_TO_SERVER, "Unable to connect to server");
+		// utils::exit_error(ERR_CONNECT_TO_SERVER, "Unable to connect to server");
 	fcntl(_fd, F_SETFL, O_NONBLOCK);
 	return res;
 }
