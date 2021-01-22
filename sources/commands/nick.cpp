@@ -30,10 +30,9 @@ cmd_nick(IRC& irc, int fd)
 	int						server_el	= IRC::find_fd(servers, fd);
 	int						curr_client = -1;
 	int						curr_user	= -1;
-	int						error;
 	std::stringstream		out_mess;
 
-	if ((error = nick_check_errors(fd, server_el, irc)) != 0)
+	if (nick_check_errors(fd, server_el, irc) != 0)
 		return;
 
 	// Если это от сервера

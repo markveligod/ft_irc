@@ -35,11 +35,11 @@ Command::Command(const string& str) : _message(str)
 	{
 		if (tok[0] == ':')
 			break;
-		this->arguments.push_back(static_cast<std::string>(tok));
+		_arguments.push_back(static_cast<std::string>(tok));
 	}
 
 	if ((last_pos = str.find(" :")) != std::string::npos)
-		this->arguments.push_back(str.substr(last_pos + 2, str.size() - last_pos - 2));
+		_arguments.push_back(str.substr(last_pos + 2, str.size() - last_pos - 2));
 
 	delete [] char_str;
 }

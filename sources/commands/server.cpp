@@ -124,8 +124,6 @@ server_check_errors(IRC& irc, int fd) const
 		return 0;
 	}
 
-	Server* srvr = irc.get_server(fd);
-
 	if (server_el >= 0 && _arguments.size() != 4)
 	{
 		utils::print_error(ERR_NEEDMOREPARAMS, "Invalid number of parameters");

@@ -219,6 +219,7 @@ cmd_mode(IRC& irc, int fd)
 			string mode_mess = " MODE " + chan_name + " +";
 		
 			ModeChannel* mode = irc.get_channels()[chan_name].getModeChannel();
+			irc.push_cmd_queue(fd, ":" + oper_name + mode_mess + "\r\n");
 			if (mode->p) irc.push_cmd_queue(fd, ":" + oper_name + mode_mess + "p" + "\r\n");
 			if (mode->s) irc.push_cmd_queue(fd, ":" + oper_name + mode_mess + "s" + "\r\n");
 			if (mode->i) irc.push_cmd_queue(fd, ":" + oper_name + mode_mess + "i" + "\r\n");
@@ -229,6 +230,7 @@ cmd_mode(IRC& irc, int fd)
 			if (mode->a) irc.push_cmd_queue(fd, ":" + oper_name + mode_mess + "a" + "\r\n");
 			if (mode->n) irc.push_cmd_queue(fd, ":" + oper_name + mode_mess + "n" + "\r\n");
 			if (mode->q) irc.push_cmd_queue(fd, ":" + oper_name + mode_mess + "q" + "\r\n");
+			return;
 		}
 	}
 

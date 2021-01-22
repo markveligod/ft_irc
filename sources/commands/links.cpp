@@ -165,7 +165,7 @@ links_find(IRC &irc,
 	return (output_servers);
 }
 
-int Command::
+void Command::
 cmd_links(IRC &irc, int fd)
 {
 	vector<Client*>& 	clients		= irc.get_clients();
@@ -180,43 +180,42 @@ cmd_links(IRC &irc, int fd)
 	Server *			remote_server = NULL;
 
 	if (links_check_errors(irc, fd, server_el, client_el) != 1)
-		return (0);
+		return;
 
-	client_name = prefix.empty() ? clients[client_el]->getName() : prefix;
+	client_name = _prefix.empty() ? clients[client_el]->getName() : _prefix;
 
-	if (arguments.size() == 0)
+	if (_arguments.size() == 0)
 		output_servers = irc.get_servers();
 
-	else if (arguments.size() == 1)
-		output_servers = links_find(irc, fd, arguments[0], irc.get_server_name(), our_server);
+	else if (_arguments.size() == 1)
+		output_servers = links_find(irc, fd, _arguments[0], irc.get_server_name(), our_server);
 
-	else if (arguments.size() == 2)
+	else if (_arguments.size() == 2)
 	{
-		if (arguments[0].find('*') == std::string::npos)
+		if (_arguments[0].find('*') == std::string::npos)
 		{
-			server_el = IRC::find_name(servers, arguments[0]);
+			server_el = IRC::find_name(servers, _arguments[0]);
 			if (server_el >= 0)
 				remote_server = servers[server_el];
-			if (arguments[0] != irc.get_server_name())
+			if (_arguments[0] != irc.get_server_name())
 				our_server = false;
 		}
-		else if (find_by_mask(arguments[0], irc, our_server).size())
-				remote_server = find_by_mask(arguments[0], irc, our_server)[0];
+		else if (find_by_mask(_arguments[0], irc, our_server).size())
+				remote_server = find_by_mask(_arguments[0], irc, our_server)[0];
 		if (remote_server == NULL && our_server == false)
 		{
-			irc.push_cmd_queue(fd, irc.response_3(ERR_NOSUCHSERVER, clients[client_el]->getName(), arguments[0], ":No such server"));
-			return (0);
+			irc.push_cmd_queue(fd, irc.response(ERR_NOSUCHSERVER, clients[client_el]->getName(), _arguments[0], ":No such server"));
+			return;
 		}
 		else if (remote_server == NULL && our_server == true)
-			output_servers = links_find(irc, fd, arguments[1], irc.get_server_name(), our_server);
+			output_servers = links_find(irc, fd, _arguments[1], irc.get_server_name(), our_server);
 		else if (remote_server != NULL)
 		{
 			out_mess << ":" << client_name
 					 << " LINKS "
 					 << remote_server->getName() << " "
-					 << arguments[1] << "\r\n";
+					 << _arguments[1] << "\r\n";
 			irc.push_cmd_queue(remote_server->getSocketFd(), out_mess.str());
-			return (0);
 		}
 	}
 	
@@ -228,18 +227,16 @@ cmd_links(IRC &irc, int fd)
 		else
 			out_mess << irc.get_server_name();
 		out_mess << " :" << output_servers[i]->getHopcount() << " " << output_servers[i]->getInfo();
-		irc.push_cmd_queue(fd, irc.response_3(RPL_LINKS, client_name, output_servers[i]->getName(), out_mess.str()));
+		irc.push_cmd_queue(fd, irc.response(RPL_LINKS, client_name, output_servers[i]->getName(), out_mess.str()));
 		out_mess.str("");
 	}
 	if (our_server)
 	{
 		out_mess << irc.get_server_name() << " :0 " << INFO;
-		irc.push_cmd_queue(fd, irc.response_3(RPL_LINKS, client_name, irc.get_server_name(), out_mess.str()));
+		irc.push_cmd_queue(fd, irc.response(RPL_LINKS, client_name, irc.get_server_name(), out_mess.str()));
 		out_mess.str("");
 	}
-	irc.push_cmd_queue(fd, irc.response_3(RPL_ENDOFLINKS, client_name, "*", ":End of LINKS list"));
-
-	return (0);
+	irc.push_cmd_queue(fd, irc.response(RPL_ENDOFLINKS, client_name, "*", ":End of LINKS list"));
 }
 
 int Command::
@@ -249,45 +246,44 @@ links_check_errors(IRC &irc, int fd, int server_el, int client_el)
 	vector<User *> &	users	= irc.get_users();
 	vector<Server *> &	servers	= irc.get_servers();
 
-	if (prefix.size() && 
-		irc.find_name(users, prefix) < 0)
+	if (_prefix.size() && 
+		irc.find_name(users, _prefix) < 0)
 	{
 		utils::print_error(0, "Invalid prefix");
-		irc.push_cmd_queue(fd, "ERROR :Invalid prefix \"" + prefix + "\"");
-		return (0);
+		irc.push_cmd_queue(fd, "ERROR :Invalid prefix \"" + _prefix + "\"");
+		return 0;
 	}
 
 	if (server_el >= 0)
 	{
-		if (prefix.empty())
+		if (_prefix.empty())
 		{
-			utils::print_error(ERR_NEEDMOREPARAMS, "Prefix is empty");
-			irc.push_cmd_queue(fd, irc.response_3(ERR_NEEDMOREPARAMS, servers[server_el]->getName(), command, ":Syntax error"));
-			return (0);
+			utils::print_error(ERR_NEEDMOREPARAMS, "prefix is empty");
+			irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, servers[server_el]->getName(), _command, ":Syntax error"));
+			return 0;
 		}
-		if (arguments.size() > 2)
+		if (_arguments.size() > 2)
 		{
 			utils::print_error(ERR_NEEDMOREPARAMS, "Too many parameters");
-			irc.push_cmd_queue(fd, irc.response_3(ERR_NEEDMOREPARAMS, prefix, command, ":Syntax error"));
-			return (0);
+			irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, _prefix, _command, ":Syntax error"));
+			return 0;
 		}
 	}
 
 	else if (client_el >= 0)
 	{
-		if (arguments.size() > 2)
+		if (_arguments.size() > 2)
 		{
 			utils::print_error(ERR_NEEDMOREPARAMS, "Too many parameters");
-			irc.push_cmd_queue(fd, irc.response_3(ERR_NEEDMOREPARAMS, clients[client_el]->getName(), command, ":Syntax error"));
-			return (0);
+			irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, clients[client_el]->getName(), _command, ":Syntax error"));
+			return 0;
 		}
-		if (prefix.size() && clients[client_el]->getName() != prefix)
+		if (_prefix.size() && clients[client_el]->getName() != _prefix)
 		{
 			utils::print_error(0, "Invalid prefix");
-			irc.push_cmd_queue(fd, "ERROR :Invalid prefix \"" + prefix + "\"");
-			return (0);
+			irc.push_cmd_queue(fd, "ERROR :Invalid prefix \"" + _prefix + "\"");
+			return 0;
 		}
 	}
-
-	return (1);
+	return 1;
 }
