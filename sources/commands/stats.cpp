@@ -46,7 +46,7 @@ stats_u(IRC& irc, int fd, Client* client)
 	work_time->tm_hour -= 3;
 	strftime(buffer, 20, "days %X", work_time);
 	out_mess << ":Server Up " << work_time->tm_yday << " " << buffer;
-	irc.push_cmd_queue(fd, irc.response(RPL_STATSCOMMANDS, client->getName(), "", out_mess.str()));
+	irc.push_cmd_queue(fd, irc.response(RPL_STATSUPTIME, client->getName(), "", out_mess.str()));
 }
 
 void Command::
@@ -148,10 +148,10 @@ stats_check_errors(IRC &irc, int fd)
 void Command::
 cmd_stats(IRC& irc, int fd)
 {
-	vector<Client*>& clients					= irc.get_clients();
-	vector<Server*>& servers					= irc.get_servers();
-	int server_el								= IRC::find_fd(servers, fd);
-	int client_el								= IRC::find_fd(clients, fd);
+	vector<Client*>& clients	= irc.get_clients();
+	vector<Server*>& servers	= irc.get_servers();
+	int server_el				= IRC::find_fd(servers, fd);
+	int client_el				= IRC::find_fd(clients, fd);
 
 	if (stats_check_errors(irc, fd) != 1)
 		return;

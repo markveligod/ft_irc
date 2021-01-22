@@ -8,7 +8,6 @@
 
 # define CERTIFICATE "cert/cert.pem"
 # define PRIVATE_KEY "cert/key.pem"
-
 std::string g_cmd_name[COMM_COUNT] = {"NICK",
 									  "PASS",
 									  "USER",
@@ -31,10 +30,12 @@ std::string g_cmd_name[COMM_COUNT] = {"NICK",
 									  "STATS",
 									  "TIME",
 									  "ERROR",
+									  "ADMIN",
 									  "WALLOPS",
 									  "CONNECT",
-									  };
-
+									  "INFO",
+									  "VERSION",
+									  "LINKS"};
 /*
 ** ----------------------------------------------------------
 ** Constructors
@@ -42,7 +43,9 @@ std::string g_cmd_name[COMM_COUNT] = {"NICK",
 */
 
 CmdStats::
-CmdStats() {}
+	CmdStats()
+{
+}
 
 CmdStats::
 CmdStats(string cmd_name) : cmd_name(cmd_name),
@@ -164,32 +167,6 @@ typedef void (IRC::*SignalHandlerPointer)(int);
 void IRC::
 do_command(Command* command, int fd)
 {
-	string cmd_name[COMM_COUNT] =  {"NICK",
-									"PASS",
-									"USER",
-									"SERVER",
-									"JOIN",
-									"OPER",
-									"QUIT",
-									"PART",
-									"NAMES",
-									"SQUIT",
-									"WHO",
-									"TOPIC",
-									"PING",
-									"PONG",
-									"MODE",
-									"KICK",
-									"PRIVMSG",
-									"AWAY",
-									"NOTICE",
-									"STATS",
-									"TIME",
-									"ERROR",
-									"ADMIN",
-									"WALLOPS",
-									"CONNECT",
-									};
 	doCommand	cmd_func[COMM_COUNT] = {&Command::cmd_nick,
 										&Command::cmd_pass,
 										&Command::cmd_user,
@@ -215,6 +192,9 @@ do_command(Command* command, int fd)
 										&Command::cmd_admin,
 										&Command::cmd_wallops,
 										&Command::cmd_connect,
+										&Command::cmd_info,
+										&Command::cmd_version,
+										&Command::cmd_links
 										};
 
 	const string & comm 			= command->getCommand();
@@ -248,7 +228,7 @@ do_command(Command* command, int fd)
 
 	for (int i = 0; i < COMM_COUNT; i++)
 	{
-		if (is_equal(cmd_name[i], comm))
+		if (is_equal(g_cmd_name[i], comm))
 		{
 			utils::print_command(fd, command->getMessage());
 			(command->*(cmd_func[i]))(*this, fd);
@@ -819,7 +799,14 @@ is_numeric_response(const Command& command)
 		command.getCommand() == "211" ||
 		command.getCommand() == "212" ||
 		command.getCommand() == "219" ||
-		command.getCommand() == "421"	
+		command.getCommand() == "421" ||
+		command.getCommand() == "371" ||
+		command.getCommand() == "374" ||
+		command.getCommand() == "351" ||
+		command.getCommand() == "005" ||
+		command.getCommand() == "242" ||
+		command.getCommand() == "364" ||
+		command.getCommand() == "365"
 		)
 	{
 		const vector<string>& args = command.getArgs();

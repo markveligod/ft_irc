@@ -31,21 +31,15 @@ Command::Command(const string& str) : _message(str)
 		_prefix = "";
 		_command = static_cast<std::string>(tok);
 	}
-	std::cout << "Prefix: " << _prefix << std::endl
-			  << "Command: " << _command << std::endl; // DEBUG
 	while (tok != NULL && (tok = strtok(NULL, " ")) != NULL)
 	{
 		if (tok[0] == ':')
 			break;
-		_arguments.push_back(static_cast<std::string>(tok));
-		std::cout << "Argument: " << tok << std::endl; // DEBUG
+		this->arguments.push_back(static_cast<std::string>(tok));
 	}
 
 	if ((last_pos = str.find(" :")) != std::string::npos)
-	{
-		_arguments.push_back(str.substr(last_pos + 2, str.size() - last_pos - 2));
-		std::cout << "Argument: " << str.substr(last_pos + 2, str.size() - last_pos - 2) << std::endl; // DEBUG
-	}
+		this->arguments.push_back(str.substr(last_pos + 2, str.size() - last_pos - 2));
 
 	delete [] char_str;
 }

@@ -80,14 +80,14 @@ cmd_server(IRC& irc, int fd)
 			}
 		}
 		new_server->setBuffer(clients[client_el]->getBuffer());
-		//irc.delete_client(fd);
+		//irc.delete_client(fd); // FIX
 		utils::print_line("DEBUG: Client deleted (as it is a new connection)");
 	}
 
 	out_message << ":" << irc.get_server_name() <<
 				  " SERVER " + new_server->getName() <<
 				  " " << (new_server->getHopcount() + 1) << " " <<
-				  (new_server->getHopcount() + 1) << " " << new_server->getInfo();
+				  (new_server->getHopcount() + 1) << " :" << new_server->getInfo();
 	irc.forward_to_servers(fd, out_message.str());
 
 	return;
@@ -129,14 +129,14 @@ server_check_errors(IRC& irc, int fd) const
 	if (server_el >= 0 && _arguments.size() != 4)
 	{
 		utils::print_error(ERR_NEEDMOREPARAMS, "Invalid number of parameters");
-		irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, srvr->getName(), "* SERVER", ERR_NEEDMOREPARAMS_MESS));
+		irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, "*", "SERVER", ERR_NEEDMOREPARAMS_MESS));
 		return (ERR_NEEDMOREPARAMS);
 	}
 
 	if (server_el < 0 && _arguments.size() != 3)
 	{
 		utils::print_error(ERR_NEEDMOREPARAMS, "Invalid number of parameters");
-		irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, srvr->getName(), "* SERVER", ERR_NEEDMOREPARAMS_MESS));
+		irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, "*", "SERVER", ERR_NEEDMOREPARAMS_MESS));
 		return (ERR_NEEDMOREPARAMS);
 	}
 
@@ -186,7 +186,6 @@ server_check_errors(IRC& irc, int fd) const
 		return 0;
 	}
 		
-
 	return (1);
 }
 

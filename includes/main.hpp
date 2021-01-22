@@ -78,6 +78,7 @@
 #define FD_REQUEST 1
 #define FD_COMMIT 2
 #define MAX_MESSAGE_LEN 510
+#define INFO "BANDA IRC server"
 
 /*
 **==========================
@@ -85,15 +86,13 @@
 **==========================
 */
 
+#define COMM_COUNT 28
+extern std::string g_cmd_name[COMM_COUNT];
+
 #include "utils.hpp"
 #include "ctime"
 #include "string.h"
-//#include "Class.Client.hpp"
-//#include "Class.Message.hpp"
-//#include "Class.User.hpp"
 #include "codes.hpp"
-
-#define COMM_COUNT 25
 
 #define OPER_MASK "op*"
 #define OPER_PASS "pass"
@@ -103,3 +102,4 @@
 #define ADMINLOC2		" :Еще есть - pdemocri"
 #define ADMINEMAIL		" :Email-a у нас нет:("
 
+#define VERSION			"BANDA_IRC-1.0"

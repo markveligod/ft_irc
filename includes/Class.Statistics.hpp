@@ -46,5 +46,6 @@ class Statistics
 		unsigned long		getRecvKBytes() const;
 		unsigned long		getWorkingTime() const;
 		struct tm * 		getWorkingTime_t() const;
+		string const 		getStartDate() const;
 		map<string, pair<int, unsigned long> >& getMapCmd();
 };

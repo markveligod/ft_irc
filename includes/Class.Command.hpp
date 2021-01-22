@@ -47,7 +47,13 @@ private:
 	void						stats_l(IRC& irc, int fd, Client* client);
 	void						stats_u(IRC& irc, int fd, Client* client);
 
-	void						join_channel(IRC& irc, const string& name, const string& key, User* user, int fd);
+	int							info_chek_errors(IRC &irc, int fd, int server_el, int client_el);
+	int							version_check_errors(IRC &irc, int fd, int server_el, int client_el);
+	int							links_check_errors(IRC &irc, int fd, int server_el, int client_el);
+	vector<Server *>			find_by_mask(string const &str_mask, IRC &irc, bool &our_server);
+	vector<Server *>			links_find(IRC &irc, int fd, string const & mask,  string const & our_servername, bool & our_server);
+
+	void						join_channel(IRC &irc, const string &name, const string &key, User *user, int fd);
 	void						leave_channel(IRC& irc, Channel& channels, int fd, string message);
 
 	vector<Client*>::iterator	find_fd(vector<Client*>& vect, int fd);
@@ -67,6 +73,7 @@ public:
 	Command(const string& str);
 	~Command();
 
+<<<<<<< HEAD
 	void				cmd_nick(IRC& irc, int fd);
 	void				cmd_pass(IRC& irc, int fd);
 	void				cmd_user(IRC& irc, int fd);
@@ -97,4 +104,39 @@ public:
 	const string&		getMessage() const;
 	const string&		getPrefix() const;
 	const vector<string>& getArgs() const;
+=======
+	int						cmd_nick(IRC& irc, int fd);
+	int						cmd_pass(IRC& irc, int fd);
+	int						cmd_user(IRC& irc, int fd);
+	int						cmd_server(IRC& irc, int fd);
+	int						cmd_join(IRC& irc, int fd);
+	int						cmd_oper(IRC& irc, int fd);
+	int						cmd_quit(IRC& irc, int fd);
+	int						cmd_part(IRC& irc, int fd);
+	int						cmd_names(IRC& irc, int fd);
+	int						cmd_squit(IRC& irc, int fd);
+	int						cmd_who(IRC& irc, int fd);
+	int						cmd_topic(IRC& irc, int fd);
+	int						cmd_ping(IRC& irc, int fd);
+	int						cmd_pong(IRC& irc, int fd);
+	int						cmd_mode(IRC& irc, int fd);
+	int						cmd_kick(IRC& irc, int fd);
+	int						cmd_privmsg(IRC& irc, int fd);
+	int						cmd_away(IRC& irc, int fd);
+	int						cmd_notice(IRC& irc, int fd);
+	int						cmd_stats(IRC& irc, int fd);
+	int						cmd_time(IRC& irc, int fd);
+	int						cmd_error(IRC& irc, int fd);
+	int						cmd_admin(IRC& irc, int fd);
+	int						cmd_wallops(IRC& irc, int fd);
+	int						cmd_connect(IRC& irc, int fd);
+	int						cmd_info(IRC& irc, int fd);
+	int						cmd_version(IRC& irc, int fd);
+	int						cmd_links(IRC& irc, int fd);
+
+	const string&			getCommand() const;
+	const string&			getMessage() const;
+	const string&			getPrefix() const;
+	const vector<string>&	getArgs() const;
+>>>>>>> e0117b423160a11d6cbf58c59aed49a508177b41
 };
