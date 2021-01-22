@@ -63,7 +63,8 @@ COMMS		= nick.cpp \
 			info.cpp \
 			version.cpp \
 			links.cpp \
-			trace.cpp
+			trace.cpp \
+			kill.cpp
 
 
 SRC			= $(addprefix $(SRC_DIR), $(SRCS))

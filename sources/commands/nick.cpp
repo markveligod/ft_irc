@@ -156,7 +156,7 @@ nick_check_errors(int fd, int serv_client, IRC& irc)
 		(serv_client >= 0 && _arguments.size() == 1 && _prefix.empty()))
 	{
 		utils::print_error(ERR_NEEDMOREPARAMS, "Too much _arguments");
-		irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, nick_name, "NICK", ":Syntax error"));
+		irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, nick_name, "NICK", ERR_NEEDMOREPARAMS_MESS));
 		return (ERR_NEEDMOREPARAMS);
 	}
 
@@ -164,14 +164,14 @@ nick_check_errors(int fd, int serv_client, IRC& irc)
 	if (_arguments.size() == 0)
 	{
 		utils::print_error(ERR_NONICKNAMEGIVEN, "No nickname");
-		irc.push_cmd_queue(fd, irc.response(ERR_NONICKNAMEGIVEN, nick_name, "NICK", ":No nickname given"));
+		irc.push_cmd_queue(fd, irc.response(ERR_NONICKNAMEGIVEN, nick_name, "NICK", ERR_NONICKNAMEGIVEN_MESS));
 		return (ERR_NONICKNAMEGIVEN);
 	}
 
 	// Если ник невалидный
 	if (!nick_valid())
 	{
-		irc.push_cmd_queue(fd, irc.response(ERR_ERRONEUSNICKNAME, nick_name, _arguments[0], ":Erroneus nickname"));
+		irc.push_cmd_queue(fd, irc.response(ERR_ERRONEUSNICKNAME, nick_name, _arguments[0], ERR_ERRONEUSNICKNAME_MESS));
 		return (ERR_ERRONEUSNICKNAME);
 	}
 
@@ -179,7 +179,8 @@ nick_check_errors(int fd, int serv_client, IRC& irc)
 	if (IRC::find_name(clients, _arguments[0]) >= 0 && serv_client >= 0)
 	{
 		utils::print_error(ERR_NICKCOLLISION, "Nick collision (this nickname already in use)");
-		irc.push_cmd_queue(fd, irc.response(ERR_NICKCOLLISION, nick_name, _arguments[0], ":Nickname collision KILL"));
+		irc.push_cmd_queue(fd, irc.response(ERR_NICKCOLLISION, nick_name, _arguments[0], ERR_NICKCOLLISION_MESS));
+		irc.push_cmd_queue(fd, ":" + irc.get_server_name() + " KILL " + _arguments[0] + " " + _arguments[1]);
 		return (ERR_NICKCOLLISION);
 	}
 
@@ -187,7 +188,7 @@ nick_check_errors(int fd, int serv_client, IRC& irc)
 	if (IRC::find_name(clients, _arguments[0]) >= 0 && serv_client < 0)
 	{
 		utils::print_error(ERR_NICKNAMEINUSE, "Nickname is already in use");
-		irc.push_cmd_queue(fd, irc.response(ERR_NICKNAMEINUSE, nick_name, _arguments[0], ":Nickname already in use"));
+		irc.push_cmd_queue(fd, irc.response(ERR_NICKNAMEINUSE, nick_name, _arguments[0], ERR_NICKNAMEINUSE_MESS));
 		return (ERR_NICKNAMEINUSE);
 	}
 

@@ -36,7 +36,9 @@ std::string g_cmd_name[COMM_COUNT] = {"NICK",
 									  "INFO",
 									  "VERSION",
 									  "LINKS",
-									  "TRACE"};
+									  "TRACE",
+									  "KILL",
+									  };
 /*
 ** ----------------------------------------------------------
 ** Constructors
@@ -197,7 +199,8 @@ do_command(Command* command, int fd)
 										&Command::cmd_info,
 										&Command::cmd_version,
 										&Command::cmd_links,
-										&Command::cmd_trace
+										&Command::cmd_trace,
+										&Command::cmd_kill,
 										};
 
 	const string & comm 			= command->getCommand();

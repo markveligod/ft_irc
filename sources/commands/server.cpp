@@ -24,6 +24,10 @@ cmd_server(IRC& irc, int fd)
 	if ((error = server_check_errors(irc, fd)) != 1)
 		return;
 
+	if (_arguments.size() == 2)
+		_arguments.push_back("1");
+	if (_arguments.size() < 4)
+		_arguments.push_back("0");
 
 // Создаем новый сервер
 	if (server_el < 0)
@@ -123,14 +127,7 @@ server_check_errors(IRC& irc, int fd) const
 		return 0;
 	}
 
-	if (server_el >= 0 && _arguments.size() != 4)
-	{
-		utils::print_error(ERR_NEEDMOREPARAMS, "Invalid number of parameters");
-		irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, "*", "SERVER", ERR_NEEDMOREPARAMS_MESS));
-		return (ERR_NEEDMOREPARAMS);
-	}
-
-	if (server_el < 0 && _arguments.size() != 3)
+	if (_arguments.size() < 2 || _arguments.size() > 4)
 	{
 		utils::print_error(ERR_NEEDMOREPARAMS, "Invalid number of parameters");
 		irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, "*", "SERVER", ERR_NEEDMOREPARAMS_MESS));
