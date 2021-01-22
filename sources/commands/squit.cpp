@@ -82,7 +82,7 @@ cmd_squit(IRC& irc, int fd)
 	for (vector<User*>::iterator it = users.begin(); it != users.end(); it++)
 	{
 		if ((*it)->getHopcount() == 0 && ((*it)->getMode('o') || (*it)->getMode('w')))
-			irc.push_cmd_queue(fd, wallop);
+			irc.push_cmd_queue(fd, wallop + "\r\n");
 	}
 
 	string quit_msg2 = ":" + quit_server_name +

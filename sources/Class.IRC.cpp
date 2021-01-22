@@ -37,7 +37,9 @@ std::string g_cmd_name[COMM_COUNT] = {"NICK",
 									  "VERSION",
 									  "LINKS",
 									  "TRACE",
-									  "MOTD"};
+									  "KILL",
+									  "MOTD"
+									  };
 /*
 ** ----------------------------------------------------------
 ** Constructors
@@ -199,6 +201,7 @@ do_command(Command* command, int fd)
 										&Command::cmd_version,
 										&Command::cmd_links,
 										&Command::cmd_trace,
+										&Command::cmd_kill,
 										&Command::cmd_motd
 										};
 

@@ -64,6 +64,7 @@ COMMS		= nick.cpp \
 			version.cpp \
 			links.cpp \
 			trace.cpp \
+			kill.cpp \
 			motd.cpp
 
 
