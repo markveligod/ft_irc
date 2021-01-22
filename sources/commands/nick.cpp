@@ -32,7 +32,7 @@ cmd_nick(IRC& irc, int fd)
 	int						curr_user	= -1;
 	std::stringstream		out_mess;
 
-	if (nick_check_errors(fd, server_el, irc) != 0)
+	if ((nick_check_errors(fd, server_el, irc) != 0))
 		return;
 
 	// Если это от сервера

@@ -844,6 +844,7 @@ string IRC::
 response(int response_code, int client_fd, string command, string message)
 {
 	string code = utils::int_to_str(response_code);
+	command = command.size() ? command + " " : command;
 
 	int i = find_fd(_clients, client_fd);
 	string client_name = (i >= 0) ? _clients[i]->getName() : string();

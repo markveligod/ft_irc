@@ -8,22 +8,22 @@
 
 #define ERR_NOSUCHNICK				401		// "<nickname> :No such nick/channel"
 	              						// - Used to indicate the nickname parameter supplied to a command is currently unused.
-#define ERR_NOSUCHNICK_MESS			" :No such nick/channel"
+#define ERR_NOSUCHNICK_MESS			":No such nick/channel"
 
 #define ERR_NOSUCHSERVER			402		// "<server name> :No such server"
 										// Used to indicate the server name given currently doesn't exist.
-#define ERR_NOSUCHSERVER_MESS		" :No such server"
+#define ERR_NOSUCHSERVER_MESS		":No such server"
 
 #define ERR_NOSUCHCHANNEL			403		// <channel name> :No such channel"
 										// - Used to indicate the given channel name is invalid.
-#define ERR_NOSUCHCHANNEL_MESS		" :No such channel"
+#define ERR_NOSUCHCHANNEL_MESS		":No such channel"
 
 #define ERR_CANNOTSENDTOCHAN		404		// "<channel name> :Cannot send to channel"
 										// - Sent to a user who is either (a) not on a channel
 										// which is mode +n or (b) not a chanop (or mode +v) on
 										// a channel which has mode +m set and is trying to send
 										// a PRIVMSG message to that channel.
-#define ERR_CANNOTSENDTOCHAN_MESS	" :Cannot send to channel"
+#define ERR_CANNOTSENDTOCHAN_MESS	":Cannot send to channel"
 
 #define ERR_TOOMANYCHANNELS			405		// "<channel name> :You have joined too many channels"
 										// - Sent to a user when they have joined the maximum
@@ -43,13 +43,13 @@
 										// - PING or PONG message missing the originator parameter
 										// which is required since these commands must work
 										// without valid prefixes.
-#define ERR_NOORIGIN_MESS			" :No origin specified"
+#define ERR_NOORIGIN_MESS			":No origin specified"
 
 #define ERR_NORECIPIENT				411		// ":No recipient given (<command>)"
-#define ERR_NORECIPIENT_MESS		" :No recipient"
+#define ERR_NORECIPIENT_MESS		":No recipient"
 
 #define ERR_NOTEXTTOSEND			412		// ":No text to send"
-#define ERR_NOTEXTTOSEND_MESS		" :No text to send"
+#define ERR_NOTEXTTOSEND_MESS		":No text to send"
 
 #define ERR_NOTOPLEVEL				413		// "<mask> :No toplevel domain specified"
 #define ERR_WILDTOPLEVEL			414		// "<mask> :Wildcard in toplevel domain"
@@ -62,7 +62,7 @@
 #define ERR_UNKNOWNCOMMAND			421		// "<command> :Unknown command"
 										// - Returned to a registered client to indicate that the
 										// command sent is unknown by the server.
-#define ERR_UNKNOWNCOMMAND_MESS		" :Unknown command"
+#define ERR_UNKNOWNCOMMAND_MESS		":Unknown command"
 
 #define ERR_NOMOTD					422		// ":MOTD File is missing"
 										// - Server's MOTD file could not be opened by the server.
@@ -79,36 +79,36 @@
 #define ERR_NONICKNAMEGIVEN			431		// ":No nickname given"
 										// - Returned when a nickname parameter expected for a
 										// command and isn't found.
-#define ERR_NONICKNAMEGIVEN_MESS	" :No nickname given"
+#define ERR_NONICKNAMEGIVEN_MESS	":No nickname given"
 
 #define ERR_ERRONEUSNICKNAME		432		// "<nick> :Erroneus nickname"
 										// - Returned after receiving a NICK message which contains
 										// characters which do not fall in the defined set.  See
 										// section x.x.x for details on valid nicknames.
-#define ERR_ERRONEUSNICKNAME_MESS	" :Erroneus nickname"
+#define ERR_ERRONEUSNICKNAME_MESS	":Erroneus nickname"
 
 #define ERR_NICKNAMEINUSE			433		// "<nick> :Nickname is already in use"
 										// - Returned when a NICK message is processed that results
 										// in an attempt to change to a currently existing
 										// nickname.
-#define ERR_NICKNAMEINUSE_MESS		" :Nickname is already in use"
+#define ERR_NICKNAMEINUSE_MESS		":Nickname is already in use"
 
 #define ERR_NICKCOLLISION			436		// "<nick> :Nickname collision KILL"
 										// - Returned by a server to a client when it detects a
 										// nickname collision (registered of a NICK that
 										// already exists by another server).
-#define ERR_NICKCOLLISION_MESS		" :Nickname collision KILL"
+#define ERR_NICKCOLLISION_MESS		":Nickname collision KILL"
 
 #define ERR_USERNOTINCHANNEL		441		// "<nick> <channel> :They aren't on that channel"
 										// - Returned by the server to indicate that the target
 										// user of the command is not on the given channel.
-#define ERR_USERNOTINCHANNEL_MESS	" :They aren't on that channel"
+#define ERR_USERNOTINCHANNEL_MESS	":They aren't on that channel"
 
 #define ERR_NOTONCHANNEL			442		// "<channel> :You're not on that channel"
 										// - Returned by the server whenever a client tries to
 										// perform a channel effecting command for which the
 										// client isn't a member.
-#define ERR_NOTONCHANNEL_MESS		" :You're not on that channel"
+#define ERR_NOTONCHANNEL_MESS		":You're not on that channel"
 
 #define ERR_USERONCHANNEL			443		// "<user> <channel> :is already on channel"
 										// - Returned when a client tries to invite a user to a
@@ -126,13 +126,13 @@
 #define ERR_USERSDISABLED			446		// ":USERS has been disabled"
 										// - Returned as a response to the USERS command.  Must be
 										// returned by any server which does not implement it.
-#define ERR_USERSDISABLED_MESS		" :USERS has been disabled"
+#define ERR_USERSDISABLED_MESS		":USERS has been disabled"
 
 #define ERR_NOTREGISTERED			451		// ":You have not registered"
 										// - Returned by the server to indicate that the client
 										// must be registered before the server will allow it
 										// to be parsed in detail.
-#define ERR_NOTREGISTERED_MESS		" :You have not registered"
+#define ERR_NOTREGISTERED_MESS		":You have not registered"
 
 #define ERR_NEEDMOREPARAMS			461		// "<command> :Not enough parameters"
 										// - Returned by the server by numerous commands to
@@ -144,7 +144,7 @@
 										// - Returned by the server to any link which tries to
 										// change part of the registered details (such as
 										// password or user details from second USER message).
-#define ERR_ALREADYREGISTRED_MESS	" :You may not reregister"
+#define ERR_ALREADYREGISTRED_MESS	":You may not reregister"
 
 #define ERR_NOPERMFORHOST			463		// ":Your host isn't among the privileged"
 										// - Returned to a client which attempts to register with
@@ -156,7 +156,7 @@
 										// - Returned to indicate a failed attempt at registering
 										// a connection for which a password was required and
 										// was either not given or incorrect.
-#define ERR_PASSWDMISMATCH_MESS		" :Password incorrect"
+#define ERR_PASSWDMISMATCH_MESS		":Password incorrect"
 
 #define ERR_YOUREBANNEDCREEP		465		// ":You are banned from this server"
 										// - Returned after an attempt to connect and register
@@ -167,29 +167,29 @@
 #define ERR_CHANNELISFULL			471		// "<channel> :Cannot join channel (+l)"
 
 #define ERR_UNKNOWNMODE				472		// "<char> :is unknown mode char to me"
-#define ERR_UNKNOWNMODE_MESS		" :is unknown mode char to me"
+#define ERR_UNKNOWNMODE_MESS		":is unknown mode char to me"
 
 #define ERR_INVITEONLYCHAN			473		// "<channel> :Cannot join channel (+i)"
 #define ERR_INVITEONLYCHAN_MESS		":Cannot join channel (+i)"
 
 #define ERR_BANNEDFROMCHAN			474		// "<channel> :Cannot join channel (+b)"
-#define ERR_BANNEDFROMCHAN_MESS		" :Cannot join channel (+b)"
+#define ERR_BANNEDFROMCHAN_MESS		":Cannot join channel (+b)"
 
 #define ERR_BADCHANNELKEY			475		// "<channel> :Cannot join channel (+k)"
-#define ERR_BADCHANNELKEY_MESS		" :Cannot join channel (+k)"
+#define ERR_BADCHANNELKEY_MESS		":Cannot join channel (+k)"
 
 #define ERR_NOPRIVILEGES			481		// ":Permission Denied- You're not an IRC operator"
 										// - Any command requiring operator privileges to operate
 										// must return this error to indicate the attempt was
 										// unsuccessful.
-#define ERR_NOPRIVILEGES_MESS		" :Permission Denied- You're not an IRC operator"
+#define ERR_NOPRIVILEGES_MESS		":Permission Denied- You're not an IRC operator"
 
 #define ERR_CHANOPRIVSNEEDED		482		// "<channel> :You're not channel operator"
 										// - Any command requiring 'chanop' privileges (such as
 										// MODE messages) must return this error if the client
 										// making the attempt is not a chanop on the specified
 										// channel.
-#define ERR_CHANOPRIVSNEEDED_MESS	" :You're not channel operator"
+#define ERR_CHANOPRIVSNEEDED_MESS	":You're not channel operator"
 
 #define ERR_CANTKILLSERVER			483		// ":You cant kill a server!"
 										// - Any attempts to use the KILL command on a server
@@ -201,7 +201,7 @@
 										// not been configured to allow connections from the
 										// client's host as an operator, this error must be
 										// returned.
-#define ERR_NOOPERHOST_MESS			" :No O-lines for your host"
+#define ERR_NOOPERHOST_MESS			":No O-lines for your host"
 
 #define ERR_UMODEUNKNOWNFLAG		501		// ":Unknown MODE flag"
 										// - Returned by the server to indicate that a MODE
@@ -211,7 +211,7 @@
 #define ERR_USERSDONTMATCH			502		// ":Cant change mode for other users"
 										// - Error sent to any user trying to view or change the
 										// user mode for a user other than themselves.
-#define ERR_USERSDONTMATCH_MESS		" :Cant change mode for other users"
+#define ERR_USERSDONTMATCH_MESS		":Cant change mode for other users"
 
 /*
 **==========================
@@ -222,7 +222,7 @@
 #define RPL_NONE					300		// Dummy reply number. Not used.
 
 #define RPL_AWAY					301		// "<nick> :<away message>"
-#define RPL_AWAY_MESS				" :<away message>"
+#define RPL_AWAY_MESS				":<away message>"
 
 #define RPL_USERHOST				302		// ":[<reply>{<space><reply>}]"
 										// - Reply format used by USERHOST to list replies to
@@ -297,7 +297,7 @@
 #define RPL_CHANNELMODEIS			324		// "<channel> <mode> <mode params>"
 
 #define RPL_NOTOPIC					331		// "<channel> :No topic is set"
-#define RPL_NOTOPIC_MESS			" :No topic is set"
+#define RPL_NOTOPIC_MESS			":No topic is set"
 
 #define RPL_TOPIC					332		// "<channel> :<topic>"
 										// - When sending a TOPIC message to determine the
@@ -334,7 +334,7 @@
 										// with a WHO message, a RPL_ENDOFWHO must be sent
 										// after processing each list item with <name> being
 										// the item.
-#define RPL_ENDOFWHO_MESS			" :End of WHO list"
+#define RPL_ENDOFWHO_MESS			":End of WHO list"
 
 #define RPL_NAMREPLY				353		// "<channel> :[[@|+]<nick> [[@|+]<nick> [...]]]"
 
@@ -348,7 +348,7 @@
 										// channels and contents are sent back in a series of
 										// RPL_NAMEREPLY messages with a RPL_ENDOFNAMES to mark
 										// the end.
-#define RPL_ENDOFNAMES_MESS			" :End of NAMES list"
+#define RPL_ENDOFNAMES_MESS			":End of NAMES list"
 
 #define RPL_LINKS					364		// "<mask> <server> :<hopcount> <server info>"
 
@@ -390,7 +390,7 @@
 										// - RPL_YOUREOPER is sent back to a client which has
 										// just successfully issued an OPER message and gained
 										// operator status.
-#define RPL_YOUREOPER_MESS			" :You are now an IRC operator"
+#define RPL_YOUREOPER_MESS			":You are now an IRC operator"
 
 #define RPL_REHASHING				382		// "<config file> :Rehashing"
 										// - If the REHASH option is used and an operator sends
