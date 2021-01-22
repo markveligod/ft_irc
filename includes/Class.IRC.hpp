@@ -157,6 +157,8 @@ class IRC
 		void						forward_to_channel(int fd, const string& channel_name, const string& message);
 		void						forward_to_all_channels(User* user, const string& message);
 
+		string						motd_generate();
+
 		void print_channels() const; //DEBUG
 };
 

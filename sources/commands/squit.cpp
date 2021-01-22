@@ -61,15 +61,20 @@ cmd_squit(IRC& irc, int fd)
 		return;
 	}
 
-	string quit_server_name = _arguments[0];		// имя отключаемого сервера
-	Server* srvr = irc.get_server(_arguments[0]);// отлючаемый сервер
+	Server* quit_server = (!_prefix.empty())
+							? irc.get_server(_prefix)
+							: irc.get_server(fd);
+
+	if (!quit_server) return;
+
+	string quit_server_name = quit_server->getName();
 
 	for (size_t i = 0; i < users.size(); i++)
 	{
-		if ((srvr->getHopcount() == 1								// если удаяемы сервер подключен к нам напрямую
-				&& users[i]->getSocketFd() == srvr->getSocketFd())	// то удаляем всех пользователей в цепочке серверов (по fd)
+		if ((quit_server->getHopcount() == 1								// если удаяемы сервер подключен к нам напрямую
+				&& users[i]->getSocketFd() == quit_server->getSocketFd())	// то удаляем всех пользователей в цепочке серверов (по fd)
 			|| users[i]->getServername() == quit_server_name)
-			irc.delete_user(users[i]);								// удаляем пользователя из всех каналов, из _users и из _clients 
+			irc.delete_user(users[i]);										// удаляем пользователя из всех каналов, из _users и из _clients 
 	}
 
 	string quit_msg1 = ":" + irc.get_server_name() +
@@ -91,6 +96,7 @@ cmd_squit(IRC& irc, int fd)
 	irc.forward_to_servers(fd, quit_msg2);
 
 	irc.close_connection(servers[pos]);
+	
 }
 
 // squit ft_irc.net/1084 :uhodi sorry  

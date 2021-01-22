@@ -103,6 +103,7 @@ public:
 	void					cmd_version(IRC& irc, int fd);
 	void					cmd_links(IRC& irc, int fd);
 	void					cmd_trace(IRC& irc, int fd);
+	void					cmd_motd(IRC& irc, int fd);
 
 	const string&			getCommand() const;
 	const string&			getMessage() const;

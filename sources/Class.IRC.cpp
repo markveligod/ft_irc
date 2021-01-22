@@ -137,7 +137,8 @@ create_socket_network()				// network_ip, _network_port и network_pass доба
 	int fd = _network[n]._socket();
 	utils::print_line("Socket network FD done!");
 
-	_network[n]._connect();
+	if ((_network[n]._connect()) < 0)
+		return;
 	utils::print_line("Socket network connection!");
 
 	_array_fd_select[fd] = FD_CLIENT;
@@ -465,13 +466,20 @@ close_connection(Server* server)
 
 	delete_client(get_client(server));		//TODO проверить, удаялются ли серверы из _clients
 	
-	int fd = server->getSocketFd();
-	_array_fd_select.erase(fd);
-	close(fd);
+	if (server->getHopcount() == 1)
+	{
+		int fd = server->getSocketFd();
+		_array_fd_select.erase(fd);
+		close(fd);
+		utils::print_line("Connection with " + server->getName() + " terminated");
+	}
 	
 	vector<Server*>::iterator it = find(_servers.begin(), _servers.end(), server);
 	if (it != _servers.end())
+	{
 		_servers.erase(it);
+		utils::print_line("Server " + server->getName() + " deleted from server list");
+	}
 	delete server;
 }
 
@@ -724,12 +732,16 @@ get_servers()								{ return _servers; }
 Server* IRC::
 get_server(int fd)
 {
-	User* user = _users[find_fd(_users, fd)];
-	return _servers[find_name(_servers, user->getServername())];
+	int n = find_fd(_servers, fd);
+	return (n >= 0) ? _servers[n] : NULL;
 }
 
 Server* IRC::
-get_server(const string& name) const		{ return _servers[find_name(_servers, name)]; }
+get_server(const string& name) const
+{
+	int n = find_name(_servers, name);
+	return (n >= 0) ? _servers[n] : NULL;
+}
 
 const string& IRC::
 get_server_name()							{ return _server_name; }
@@ -945,7 +957,7 @@ void IRC::
 delete_user(User* usr)
 {
 	delete_client(get_client(usr));
-	delete_user_from_channels(usr, string(" :"));
+	delete_user_from_channels(usr, string(" QUIT :Client closed connection"));
 
 	vector<User*>::iterator it = find(_users.begin(), _users.end(), usr);
 	if (it != _users.end())
@@ -990,6 +1002,8 @@ delete_user_from_channels(User* user, const string& quit_mess)
 			}
 			else //иначе отправить всем пользователем канал сообщение о выходе юзера
 				forward_to_channel(fd, it_channels->first, fullname(user) + quit_mess);
+
+			forward_to_servers(fd, ":" + user->getName() + quit_mess);
 		}
 		// удаляем из бан списка
 		vector<User*>::iterator it_ban_start = it_channels->second.getVecBanned().begin();
@@ -1006,4 +1020,34 @@ delete_user_from_channels(User* user, const string& quit_mess)
 		}
 		++it_channels;
 	}
+}
+
+string IRC::
+motd_generate()
+{
+	std::stringstream out_mess_to_user;
+	out_mess_to_user << "****************************************************************************\n";
+	out_mess_to_user << "*_      `-._     `-.     `.   \\      :      /   .'     .-'     _.-'      _ *\n";
+	out_mess_to_user << "* `--._     `-._    `-.    `.  `.    :    .'  .'    .-'    _.-'     _.--'  *\n";
+	out_mess_to_user << "*      `--._    `-._   `-.   `.  \\   :   /  .'   .-'   _.-'    _.--'       *\n";
+	out_mess_to_user << "*`--.__     `--._   `-._  `-.  `. `. : .' .'  .-'  _.-'   _.--'     __.--' *\n";
+	out_mess_to_user << "*__    `--.__    `--._  `-._ `-. `. \\:/ .' .-' _.-'  _.--'    __.--'    __ *\n";
+	out_mess_to_user << "*  `--..__   `--.__   `--._ `-._`-.`_=_'.-'_.-' _.--'   __.--'   __..--'   *\n";
+	out_mess_to_user << "*--..__   `--..__  `--.__  `--._`-q(-_-)p-'_.--'  __.--'  __..--'   __..-- *\n";
+	out_mess_to_user << "*      ``--..__  `--..__ `--.__ `-'_) (_`-' __.--' __..--'  __..--''       *\n";
+	out_mess_to_user << "*...___        ``--..__ `--..__`--/__/  \\--'__..--' __..--''        ___... *\n";
+	out_mess_to_user << "*      ```---...___    ``--..__`_(<_   _/)_'__..--''    ___...---'''       *\n";
+	out_mess_to_user << "*```-----....._____```---...___(__\\_\\_|_/__)___...---'''_____.....-----''' *\n";
+	out_mess_to_user << "* ___   __  ________   _______   _       _   _______    ___   __   _______ *\n";
+	out_mess_to_user << "*|| \\  ||     ||     ||_____))  \\\\     //  ||_____||  || \\\\  ||  ||_____|| *\n";
+	out_mess_to_user << "*||  \\_||  ___||___  ||     \\\\   \\\\___//   ||     ||  ||  \\\\_||  ||     || *\n";
+	out_mess_to_user << "****************************************************************************\n";
+	out_mess_to_user << "*                              Welcome to IRC                              *\n";
+	out_mess_to_user << "*\t\t" << ADMINME << "                                              *\n";
+	out_mess_to_user << "*\t\t" << ADMINLOC1 << "                                             *\n";
+	out_mess_to_user << "*\t\t" << ADMINLOC2 << "                                                   *\n";
+	out_mess_to_user << "*\t\t" << ADMINEMAIL << "                                                   *\n";
+	out_mess_to_user << "*\t\t\t" << VERSION << "                                                          *\n";
+	out_mess_to_user << "****************************************************************************\n";
+	return (out_mess_to_user.str());
 }
