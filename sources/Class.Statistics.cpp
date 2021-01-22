@@ -64,7 +64,7 @@ string const Statistics::
 getStartDate() const
 {
 	char buffer[100];
-	struct tm *work_time = localtime(&time_start);
+	struct tm *work_time = localtime(&_time_start);
 	std::stringstream ss;
 
 	strftime(buffer, 100, "%a %b %d %Y at %H:%M:%S", work_time);
