@@ -146,7 +146,7 @@ server_check_errors(IRC& irc, int fd) const
 	if (server_el >= 0 && _prefix.empty())
 	{
 		utils::print_error(0, "SERVER command without prefix");
-		irc.push_cmd_queue(fd, "ERROR :SERVER command without prefix\r\n");
+		irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, "*", "SERVER", ":Server command without prefix"));
 		return 0;
 	}
 
@@ -163,7 +163,7 @@ server_check_errors(IRC& irc, int fd) const
 	{
 		utils::print_error(ERR_ALREADYREGISTRED, "Already registered! Connection closed!");
 		irc.push_cmd_queue(fd, "ERROR :ID \"" + _arguments[0] + "\" already registered\r\n");
-		irc.close_connection(clients[client_el]);
+		irc.close_connection(fd, 0);
 		return (ERR_ALREADYREGISTRED);
 	}
 	else if (server_el >= 0 &&
@@ -171,7 +171,6 @@ server_check_errors(IRC& irc, int fd) const
 	{
 		utils::print_error(ERR_ALREADYREGISTRED, "Already registered! Connection closed!");
 		irc.push_cmd_queue(fd, "ERROR :ID \"" + _arguments[0] + "\" already registered\r\n");
-		irc.close_connection(servers[irc.find_fd(servers, fd)]);
 		return (ERR_ALREADYREGISTRED);
 	}
 
