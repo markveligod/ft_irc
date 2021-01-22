@@ -15,6 +15,7 @@ void Command::
 cmd_motd(IRC& irc, int fd)
 {
     vector<User*>& users 		= irc.get_users();
+    vector<Server *>& servers = irc.get_servers();
     int pos_user                = irc.find_fd(users, fd);
 
     if (pos_user != -1 && this->_prefix.size() == 0) //если обратился клиент
@@ -27,7 +28,6 @@ cmd_motd(IRC& irc, int fd)
         }
         else if (this->_arguments.size() == 1) //если указан параметр target шлем по серверу
         {
-            vector<Server *>& servers = irc.get_servers();
             int server_el_name = irc.find_name(servers, this->_arguments[0]);
 
             if (server_el_name == -1)
@@ -35,9 +35,9 @@ cmd_motd(IRC& irc, int fd)
                 irc.push_cmd_queue(fd, irc.response(300, "None", "300", ":error find server"));
                 return ;
             }
-            irc.push_cmd_queue(servers[server_el_name]->getSocketFd(), ":" + users[pos_user]->getName() + " " + this->_command + "\r\n");
+            irc.push_cmd_queue(servers[server_el_name]->getSocketFd(), ":" + users[pos_user]->getName() + " " + this->_command + " " + this->_arguments[0] + "\r\n");
         }
-        else // если не указан шлем по fd клиента
+        else // если не указан шлём по fd клиента
         {
             irc.push_cmd_queue(fd, irc.response(375, users[pos_user]->getNickname(), "375", ":- " + irc.get_server_name() + " Message of the day - "));
 
@@ -53,30 +53,45 @@ cmd_motd(IRC& irc, int fd)
     else // если обратился сервер
     {
         std::cout << "\nDEBUG: раздел если обратился сервер\n";
-        if (this->_prefix.size() != 0)
+        std::cout << "Command: " << this->_command << std::endl;
+        std::cout << "Prefix: " << this->_prefix << std::endl;
+        std::cout << "Arg:\n";
+        for (size_t i = 0; i < this->_arguments.size(); i++)
         {
-            int pos_user_prefix = irc.find_name(users, this->_prefix);
-            
-            if (pos_user_prefix == -1)
-            {
-                irc.push_cmd_queue(fd, irc.response(300, users[pos_user]->getName(), "300", ":None user"));
-                return ;
-            }
-            
-            irc.push_cmd_queue(users[pos_user_prefix]->getSocketFd(), irc.response(375, users[pos_user_prefix]->getNickname(), "375", ":- " + irc.get_server_name() + " Message of the day - "));
+            std::cout << "Index #" << i << " " << this->_arguments[i] << std::endl;
+        }
+        
+        int pos_user_prefix = irc.find_name(users, this->_prefix);
+
+        if (users[pos_user_prefix]->getHopcount() != 0 && this->_arguments.size() == 1 && irc.get_server_name() == this->_arguments[0])
+        {   
+            irc.push_cmd_queue(users[pos_user_prefix]->getSocketFd(), ":" + this->_prefix + " MOTD 375 : - " + irc.get_server_name() + " Message of the day - \r\n");
 
 		    vector<string> temp_motd = irc.motd_generate();
 		    for (size_t i = 0; i < temp_motd.size(); i++)
 		    {
-		    	irc.push_cmd_queue(users[pos_user_prefix]->getSocketFd(), irc.response(372, users[pos_user_prefix]->getNickname(), "372", temp_motd[i]));
+		    	irc.push_cmd_queue(users[pos_user_prefix]->getSocketFd(), ":" + this->_prefix + " MOTD 372 : " + temp_motd[i] + "\r\n");
 		    }
-
-		    irc.push_cmd_queue(users[pos_user_prefix]->getSocketFd(), irc.response(376, users[pos_user_prefix]->getNickname(), "376", ":End of MOTD command"));
+		    irc.push_cmd_queue(users[pos_user_prefix]->getSocketFd(), ":" + this->_prefix + " MOTD 376 : End of MOTD command\r\n");
+        }
+        else if (users[pos_user_prefix]->getHopcount() != 0 && this->_arguments.size() == 1 && irc.get_server_name() != this->_arguments[0])
+        {
+            int server_el_name = irc.find_name(servers, this->_arguments[0]);
+            irc.push_cmd_queue(servers[server_el_name]->getSocketFd(), ":" + this->_prefix + " " + this->_command + " " + this->_arguments[0] + "\r\n");
         }
         else
         {
-            irc.push_cmd_queue(fd, irc.response(300, users[pos_user]->getName(), "300", ":None prefix"));
-            return ;
+            std::cout << "DEBUG: Hopcount: " << users[pos_user_prefix]->getHopcount() << std::endl;
+            std::stringstream temp;
+            for (size_t i = 0; i < this->_arguments.size(); i++)
+            {
+                temp << this->_arguments[i];
+            }
+            if (users[pos_user_prefix]->getHopcount() != 0 && this->_arguments.size() != 1)
+                irc.push_cmd_queue(users[pos_user_prefix]->getSocketFd(), ":" + this->_prefix + " " + this->_command + " :" + temp.str() + "\r\n");
+            else
+                irc.push_cmd_queue(users[pos_user_prefix]->getSocketFd(), temp.str() + "\r\n");
+            
         }
     }
 }
