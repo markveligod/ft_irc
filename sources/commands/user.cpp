@@ -57,34 +57,37 @@ cmd_user(IRC& irc, int fd)
 	irc.forward_to_servers(fd, out_message.str());
 
 	//hello
-	irc.push_cmd_queue(fd, irc.response(001, curr_user->getNickname(), "001", "Welcome to the Internet Relay Network " + irc.fullname(curr_user)));
-
-	irc.push_cmd_queue(fd, irc.response(002, curr_user->getNickname(), "002", "Your host is " + irc.get_server_name() + ", running version " + VERSION));
-
-	time_t t = time(0);
-	string time_mess = ctime(&t);
-	time_mess.erase(--time_mess.end());
-	irc.push_cmd_queue(fd, irc.response(003, curr_user->getNickname(), "003", "This server was created " + time_mess));
-
-	irc.push_cmd_queue(fd, irc.response(004, curr_user->getNickname(), "004", irc.get_server_name() + " " + VERSION + "aiwroO" + "OovaimnqpsrtklbeI"));
-
-	irc.push_cmd_queue(fd, irc.response(005, curr_user->getNickname(), "005", "Try server " + irc.get_server_name()));
-
-	irc.push_cmd_queue(fd, irc.response(251, curr_user->getNickname(), "251", ":There are " + utils::int_to_str(users.size()) + " users and 0 services on " + utils::int_to_str(servers.size()) + " servers"));
-
-	irc.push_cmd_queue(fd, irc.response(254, curr_user->getNickname(), "254", utils::int_to_str(irc.get_channels().size()) + " :channels formed"));
-
-	irc.push_cmd_queue(fd, irc.response(255, curr_user->getNickname(), "255", ":I have " + utils::int_to_str(users.size()) + " clients and " + utils::int_to_str(servers.size()) + " servers"));
-
-	irc.push_cmd_queue(fd, irc.response(375, curr_user->getNickname(), "375", ":- " + irc.get_server_name() + " Message of the day - "));
-
-	vector<string> temp_motd = irc.motd_generate();
-	for (size_t i = 0; i < temp_motd.size(); i++)
+	if (server_el < 0)
 	{
-		irc.push_cmd_queue(fd, irc.response(372, curr_user->getNickname(), "372", temp_motd[i]));
-	}
+		irc.push_cmd_queue(fd, irc.response(001, curr_user->getNickname(), "001", "Welcome to the Internet Relay Network " + irc.fullname(curr_user)));
 
-	irc.push_cmd_queue(fd, irc.response(376, curr_user->getNickname(), "376", ":End of MOTD command"));
+		irc.push_cmd_queue(fd, irc.response(002, curr_user->getNickname(), "002", "Your host is " + irc.get_server_name() + ", running version " + VERSION));
+
+		time_t t = time(0);
+		string time_mess = ctime(&t);
+		time_mess.erase(--time_mess.end());
+		irc.push_cmd_queue(fd, irc.response(003, curr_user->getNickname(), "003", "This server was created " + time_mess));
+
+		irc.push_cmd_queue(fd, irc.response(004, curr_user->getNickname(), "004", irc.get_server_name() + " " + VERSION + "aiwroO" + "OovaimnqpsrtklbeI"));
+
+		irc.push_cmd_queue(fd, irc.response(005, curr_user->getNickname(), "005", "Try server " + irc.get_server_name()));
+
+		irc.push_cmd_queue(fd, irc.response(251, curr_user->getNickname(), "251", ":There are " + utils::int_to_str(users.size()) + " users and 0 services on " + utils::int_to_str(servers.size()) + " servers"));
+
+		irc.push_cmd_queue(fd, irc.response(254, curr_user->getNickname(), "254", utils::int_to_str(irc.get_channels().size()) + " :channels formed"));
+
+		irc.push_cmd_queue(fd, irc.response(255, curr_user->getNickname(), "255", ":I have " + utils::int_to_str(users.size()) + " clients and " + utils::int_to_str(servers.size()) + " servers"));
+
+		irc.push_cmd_queue(fd, irc.response(375, curr_user->getNickname(), "375", ":- " + irc.get_server_name() + " Message of the day - "));
+
+		vector<string> temp_motd = irc.motd_generate();
+		for (size_t i = 0; i < temp_motd.size(); i++)
+		{
+			irc.push_cmd_queue(fd, irc.response(372, curr_user->getNickname(), "372", temp_motd[i]));
+		}
+
+		irc.push_cmd_queue(fd, irc.response(376, curr_user->getNickname(), "376", ":End of MOTD command"));
+	}
 }
 
 void Command::
