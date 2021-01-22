@@ -37,38 +37,30 @@
 void Command::
 cmd_squit(IRC& irc, int fd)
 {
-    std::vector<Server*>& servers = irc.get_servers();
-    std::vector<User*>& users = irc.get_users();
-	User* usr = (!_prefix.empty()) ? irc.get_user(_prefix) : irc.get_user(fd);
-	if (!usr) return;
+	string sender = (!_prefix.empty()) ? _prefix : irc.get_user(fd)->getName();
 
-	if (!usr->getMode('o'))
+	if (!irc.is_server(fd) && !irc.get_user(fd)->getMode('o'))	// сообщение от пользовател, не являющегося оператором сервера
 	{
-		irc.push_cmd_queue(fd, irc.response(ERR_NOPRIVILEGES, usr->getName(), _command, ERR_NOPRIVILEGES_MESS));
+		irc.push_cmd_queue(fd, irc.response(ERR_NOPRIVILEGES, sender, _command, ERR_NOPRIVILEGES_MESS));
 		return;
 	}
 
 	if (!check_args_number(2))
 	{
-		irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, usr->getName(), _command, ERR_NEEDMOREPARAMS_MESS));
+		irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, sender, _command, ERR_NEEDMOREPARAMS_MESS));
 		return;
 	}
 
-	int pos;
-	if ((pos = irc.find_name(irc.get_servers(), _arguments[0])) < 0)
+	string quit_server_name = _arguments[0];
+	Server* quit_server = irc.get_server(quit_server_name);
+
+	if (!quit_server)
 	{
-		irc.push_cmd_queue(fd, irc.response(ERR_NOSUCHSERVER, usr->getName(), _command, ERR_NOSUCHSERVER_MESS));
+		irc.push_cmd_queue(fd, irc.response(ERR_NOSUCHSERVER, sender, _command, ERR_NOSUCHSERVER_MESS));
 		return;
 	}
 
-	Server* quit_server = (!_prefix.empty())
-							? irc.get_server(_prefix)
-							: irc.get_server(fd);
-
-	if (!quit_server) return;
-
-	string quit_server_name = quit_server->getName();
-
+	std::vector<User*>& users = irc.get_users();
 	for (size_t i = 0; i < users.size(); i++)
 	{
 		if ((quit_server->getHopcount() == 1								// если удаяемы сервер подключен к нам напрямую
@@ -77,26 +69,31 @@ cmd_squit(IRC& irc, int fd)
 			irc.delete_user(users[i]);										// удаляем пользователя из всех каналов, из _users и из _clients 
 	}
 
-	string quit_msg1 = ":" + irc.get_server_name() +
+	string wallop = ":" + irc.get_server_name() +
 								" WALLOPS :Received SQUIT " +
-								_arguments[0] +
+								quit_server_name +
 								" from " +
-								usr->getName() + ": " +
+								sender + ": " +
 								_arguments[1];
 
-	irc.forward_to_servers(fd, quit_msg1);
+	irc.forward_to_servers(fd, wallop);				// рассылаем валлоп серверам
+
+													// и операторам текущего сервера
+	for (vector<User*>::iterator it = users.begin(); it != users.end(); it++)
+	{
+		if ((*it)->getHopcount() == 0 && ((*it)->getMode('o') || (*it)->getMode('w')))
+			irc.push_cmd_queue(fd, wallop);
+	}
 
 	string quit_msg2 = ":" + quit_server_name +
 								" SQUIT " +
 								quit_server_name + " :" +
 								_arguments[1] +
 								" (SQUIT from " +
-								usr->getName() + ")";
+								sender + ")";
 
 	irc.forward_to_servers(fd, quit_msg2);
 
-	irc.close_connection(servers[pos]);
+	irc.close_connection(quit_server);
 	
 }
-
-// squit ft_irc.net/1084 :uhodi sorry  

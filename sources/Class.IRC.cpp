@@ -352,6 +352,7 @@ check_fd_select()
 					do_command(&mess, it->first); // передаем в исполнение команды сообщение и сокет, из которого пришло сообщение
 				}
 				bzero(buffer, 512);
+				break;
 			}
 			//Раздел для приемки сообщений из селекта
 			if (it->second == FD_SERVER || it->second == FD_SERVER_SSL)
@@ -435,9 +436,8 @@ void IRC::close_connection(int fd, int n)
 		{
 			_array_fd_select.erase(fd);
 			close(fd);
-		}
-		
-	}	
+		}	
+	}
 }
 
 void IRC::
@@ -453,7 +453,10 @@ close_connection(User* user)
 {
 	int fd = user->getSocketFd();
 	if (!is_server(fd))
+	{
 		_array_fd_select.erase(fd);
+		close(fd);
+	}
 	delete_user(user);
 }
 
