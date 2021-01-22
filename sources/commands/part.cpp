@@ -15,20 +15,21 @@
 ** ====================================================================
 */
 
-int Command::cmd_part(IRC& irc, int fd)
+void Command::
+cmd_part(IRC& irc, int fd)
 {
-	if (arguments.empty())
+	if (_arguments.empty())
 	{
-		irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, fd, command, ERR_NEEDMOREPARAMS_MESS));
-		return 1;
+		irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, fd, _command, ERR_NEEDMOREPARAMS_MESS));
+		return;
 	}
 
-	vector<string> channels = utils::split(arguments[0], ',');			// получаем вектор каналов
+	vector<string> channels = utils::split(_arguments[0], ',');			// получаем вектор каналов
 
 	channel_map& _channels = irc.get_channels();
-	string exit_message = " :" + ((arguments.size() == 2) ? arguments[1] : string());
+	string exit_message = " :" + ((_arguments.size() == 2) ? _arguments[1] : string());
 
-	// channels - список каналов, которые были в arguments[0] перечислены через ','
+	// channels - список каналов, которые были в _arguments[0] перечислены через ','
 	// channels[i].substr(1) - название канала без первого символа ('&' или '#')
 
 	for (size_t i = 0; i < channels.size(); i++)
@@ -46,8 +47,6 @@ int Command::cmd_part(IRC& irc, int fd)
 		else
 			irc.push_cmd_queue(fd, irc.response(ERR_NOSUCHCHANNEL, fd, channels[i], ERR_NOSUCHCHANNEL_MESS));
 	}
-
-	return 0;
 }
 
 /*
@@ -64,7 +63,7 @@ leave_channel(IRC& irc, Channel& channel, int fd, string message)
 		user->dec_channel_count();
 		all_users.erase(user);
 		
-		string message1 = (irc.full_name(user))
+		string message1 = (irc.fullname(user))
 							   + " PART " + channel.getName() + message;
 		string message2 =  ":" + user->getName()
 							   + " PART " + channel.getName() + message;

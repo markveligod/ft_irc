@@ -20,13 +20,13 @@ struct CmdStats
 class Statistics
 {
 	private:
-		int										sent_count;
-		int										recv_count;
-		unsigned long							sent_kbytes;
-		unsigned long 							recv_kbytes;
-		time_t									time_start;
-		int										queue_count;
-		map<string, pair<int, unsigned long> >	map_cmd;		// cmd_name - count - bytes
+		int										_sent_count;
+		int										_recv_count;
+		unsigned long							_sent_kbytes;
+		unsigned long 							_recv_kbytes;
+		time_t									_time_start;
+		int										_queue_count;
+		map<string, pair<int, unsigned long> >	_map_cmd;		// cmd_name - count - bytes
 
 	public:
 		Statistics();

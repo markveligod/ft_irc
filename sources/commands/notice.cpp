@@ -19,21 +19,22 @@
 ** =====================================================================
 */
 
-int Command::cmd_notice(IRC& irc, int fd)
+void Command::
+cmd_notice(IRC& irc, int fd)
 {
-	User* sender = (prefix.size()) ? irc.get_user(prefix) : irc.get_user(fd);
+	User* sender = (_prefix.size()) ? irc.get_user(_prefix) : irc.get_user(fd);
 
-	if (!sender || arguments.size() != 2)
-		return 1;
+	if (!sender || _arguments.size() != 2)
+		return;
 
-	vector<string> recepients = utils::split(arguments[0], ',');
+	vector<string> recepients = utils::split(_arguments[0], ',');
 
 	for (size_t i = 0; i < recepients.size(); i++)
 	{
 		string message1 = ":" + sender->getName() + " " + "NOTICE" + " " +
-							 recepients[i] + " " + ":" + arguments[1] + "\r\n";
-		string message2 = irc.full_name(sender) + " " + "NOTICE" + " " +
-							 recepients[i] + " " + ":" + arguments[1] + "\r\n";
+							 recepients[i] + " " + ":" + _arguments[1] + "\r\n";
+		string message2 = irc.fullname(sender) + " " + "NOTICE" + " " +
+							 recepients[i] + " " + ":" + _arguments[1] + "\r\n";
 
 		Channel* channel = irc.get_channel(recepients[i]);
 		if (channel)
@@ -57,19 +58,4 @@ int Command::cmd_notice(IRC& irc, int fd)
 		if (user)
 			irc.push_cmd_queue(user->getSocketFd(), message2);
 	}
-
-	return 0;
 }
-
-// личное сообщение от клиента для cddoma
-// PRIVMSG cddoma :hello
-// :poli PRIVMSG cddoma :hello
-
-// сообщение в канал
-// PRIVMSG #q :hello
-// :poli PRIVMSG #q :hello
-
-// одновременно и туда, и туда
-// PRIVMSG #q,poli :hello
-// :poli PRIVMSG #q :hello
-// :poli PRIVMSG poli :hello

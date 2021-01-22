@@ -22,16 +22,20 @@
 ** =====================================================================
 */
 
-int Command::
+void Command::
 cmd_oper(IRC& irc, int fd)
 {
-	if (!this->check_args_number(2))
-		return (irc.push_mess_client(fd, ERR_NEEDMOREPARAMS));
-
 	User* usr = irc.get_user(fd);
 
-	if (!usr)
-		return (irc.push_mess_client(fd, ERR_NOTREGISTERED));
+	if (!usr || irc.is_server(fd))
+		return;
+
+	string usr_name = usr->getName();
+	if (!check_args_number(2))
+	{
+		irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, usr_name, _command, ERR_NEEDMOREPARAMS_MESS));
+		return;
+	}
 
 	/*	юзер для оператора добавлен в виде prefix*
 	 	чтобы можно было добавлять несколько операторов
@@ -39,27 +43,26 @@ cmd_oper(IRC& irc, int fd)
 		символов ника, запрашиващего операторские права, и префикса
 	*/
 
-	if (arguments[1] == irc.get_operator_pass())
+	if (_arguments[1] == irc.get_operator_pass())
 	{
 		size_t n = irc.get_operator_user().size() - 1;
 
 		string operator_mask = irc.get_operator_user();
-		string user_name = usr->getName().substr(0, n) + "*";
+		string user_name = usr_name.substr(0, n) + "*";
 
-		if (arguments[0] == operator_mask && user_name == operator_mask)
+		if (_arguments[0] == operator_mask && user_name == operator_mask)
 		{
-			string mode_mess = " MODE " + usr->getName() + " :+o\r\n";
+			string mode_mess = " MODE " + usr_name + " :+o\r\n";
 
 			usr->setMode('o', true);
 			irc.push_cmd_queue(fd, ":" + irc.get_server_name() + mode_mess);
-			irc.push_cmd_queue(fd, irc.response(RPL_YOUREOPER, fd, command, RPL_YOUREOPER_MESS));
+			irc.push_cmd_queue(fd, irc.response(RPL_YOUREOPER, usr_name, _command, RPL_YOUREOPER_MESS));
 
-			irc.forward_to_servers(fd, usr->getName() + mode_mess);
+			irc.forward_to_servers(fd, usr_name + mode_mess);
 		}
 		else
-			irc.push_cmd_queue(fd, irc.response(ERR_NOOPERHOST, fd, command, ERR_NOOPERHOST_MESS));
+			irc.push_cmd_queue(fd, irc.response(ERR_NOOPERHOST, usr_name, _command, ERR_NOOPERHOST_MESS));
 	}
 	else
-		return (irc.push_mess_client(fd, ERR_PASSWDMISMATCH));
-	return (0);
+		return irc.push_cmd_queue(fd, irc.response(ERR_PASSWDMISMATCH, usr_name, _command, ERR_PASSWDMISMATCH_MESS));
 }

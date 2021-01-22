@@ -24,13 +24,14 @@
 ** =====================================================================
 */
 
-int Command::cmd_error(IRC& irc, int fd)
+void Command::
+cmd_error(IRC& irc, int fd)
 {
 	if (!irc.is_server(fd))
-		return 1;
+		return;
 
 	string notice = ":" + irc.get_server_name() + " " + "NOTICE" + " ";
-	string error = " :ERROR :" + ((!arguments.empty()) ? arguments[0] : "") + "\r\n";
+	string error = " :ERROR :" + ((!_arguments.empty()) ? _arguments[0] : "") + "\r\n";
 	vector<User*> users = irc.get_users();
 
 	for (size_t i = 0; i < users.size(); i++)
@@ -51,6 +52,4 @@ int Command::cmd_error(IRC& irc, int fd)
 	}
 
 	irc.close_connection(server);
-
-	return 0;
 }

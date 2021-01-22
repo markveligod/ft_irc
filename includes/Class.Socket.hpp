@@ -12,6 +12,7 @@
 class Socket
 {
 protected:
+public:
 	int					_port;
 	int					_fd;
 	int					_sin_family;

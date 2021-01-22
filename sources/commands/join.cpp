@@ -19,17 +19,17 @@
 ** ====================================================================
 */
 
-int Command::
+void Command::
 cmd_join(IRC& irc, int fd)
 {
-	if (arguments.empty())
+	if (_arguments.empty())
 	{
-		irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, fd, command, ERR_NEEDMOREPARAMS_MESS));
-		return 1;
+		irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, fd, _command, ERR_NEEDMOREPARAMS_MESS));
+		return;
 	}
 
-	vector<string> channels = utils::split(arguments[0], ',');
-	vector<string> keys = (arguments.size() > 1) ? utils::split(arguments[1], ',') : vector<string>();
+	vector<string> channels = utils::split(_arguments[0], ',');
+	vector<string> keys = (_arguments.size() > 1) ? utils::split(_arguments[1], ',') : vector<string>();
 	
 	for (size_t i = 0; i < channels.size(); i++)
 	{
@@ -41,12 +41,11 @@ cmd_join(IRC& irc, int fd)
 		
 		string key = (i < keys.size()) ? keys[i] : string();
 
-		User* user = (prefix.size()) ? irc.get_user(prefix) : irc.get_user(fd);
-		if (!user) return 1;
+		User* user = (_prefix.size()) ? irc.get_user(_prefix) : irc.get_user(fd);
+		if (!user) return;
 
 		join_channel(irc, channels[i], key, user, fd);
 	}
-	return 0;
 }
 
 void Command::
@@ -58,7 +57,7 @@ join_channel(IRC& irc,
 {
 	channel_map& channels = irc.get_channels();
 
-	string mess_to_user = 		irc.full_name(user) + " JOIN :" + channel_name;
+	string mess_to_user = 		irc.fullname(user) + " JOIN :" + channel_name;
 	string mess_to_server =		":" + user->getName() + " JOIN " + channel_name;
 	string mode_message = 		":" + user->getName() + " MODE " + channel_name + " +o " + user->getName();
 
@@ -130,6 +129,4 @@ join_channel(IRC& irc,
 		send_channel_users(irc, fd, user, channels[channel_name]);		// отсылаем подключившемуся список всех пользователей канала
 		irc.push_cmd_queue(fd, irc.response(RPL_ENDOFNAMES, fd, channel_name, RPL_ENDOFNAMES_MESS));
 	}
-	
-	return;
 }

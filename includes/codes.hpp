@@ -165,7 +165,9 @@
 
 #define ERR_KEYSET					467		// "<channel> :Channel key already set"
 #define ERR_CHANNELISFULL			471		// "<channel> :Cannot join channel (+l)"
+
 #define ERR_UNKNOWNMODE				472		// "<char> :is unknown mode char to me"
+#define ERR_UNKNOWNMODE_MESS		" :is unknown mode char to me"
 
 #define ERR_INVITEONLYCHAN			473		// "<channel> :Cannot join channel (+i)"
 #define ERR_INVITEONLYCHAN_MESS		":Cannot join channel (+i)"
@@ -180,6 +182,7 @@
 										// - Any command requiring operator privileges to operate
 										// must return this error to indicate the attempt was
 										// unsuccessful.
+#define ERR_NOPRIVILEGES_MESS		" :Permission Denied- You're not an IRC operator"
 
 #define ERR_CHANOPRIVSNEEDED		482		// "<channel> :You're not channel operator"
 										// - Any command requiring 'chanop' privileges (such as
@@ -208,6 +211,7 @@
 #define ERR_USERSDONTMATCH			502		// ":Cant change mode for other users"
 										// - Error sent to any user trying to view or change the
 										// user mode for a user other than themselves.
+#define ERR_USERSDONTMATCH_MESS		" :Cant change mode for other users"
 
 /*
 **==========================
@@ -488,8 +492,3 @@
 										// (RPL_ADMINLOC2) and finally the administrative
 										// contact for the server (an email address here
 										// is required) in RPL_ADMINEMAIL.
-
-
-
-
-void generate_map_codes();

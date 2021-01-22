@@ -22,15 +22,15 @@
 ** ====================================================================
 */
 
-int Command::
+void Command::
 cmd_names(IRC& irc, int fd)
 {
-	vector<string> args = (!arguments.empty()) ? utils::split(arguments[0], ',') : vector<string>();
+	vector<string> args = (!_arguments.empty()) ? utils::split(_arguments[0], ',') : vector<string>();
 
-	User* user = (prefix.size()) ? irc.get_user(prefix) : irc.get_user(fd);
-	if (!user) return 1;
+	User* user = (_prefix.size()) ? irc.get_user(_prefix) : irc.get_user(fd);
+	if (!user) return;
 
-	if (arguments.empty() || args[0] == "0" || atoi(args[0].c_str()) == irc.get_localhost_port())
+	if (_arguments.empty() || args[0] == "0" || atoi(args[0].c_str()) == irc.get_localhost_port())
 	{
 		channel_map& channels = irc.get_channels();
 
@@ -51,7 +51,6 @@ cmd_names(IRC& irc, int fd)
 
 		send_users_without_channel(irc, fd);
 		irc.push_cmd_queue(fd, irc.response(RPL_ENDOFNAMES, fd, "*", RPL_ENDOFNAMES_MESS));
-		return 0;
 	}
 	
 	channel_map channels = irc.get_channels();
@@ -69,7 +68,6 @@ cmd_names(IRC& irc, int fd)
 		else
 			irc.push_cmd_queue(fd, irc.response(RPL_ENDOFNAMES, fd, args[i], RPL_ENDOFNAMES_MESS));
 	}
-	return 0;
 }
 
 void Command::

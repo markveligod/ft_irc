@@ -14,42 +14,43 @@
 ** =====================================================================
 */
 
-int Command::cmd_privmsg(IRC& irc, int fd)
+void Command::
+cmd_privmsg(IRC& irc, int fd)
 {
-	User* sender = (prefix.size()) ? irc.get_user(prefix) : irc.get_user(fd);
+	User* sender = (_prefix.size()) ? irc.get_user(_prefix) : irc.get_user(fd);
 
 	if (!sender)
 	{
-		irc.push_cmd_queue(fd, irc.response(ERR_NOSUCHNICK, fd, prefix, ERR_NOSUCHNICK_MESS));
-		return 1;
+		irc.push_cmd_queue(fd, irc.response(ERR_NOSUCHNICK, fd, _prefix, ERR_NOSUCHNICK_MESS));
+		return;
 	}
 
-	if (arguments.empty())
+	if (_arguments.empty())
 	{
-		irc.push_cmd_queue(fd, irc.response(ERR_NORECIPIENT, fd, prefix, string(ERR_NORECIPIENT_MESS) + " (PRIVMSG)"));
-		return 1;
+		irc.push_cmd_queue(fd, irc.response(ERR_NORECIPIENT, fd, _prefix, string(ERR_NORECIPIENT_MESS) + " (PRIVMSG)"));
+		return;
 	}
 
-	if (arguments.size() == 1)
+	if (_arguments.size() == 1)
 	{
-		irc.push_cmd_queue(fd, irc.response(ERR_NOTEXTTOSEND, fd, prefix, ERR_NOTEXTTOSEND_MESS));
-		return 1;
+		irc.push_cmd_queue(fd, irc.response(ERR_NOTEXTTOSEND, fd, _prefix, ERR_NOTEXTTOSEND_MESS));
+		return;
 	}
 
-	if (arguments.size() > 2)
+	if (_arguments.size() > 2)
 	{
-		irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, fd, prefix, ERR_NEEDMOREPARAMS_MESS));
-		return 1;
+		irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, fd, _prefix, ERR_NEEDMOREPARAMS_MESS));
+		return;
 	}
 
-	vector<string> recepients = utils::split(arguments[0], ',');
+	vector<string> recepients = utils::split(_arguments[0], ',');
 
 	for (size_t i = 0; i < recepients.size(); i++)
 	{
 		string message = ":" + sender->getName() + " " +
 							   "PRIVMSG" + " " +
 							   recepients[i] + " " +
-						 ":" + arguments[1];
+						 ":" + _arguments[1];
 
 		Channel* channel = irc.get_channel(recepients[i]);
 		if (channel)
@@ -62,7 +63,7 @@ int Command::cmd_privmsg(IRC& irc, int fd)
 				|| (channel->getModeChannel('m')
 					&& (!in_channel || !(mode_user.o || mode_user.v))))	// модерируемый канал и пользователь не в канале или не имеет право говорить
 			{
-				irc.push_cmd_queue(fd, irc.response(ERR_CANNOTSENDTOCHAN, fd, prefix,
+				irc.push_cmd_queue(fd, irc.response(ERR_CANNOTSENDTOCHAN, fd, _prefix,
 													recepients[i] + " " + string(ERR_CANNOTSENDTOCHAN_MESS)));
 			}
 			else
@@ -82,10 +83,8 @@ int Command::cmd_privmsg(IRC& irc, int fd)
 				irc.push_cmd_queue(user->getSocketFd(), message + "\r\n");
 			continue;
 		}
-		irc.push_cmd_queue(fd, irc.response(ERR_NOSUCHNICK, fd, prefix, ERR_NOSUCHNICK_MESS));
+		irc.push_cmd_queue(fd, irc.response(ERR_NOSUCHNICK, fd, _prefix, ERR_NOSUCHNICK_MESS));
 	}
-
-	return 0;
 }
 
 // личное сообщение от клиента для cddoma

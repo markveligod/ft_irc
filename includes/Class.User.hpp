@@ -31,12 +31,12 @@ struct ModeUser
 class User : public Client
 {
 private:
-	string 		username;
-	string 		hostname;
-	string 		servername;
-	string 		realname;
-	ModeUser	mode;
-	size_t		channel_count;
+	string 		_username;
+	string 		_hostname;
+	string 		_servername;
+	string 		_realname;
+	ModeUser	_mode;
+	size_t		_channel_count;
 
 public:
 	User(Client* src);

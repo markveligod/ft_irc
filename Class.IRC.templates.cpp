@@ -19,11 +19,11 @@ int IRC::find_name(T& cont, const std::string& name)
 	while (v_begin != cont.end())
 	{
 		if (is_equal((*v_begin)->getName(),name))
-			return (i);
+			return i;
 		v_begin++;
 		i++;
 	}
-	return (-1);
+	return -1;
 }
 
 template <typename T>
@@ -35,11 +35,11 @@ int IRC::find_fd(T& cont, int fd)
 	while (v_begin != cont.end())
 	{
 		if ((*v_begin)->getSocketFd() == fd)
-			return (i);
+			return i;
 		v_begin++;
 		i++;
 	}
-	return (-1);
+	return -1;
 }
 
 template <typename T>
@@ -54,5 +54,5 @@ int IRC::find_fd_count(T &cont, int fd)
 			i++;
 		v_begin++;
 	}
-	return (i);
+	return i;
 }

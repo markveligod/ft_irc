@@ -62,8 +62,7 @@ class IRC
 		SSL*						_ssl;
 		SSL_CTX*					_ctx;
 
-		map<int, string> 			map_codes;
-		Statistics					statistics;
+		Statistics					_statistics;
 
 	public:
 		IRC();
@@ -80,13 +79,12 @@ class IRC
 
 		IRC&						operator=(const IRC& other);
 
-		// void						create_socket_network(std::vector<std::string> network);
 		void						create_socket_network();
 		void						create_socket_local();
 		void						init_fd_select();
 		void						do_select();
 		void						check_fd_select();
-		int							do_command(Command* command, int socket_fd);
+		void						do_command(Command* command, int socket_fd);
 
 		void						init_ssl();
 		void						init_ctx();
@@ -98,6 +96,7 @@ class IRC
 		void						add_network_ip(const string& ip);
 		void						add_network_port(const string& port);
 		void						add_network_pass(const string& pass);
+		void						add_fd(int fd, int fd_type);
 
 		void						delete_user(int fd);
 		void						delete_client(int fd);
@@ -149,18 +148,15 @@ class IRC
 		static int 					find_fd_count(T &cont, int fd);
 
 		void 						push_cmd_queue(int fd, const string& str);
-		string						full_name(const User*) const;
-		string						response(int response_code, int client_fd, string message_prefix, string message);
-		string						response_2(int response_code, int fd, string command, string message);
-		string						response_3(int response_code, string name, string command, string message);
-		int							push_mess_client(int fd, int code);
+		string						fullname(const User*) const;
+		string						response(int response_code, int client_fd, string command, string message);
+		string						response(int response_code, string name, string command, string message);
 		void						forward_to_servers(int fd, const string& message);
 		void						forward_to_clients(IRC& irc, const string& message);
 		void						forward_to_channel(int fd, Channel& channel, const string& message);
 		void						forward_to_channel(int fd, const string& channel_name, const string& message);
 		void						forward_to_all_channels(User* user, const string& message);
 
-		void generate_map_codes();
 		void print_channels() const; //DEBUG
 };
 

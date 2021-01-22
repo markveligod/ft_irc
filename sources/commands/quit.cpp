@@ -21,15 +21,15 @@
 ** =====================================================================
 */
 
-int Command::
+void Command::
 cmd_quit(IRC& irc, int fd)
 {
-	User* user = (!prefix.empty()) ? irc.get_user(prefix) : irc.get_user(fd);
+	User* user = (!_prefix.empty()) ? irc.get_user(_prefix) : irc.get_user(fd);
 
 	if (user) // если от клиента
 	{
 		string quit_mess = " QUIT :" +
-							(arguments.size() == 1 ? arguments[0] : "Client closed connection");
+							(_arguments.size() == 1 ? _arguments[0] : "Client closed connection");
 		
 		irc.forward_to_servers(fd, ":" + user->getName() + quit_mess);	// отправляем всем серверам информацию о том что клиент вышел
 		
@@ -38,6 +38,4 @@ cmd_quit(IRC& irc, int fd)
 	}
 	else
 		irc.close_connection(fd, 0);
-	
-	return (0);
 }

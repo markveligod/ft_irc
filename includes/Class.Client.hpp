@@ -8,14 +8,14 @@ using std::string;
 class Client
 {
 protected:
-	string					nickname;
-	string					hostname;
-	int						socket_fd;
-	int						hopcount;
-	bool					password;
-	string					buffer;
-	bool					is_server;
-	Statistics				statistics;
+	string					_nickname;
+	string					_hostname;
+	int						_socket_fd;
+	int						_hopcount;
+	bool					_password;
+	string					_buffer;
+	bool					_is_server;
+	Statistics				_statistics;
 
 public:
 	Client(string const &hostname = "", int socket_fd = 0, int hopcount = 0);

@@ -15,14 +15,20 @@
 ** =====================================================================
 */
 
-int Command::cmd_admin(IRC& irc, int fd)
+void Command::
+cmd_admin(IRC& irc, int fd)
 {
-	if (arguments.size() > 1)
-		return irc.push_mess_client(fd, ERR_NEEDMOREPARAMS);
+	string recepient = (!_prefix.empty()) ? _prefix : irc.get_user(fd)->getName();
+	
+	if (_arguments.size() > 1)
+	{
+		irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, recepient, _command, ERR_NEEDMOREPARAMS_MESS));
+		return;
+	}
 
 	User* usr = irc.get_user(fd);
 
-	if (!irc.is_server(fd) && arguments.empty())
+	if (_arguments.empty())
 	{
 
 		string admin_info = ":" + irc.get_server_name() + " " +
@@ -48,19 +54,17 @@ int Command::cmd_admin(IRC& irc, int fd)
 		
 		irc.push_cmd_queue(fd, admin_info);
 	}
-	else if (!arguments.empty())
+	else
 	{
 		const vector<Server*>& servers = irc.get_servers();
 		for (size_t i = 0; i < servers.size(); i++)
 		{
-			if (servers[i]->getName() == arguments[0])
+			if (servers[i]->getName() == _arguments[0])
 			{
-				irc.forward_to_servers(fd, ":" + usr->getNickname() + " ADMIN " + arguments[0] + "\r\n");
-				return 0;	
+				irc.forward_to_servers(fd, ":" + usr->getNickname() + " ADMIN " + _arguments[0] + "\r\n");
+				return;	
 			}
 		}
-		irc.push_mess_client(fd, ERR_NOSUCHSERVER);
+		irc.push_cmd_queue(fd, irc.response(ERR_NOSUCHSERVER, recepient, _command, ERR_NOSUCHSERVER_MESS));
 	}
-
-	return 1;
 }

@@ -15,19 +15,23 @@
 ** =====================================================================
 */
 
-int Command::cmd_wallops(IRC& irc, int fd)
+void Command::
+cmd_wallops(IRC& irc, int fd)
 {
-	if (arguments.size() != 1)
-		return (irc.push_mess_client(fd, ERR_NEEDMOREPARAMS));
+	string recepient = (!_prefix.empty()) ? _prefix : irc.get_user(fd)->getName();
+
+	if (_arguments.size() != 1)
+	{
+		irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, recepient, _command, ERR_NEEDMOREPARAMS_MESS));
+		return;
+	}
 
 	vector<User*>& users = irc.get_users();
-	string wallop = ":" + irc.get_server_name() + " WALLOPS :" + arguments[0] + "\r\n";
+	string wallop = ":" + irc.get_server_name() + " WALLOPS :" + _arguments[0] + "\r\n";
 
 	for (vector<User*>::iterator it = users.begin(); it != users.end(); it++)
 	{
 		if ((*it)->getHopcount() == 0 && ((*it)->getMode('o') || (*it)->getMode('w')))
 			irc.push_cmd_queue(fd, wallop);
 	}
-
-	return 0;
 }

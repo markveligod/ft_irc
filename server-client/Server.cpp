@@ -39,36 +39,36 @@ void			Server::connection()
 void			Server::recv_message()
 {
 	std::cout << "Client: ";
-	recv(this->server, this->buffer, BUFFER_SIZE, 0);
-	std::cout << this->buffer << std::endl;
-	if (Server::end_connection(this->buffer))
+	recv(this->server, _buffer, BUFFER_SIZE, 0);
+	std::cout << _buffer << std::endl;
+	if (Server::end_connection(_buffer))
 		return ;
 }
 
 void			Server::chat()
 {
-	strcpy(this->buffer, "Server connected!\n");
-	send(this->server, this->buffer, BUFFER_SIZE, 0);
+	strcpy(_buffer, "Server connected!\n");
+	send(this->server, _buffer, BUFFER_SIZE, 0);
 	std::cout << "Connected to the client 1\n";
 
 	std::cout << "Client: ";
-	recv(this->server, this->buffer, BUFFER_SIZE, 0);
-	std::cout << this->buffer << std::endl;
-	if (Server::end_connection(this->buffer))
+	recv(this->server, _buffer, BUFFER_SIZE, 0);
+	std::cout << _buffer << std::endl;
+	if (Server::end_connection(_buffer))
 		return ;
 
 	/*while (1)
 	{
 		std::cout << "Server: ";
-		std::cin.getline(this->buffer, BUFFER_SIZE);
-		send(this->server, this->buffer, BUFFER_SIZE, 0);
-		if (Server::end_connection(this->buffer))
+		std::cin.getline(_buffer, BUFFER_SIZE);
+		send(this->server, _buffer, BUFFER_SIZE, 0);
+		if (Server::end_connection(_buffer))
 			break;
 
 		std::cout << "Client: ";
-		recv(this->server, this->buffer, BUFFER_SIZE, 0);
-		std::cout << this->buffer << std::endl;
-		if (Server::end_connection(this->buffer))
+		recv(this->server, _buffer, BUFFER_SIZE, 0);
+		std::cout << _buffer << std::endl;
+		if (Server::end_connection(_buffer))
 			break;
 	}*/
 	std::cout << "\nEnd\n";
@@ -82,8 +82,8 @@ bool Server::end_connection(const char* line)
 	std::string str(line);
 
 	if (str == "end connection" || str == "end connectin\n")
-		return (true);
-	return (false);
+		return true;
+	return false;
 }
 
 void Server::error(const std::string& str)

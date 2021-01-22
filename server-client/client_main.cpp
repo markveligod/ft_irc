@@ -15,5 +15,5 @@ int main(int ac, char **av)
 		client.chat();
 	client.close_connectionion();
 
-	return (0);
+	return 0;
 }

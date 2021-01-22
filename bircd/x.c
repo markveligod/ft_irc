@@ -13,7 +13,7 @@ int	x_int(int err, int res, char* str, char* file, int line)
 	      str, file, line, strerror(errno));
       exit (1);
     } 
-  return (res);
+  return res;
 }
 
 void	*x_void(void* err, void* res, char* str, char* file, int line)
@@ -24,5 +24,5 @@ void	*x_void(void* err, void* res, char* str, char* file, int line)
 	      str, file, line, strerror(errno));
       exit (1);
     } 
-  return (res);
+  return res;
 }

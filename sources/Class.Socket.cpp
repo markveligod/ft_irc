@@ -36,13 +36,13 @@ Socket(const char* host_ip,
 const Socket& Socket::
 operator=(const Socket& other)
 {
-	this->_port			= other._port;
-	this->_fd			= other._fd;
-	this->_sin_family	= other._sin_family;
-	this->_type			= other._type;
-	this->_protocol		= other._protocol;
-	this->_addr			= other._addr;
-	this->_addr_size	= other._addr_size;
+	_port			= other._port;
+	_fd			= other._fd;
+	_sin_family	= other._sin_family;
+	_type			= other._type;
+	_protocol		= other._protocol;
+	_addr			= other._addr;
+	_addr_size	= other._addr_size;
 	return (*this);
 }
 
@@ -111,6 +111,6 @@ get_port() const	{ return _port; }
 const std::string Socket::
 getHostname() const
 {
-	//std::string hostname(inet_ntoa(this->_addr.sin_addr));
-	return (std::string(inet_ntoa(this->_addr.sin_addr)));
+	//std::string hostname(inet_ntoa(_addr.sin_addr));
+	return (std::string(inet_ntoa(_addr.sin_addr)));
 }

@@ -12,35 +12,35 @@
 ** =====================================================================
 */
 
-int Command::
+void Command::
 cmd_time(IRC& irc, int fd)
 {
-	if (arguments.size() > 1)												// слишком много аргуменотов
+	if (_arguments.size() > 1)												// слишком много аргуменотов
 	{
-		irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, fd, command, ERR_NEEDMOREPARAMS_MESS));
-		return 1;
+		irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, fd, _command, ERR_NEEDMOREPARAMS_MESS));
+		return;
 	}
 
-	User* user = prefix.size() ? irc.get_user(prefix) : irc.get_user(fd);
+	User* user = _prefix.size() ? irc.get_user(_prefix) : irc.get_user(fd);
 	if (!user)																// сообщение от нусществующего пользователя
 	{
-		irc.push_cmd_queue(fd, irc.response(ERR_NOSUCHNICK, fd, command, ERR_NOSUCHNICK_MESS));
-		return 1;
+		irc.push_cmd_queue(fd, irc.response(ERR_NOSUCHNICK, fd, _command, ERR_NOSUCHNICK_MESS));
+		return;
 	}
 
 
 	string target = string();
 	
-	if (arguments.empty())
+	if (_arguments.empty())
 		target = irc.get_server_name();
-	else if (IRC::find_name(irc.get_servers(), arguments[0]) >= 0)
-		target = arguments[0];
-	else if (IRC::find_name(irc.get_users(), arguments[0]) >= 0)
-		target = irc.get_user(arguments[0])->getServername();
+	else if (IRC::find_name(irc.get_servers(), _arguments[0]) >= 0)
+		target = _arguments[0];
+	else if (IRC::find_name(irc.get_users(), _arguments[0]) >= 0)
+		target = irc.get_user(_arguments[0])->getServername();
 	else
 	{
-		irc.push_cmd_queue(fd, irc.response(ERR_NOSUCHSERVER, fd, command, ERR_NOSUCHSERVER_MESS));
-		return 1;
+		irc.push_cmd_queue(fd, irc.response(ERR_NOSUCHSERVER, fd, _command, ERR_NOSUCHSERVER_MESS));
+		return;
 	}
 	
 	time_t t = time(0);
@@ -55,6 +55,4 @@ cmd_time(IRC& irc, int fd)
 						time_mess + "\r\n";
 
 	irc.push_cmd_queue(fd, message);
-
-	return 0;
 }

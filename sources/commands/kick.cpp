@@ -17,28 +17,29 @@
 ** =====================================================================
 */
 
-int Command::cmd_kick(IRC& irc, int fd)
+void Command::
+cmd_kick(IRC& irc, int fd)
 {
-	if (arguments.size() < 2)												// не достаточно параметров
+	if (_arguments.size() < 2)												// не достаточно параметров
 	{
-		irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, fd, command, ERR_NEEDMOREPARAMS_MESS));
-		return 1;
+		irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, fd, _command, ERR_NEEDMOREPARAMS_MESS));
+		return;
 	}
 
-	User* oper = prefix.size() ? irc.get_user(prefix) : irc.get_user(fd);	// сообщение от нусществующего пользователя
+	User* oper = _prefix.size() ? irc.get_user( _prefix) : irc.get_user(fd);	// сообщение от нусществующего пользователя
 	if (!oper)
 	{
-		irc.push_cmd_queue(fd, irc.response(ERR_NOSUCHNICK, fd, command, ERR_NOSUCHNICK_MESS));
-		return 1;
+		irc.push_cmd_queue(fd, irc.response(ERR_NOSUCHNICK, fd, _command, ERR_NOSUCHNICK_MESS));
+		return;
 	}
 
-	vector<string> channels = utils::split(arguments[0], ',');
-	vector<string> users = utils::split(arguments[1], ',');
+	vector<string> channels = utils::split(_arguments[0], ',');
+	vector<string> users = utils::split(_arguments[1], ',');
 
 	if (channels.size() > users.size())										// неверный ввод команды
 	{
-		irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, fd, command, ERR_NEEDMOREPARAMS_MESS));
-		return 1;
+		irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, fd, _command, ERR_NEEDMOREPARAMS_MESS));
+		return;
 	}
 
 	else if (channels.size() == users.size())									// удялаем i-го юзера из i-го канала
@@ -63,7 +64,7 @@ int Command::cmd_kick(IRC& irc, int fd)
 
 			if (!chann->is_channel_operator(oper))							// oператор не оператор
 			{
-				irc.push_cmd_queue(fd, irc.response(ERR_CHANOPRIVSNEEDED, fd, command, ERR_CHANOPRIVSNEEDED_MESS));
+				irc.push_cmd_queue(fd, irc.response(ERR_CHANOPRIVSNEEDED, fd, _command, ERR_CHANOPRIVSNEEDED_MESS));
 				continue;
 			}
 
@@ -73,8 +74,8 @@ int Command::cmd_kick(IRC& irc, int fd)
 				continue;
 			}
 
-			string exit_message = (arguments.size() == 3) ? arguments[2] : oper->getName();
-			string mess_to_user = 		irc.full_name(oper)   + " KICK " + channels[i] + " " + usr->getName();
+			string exit_message = (_arguments.size() == 3) ? _arguments[2] : oper->getName();
+			string mess_to_user = 		irc.fullname(oper)   + " KICK " + channels[i] + " " + usr->getName();
 			string mess_to_server =		":" + oper->getName() + " KICK " + channels[i] + " " + usr->getName();
 			irc.forward_to_channel(fd, channels[i], mess_to_user);
 			irc.forward_to_servers(fd, mess_to_server);
@@ -90,8 +91,8 @@ int Command::cmd_kick(IRC& irc, int fd)
 
 	else if (channels.size() != 1)												// неверный ввод команды
 	{
-		irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, fd, command, ERR_NEEDMOREPARAMS_MESS));
-		return 1;
+		irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, fd, _command, ERR_NEEDMOREPARAMS_MESS));
+		return;
 	}
 
 	else																	// удаляем список юзеров из одного канала
@@ -101,7 +102,7 @@ int Command::cmd_kick(IRC& irc, int fd)
 		if (!irc.get_channel(chann_name))							// канала не существует
 		{
 			irc.push_cmd_queue(fd, irc.response(ERR_NOSUCHCHANNEL, fd, chann_name, ERR_NOSUCHCHANNEL_MESS));
-			return 1;
+			return;
 		}
 			
 		Channel* chann = irc.get_channel(chann_name);
@@ -109,13 +110,13 @@ int Command::cmd_kick(IRC& irc, int fd)
 		if (!chann->is_user_in_channel(oper))								// оператора нет в канале
 		{
 			irc.push_cmd_queue(fd, irc.response(ERR_NOTONCHANNEL, fd, chann_name, ERR_NOTONCHANNEL_MESS));
-			return 1;
+			return;
 		}
 
 		if (!chann->is_channel_operator(oper))								// oператор не оператор
 		{
-			irc.push_cmd_queue(fd, irc.response(ERR_CHANOPRIVSNEEDED, fd, command, ERR_CHANOPRIVSNEEDED_MESS));
-			return 1;
+			irc.push_cmd_queue(fd, irc.response(ERR_CHANOPRIVSNEEDED, fd, _command, ERR_CHANOPRIVSNEEDED_MESS));
+			return;
 		}
 
 		for (size_t i = 0; i < users.size(); i++)
@@ -128,8 +129,8 @@ int Command::cmd_kick(IRC& irc, int fd)
 				continue;
 			}
 
-			string exit_message = (arguments.size() == 3) ? arguments[2] : oper->getName();
-			string mess_to_user = 		irc.full_name(oper)   + " KICK " + chann_name + " " + usr->getName();
+			string exit_message = (_arguments.size() == 3) ? _arguments[2] : oper->getName();
+			string mess_to_user = 		irc.fullname(oper)   + " KICK " + chann_name + " " + usr->getName();
 			string mess_to_server =		":" + oper->getName() + " KICK " + chann_name + " " + usr->getName();
 			irc.forward_to_channel(fd, chann_name, mess_to_user);
 			irc.forward_to_servers(fd, mess_to_server);
@@ -143,6 +144,4 @@ int Command::cmd_kick(IRC& irc, int fd)
 				irc.get_channels().erase(chann_name);
 		}
 	}
-
-	return 0;
 }

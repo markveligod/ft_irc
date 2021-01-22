@@ -13,7 +13,6 @@ void terminate_server(int signal)
 
 int main(int ac, char **av)
 {
-	vector<string> network;
 	g_exit = 0;
 
 	if (ac != 3 && ac != 4)
@@ -21,23 +20,18 @@ int main(int ac, char **av)
 	if (!utils::check_av(ac, av))
 		utils::exit_error(ERR_CHECKAV, "Incorrect enter to argv!");
 
+	vector<string> network;
 	if (ac == 4)
-	{
 		network = utils::split(av[1], ':');
-		if (network.size() < 3)
-			network.push_back(string());
-	}
 	else
-	{
-		network.push_back(LOCALHOST);
-		network.push_back(DEF_PORT);
-		network.push_back(DEF_PASS);
-	}
+		network.insert(network.begin(), 3, string());
+	network.push_back(string(av[1]));
+	network.push_back(string(av[2]));
 	
-	IRC server(network[0], network[1], network[2], (ac == 4) ? av[2] : av[1], (ac == 4) ? av[3] : av[2]);
+	IRC server(network[0], network[1], network[2], network[3], network[4]);
+
 	signal(SIGINT, terminate_server);
 	if (ac == 4)
-		// server.create_socket_network();
 		server.create_socket_network();
 
 	server.init_ssl();
@@ -45,7 +39,6 @@ int main(int ac, char **av)
 
 	server.create_socket_local();
 	while (true)
-	// for (int i = 0; i < 3; i++)
 	{
 		server.init_fd_select();
 		// std::cout << "DEBUG: INIT DONE!\n";
@@ -66,6 +59,6 @@ int main(int ac, char **av)
 			server.get_servers().clear();
 		}
 	}
-	return (0);
+	return 0;
 }
 

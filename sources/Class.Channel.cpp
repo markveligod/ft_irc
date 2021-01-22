@@ -35,10 +35,10 @@ user_map& Channel::
 get_users()											{ return _users; }
 
 ModeChannel* Channel::
-getModeChannel() 									{ return (&(this->_mode));}
+getModeChannel() 									{ return &_mode;}
 
 vector<User*>& Channel::
-getVecBanned()										{ return (this->_banned);}
+getVecBanned()										{ return _banned;}
 
 bool Channel::
 getModeChannel(char mode)
@@ -65,10 +65,10 @@ void Channel::
 set_topic(const string& topic)						{ _topic = topic; }
 
 void Channel::
-set_key(const string & new_key)						{ this->_key = new_key;}
+set_key(const string & new_key)						{ _key = new_key;}
 
 void Channel::
-set_limit_users(int new_limit)						{ this->_limit_users = new_limit;}
+set_limit_users(int new_limit)						{ _limit_users = new_limit;}
 
 void Channel::
 add_user(User* user)
@@ -90,10 +90,10 @@ void Channel::
 del_operator(User* user)							{ _users[user].o = false; }
 
 void Channel::
-set_creator(User* creator)							{ this->_creator = creator;}
+set_creator(User* creator)							{ _creator = creator;}
 
 void Channel::
-del_creator()										{ this->_creator = NULL;}
+del_creator()										{ _creator = NULL;}
 
 void Channel::
 set_voice(User* user) 								{ _users[user].v = true;}

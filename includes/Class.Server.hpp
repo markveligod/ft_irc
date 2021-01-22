@@ -25,7 +25,7 @@ class Server
 		vector<User*>			_users;
 		vector<Client*>			_clients;
 		string					_buffer;
-		Statistics				statistics;
+		Statistics				_statistics;
 
 		Server();
 		Server(const Server& other);

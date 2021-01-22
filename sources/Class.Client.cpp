@@ -10,41 +10,41 @@ using std::string;
 
 Client::
 Client(const string& hostname, int socket_fd, int hopcount) 		
-					  : nickname(""),
-					  	hostname(hostname),
-					  	socket_fd(socket_fd),
-						hopcount(hopcount),
-						password(false),
-						is_server(false) {}
+					  : _nickname(""),
+					  	_hostname(hostname),
+					  	_socket_fd(socket_fd),
+						_hopcount(hopcount),
+						_password(false),
+						_is_server(false) {}
 
 Client::
 Client(int socket_fd, const string&  nickname, const string& hostname, int hopcount)
-									: nickname(nickname),
-									  hostname(hostname),
-									  socket_fd(socket_fd),
-									  hopcount(hopcount),
-									  password(true),
-									  is_server(false) {}
+									: _nickname(nickname),
+									  _hostname(hostname),
+									  _socket_fd(socket_fd),
+									  _hopcount(hopcount),
+									  _password(true),
+									  _is_server(false) {}
 
 Client::
 Client(const Client& src)
-					  : nickname(src.nickname),
-					  	hostname(src.hostname),
-						socket_fd(src.socket_fd),
-						hopcount(src.hopcount),
-						password(src.password),
-						is_server(src.is_server) {}
+					  : _nickname(src._nickname),
+					  	_hostname(src._hostname),
+						_socket_fd(src._socket_fd),
+						_hopcount(src._hopcount),
+						_password(src._password),
+						_is_server(src._is_server) {}
 
 Client& Client::
 operator=(const Client& src)
 {
-	nickname = src.nickname;
-	hostname = src.hostname;
-	socket_fd = src.socket_fd;
-	hopcount = src.hopcount;
-	password = src.password;
-	buffer = src.buffer;
-	is_server = src.is_server;
+	_nickname = src._nickname;
+	_hostname = src._hostname;
+	_socket_fd = src._socket_fd;
+	_hopcount = src._hopcount;
+	_password = src._password;
+	_buffer = src._buffer;
+	_is_server = src._is_server;
 	return *this;
 }
 
@@ -57,22 +57,22 @@ operator=(const Client& src)
 void Client::
 setNickname(const string& nickname)
 {
-	if (this->password == true)
-		this->nickname = nickname;
+	if (_password == true)
+		_nickname = nickname;
 }
 
 void Client::
 setHopcount(int hopcount)
 {
-	if (this->password == true)
-		this->hopcount = hopcount;
+	if (_password == true)
+		_hopcount = hopcount;
 }
 
 void Client::
-setPassword(bool password)		{ this->password = password; }
+setPassword(bool password)		{ _password = password; }
 
 void Client::
-setIsServer(bool state)			{ this->is_server = state; }
+setIsServer(bool state)			{ _is_server = state; }
 
 /*
 ** ----------------------------------------------------------
@@ -81,28 +81,28 @@ setIsServer(bool state)			{ this->is_server = state; }
 */
 
 int Client::
-getHopcount() const				{ return (this->hopcount); }
+getHopcount() const				{ return (_hopcount); }
 
 bool Client::
-getPassword() const				{ return (this->password); }
+getPassword() const				{ return (_password); }
 
 int Client::
-getSocketFd() const				{ return (this->socket_fd); }
+getSocketFd() const				{ return (_socket_fd); }
 
 const string& Client::
-getName() const					{ return (this->nickname); }
+getName() const					{ return (_nickname); }
 
 const string&	Client::
-getBuffer() const				{ return (this->buffer); }
+getBuffer() const				{ return (_buffer); }
 
 bool			Client::
-getIsServer() const				{ return  (this->is_server); }
+getIsServer() const				{ return  (_is_server); }
 
 const string& Client::
-getHostname() const				{ return (this->hostname); }
+getHostname() const				{ return (_hostname); }
 
 Statistics &Client::
-getStatistics() 				{ return (this->statistics); }
+getStatistics() 				{ return (_statistics); }
 
 
 /*
@@ -118,15 +118,15 @@ getStatistics() 				{ return (this->statistics); }
 void Client::
 setBuffer(const string& buff)
 {
-	this->buffer = buff;
+	_buffer = buff;
 }
 
 bool Client::
 find_line_break()
 {
-	if (this->buffer.find("\n") != string::npos)
-		return (true);
-	return (false);
+	if (_buffer.find("\n") != string::npos)
+		return true;
+	return false;
 }
 
 string Client::
@@ -136,27 +136,27 @@ get_line_break()
 	string temp_2;
 	size_t pos;
 
-	if ((pos = this->buffer.find("\n")) == string::npos)
+	if ((pos = _buffer.find("\n")) == string::npos)
 	{
-			temp_1 = this->buffer;
-			this->buffer.clear();
+			temp_1 = _buffer;
+			_buffer.clear();
 			return (temp_1);
 	}
-	if ((pos = this->buffer.find("\r\n")) != string::npos)
+	if ((pos = _buffer.find("\r\n")) != string::npos)
 	{
-		temp_1 = string(this->buffer.begin(), (this->buffer.begin() + pos));
-		temp_2 = string(this->buffer.begin() + (pos + 2), this->buffer.end());
+		temp_1 = string(_buffer.begin(), (_buffer.begin() + pos));
+		temp_2 = string(_buffer.begin() + (pos + 2), _buffer.end());
 	}
-	else if ((pos = this->buffer.find("\n")) != string::npos)
+	else if ((pos = _buffer.find("\n")) != string::npos)
 	{
-		temp_1 = string(this->buffer.begin(), (this->buffer.begin() + pos));
-		temp_2 = string(this->buffer.begin() + (pos + 1), this->buffer.end());
+		temp_1 = string(_buffer.begin(), (_buffer.begin() + pos));
+		temp_2 = string(_buffer.begin() + (pos + 1), _buffer.end());
 	}
 
-	this->buffer = temp_2;
+	_buffer = temp_2;
 	return (temp_1);
 }
 
 bool Client::
-isempty_buffer()			{ return (this->buffer.empty()); }
+isempty_buffer()			{ return (_buffer.empty()); }
 

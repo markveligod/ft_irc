@@ -37,7 +37,7 @@ public:
 	void				connection();
 	void				chat();
 	void				recv_message();
-	std::string const get_buffer() { return (std::string(this->buffer)); };
+	std::string const get_buffer() { return (std::string(_buffer)); };
 };
 
 #endif

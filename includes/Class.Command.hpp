@@ -24,10 +24,10 @@ class Channel;
 class Command
 {
 private:
-	string			prefix;
-	string			command;
-	vector<string>	arguments;
-	string			message;
+	string			_prefix;
+	string			_command;
+	vector<string>	_arguments;
+	string			_message;
 
 
 	bool						nick_valid() const;
@@ -67,31 +67,31 @@ public:
 	Command(const string& str);
 	~Command();
 
-	int					cmd_nick(IRC& irc, int fd);
-	int					cmd_pass(IRC& irc, int fd);
-	int					cmd_user(IRC& irc, int fd);
-	int					cmd_server(IRC& irc, int fd);
-	int					cmd_join(IRC& irc, int fd);
-	int					cmd_oper(IRC& irc, int fd);
-	int					cmd_quit(IRC& irc, int fd);
-	int					cmd_part(IRC& irc, int fd);
-	int					cmd_names(IRC& irc, int fd);
-	int					cmd_squit(IRC& irc, int fd);
-	int					cmd_who(IRC& irc, int fd);
-	int					cmd_topic(IRC& irc, int fd);
-	int					cmd_ping(IRC& irc, int fd);
-	int					cmd_pong(IRC& irc, int fd);
-	int					cmd_mode(IRC& irc, int fd);
-	int					cmd_kick(IRC& irc, int fd);
-	int					cmd_privmsg(IRC& irc, int fd);
-	int					cmd_away(IRC& irc, int fd);
-	int					cmd_notice(IRC& irc, int fd);
-	int					cmd_stats(IRC& irc, int fd);
-	int					cmd_time(IRC& irc, int fd);
-	int					cmd_error(IRC& irc, int fd);
-	int					cmd_admin(IRC& irc, int fd);
-	int					cmd_wallops(IRC& irc, int fd);
-	int					cmd_connect(IRC& irc, int fd);
+	void				cmd_nick(IRC& irc, int fd);
+	void				cmd_pass(IRC& irc, int fd);
+	void				cmd_user(IRC& irc, int fd);
+	void				cmd_server(IRC& irc, int fd);
+	void				cmd_join(IRC& irc, int fd);
+	void				cmd_oper(IRC& irc, int fd);
+	void				cmd_quit(IRC& irc, int fd);
+	void				cmd_part(IRC& irc, int fd);
+	void				cmd_names(IRC& irc, int fd);
+	void				cmd_squit(IRC& irc, int fd);
+	void				cmd_who(IRC& irc, int fd);
+	void				cmd_topic(IRC& irc, int fd);
+	void				cmd_ping(IRC& irc, int fd);
+	void				cmd_pong(IRC& irc, int fd);
+	void				cmd_mode(IRC& irc, int fd);
+	void				cmd_kick(IRC& irc, int fd);
+	void				cmd_privmsg(IRC& irc, int fd);
+	void				cmd_away(IRC& irc, int fd);
+	void				cmd_notice(IRC& irc, int fd);
+	void				cmd_stats(IRC& irc, int fd);
+	void				cmd_time(IRC& irc, int fd);
+	void				cmd_error(IRC& irc, int fd);
+	void				cmd_admin(IRC& irc, int fd);
+	void				cmd_wallops(IRC& irc, int fd);
+	void				cmd_connect(IRC& irc, int fd);
 
 	const string&		getCommand() const;
 	const string&		getMessage() const;

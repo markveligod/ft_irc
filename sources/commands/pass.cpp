@@ -20,7 +20,7 @@
 ** =================================================================
 */
 
-int	Command::
+void Command::
 cmd_pass(IRC& irc, int fd)
 {
 	int i;
@@ -32,17 +32,17 @@ cmd_pass(IRC& irc, int fd)
 	//	return (ERR_NEEDMOREPARAMS);
 
 	if ((i = IRC::find_fd(clients, fd)) < 0)
-		return (0);								// по идее, такой ситуации быть не может
+		return;								// по идее, такой ситуации быть не может
 
 	if (clients[i]->getPassword() || IRC::find_fd(servers, fd) >= 0)
 	{
 		utils::print_error(ERR_ALREADYREGISTRED, "Already registered");
-		return (ERR_ALREADYREGISTRED);
+		return;
 	}
 
-	res = this->pass(this->arguments[0], irc.get_localhost_pass());
+	res = pass(_arguments[0], irc.get_localhost_pass());
 	clients[i]->setPassword(res);
-	return (res == false ? ERR_PASSWDMISMATCH : 0);	// в документации нет такой ошибки
+	return;
 }
 
 bool Command::

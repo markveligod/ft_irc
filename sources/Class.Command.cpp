@@ -10,7 +10,7 @@ using std::string;
 ** ==========================================
 */
 
-Command::Command(const string& str) : message(str)
+Command::Command(const string& str) : _message(str)
 {
 	string				last_arg;
 	char *				tok;
@@ -22,28 +22,28 @@ Command::Command(const string& str) : message(str)
 
 	if (tok[0] == ':')
 	{
-		prefix = static_cast<std::string>(&tok[1]);
+		_prefix = static_cast<std::string>(&tok[1]);
 		tok = strtok(NULL, " ");
-		command = tok == NULL ? "" : static_cast<std::string>(tok);
+		_command = tok == NULL ? "" : static_cast<std::string>(tok);
 	}
 	else
 	{
-		prefix = "";
-		command = static_cast<std::string>(tok);
+		_prefix = "";
+		_command = static_cast<std::string>(tok);
 	}
-	std::cout << "Prefix: " << prefix << std::endl
-			  << "Command: " << command << std::endl; // DEBUG
+	std::cout << "Prefix: " << _prefix << std::endl
+			  << "Command: " << _command << std::endl; // DEBUG
 	while (tok != NULL && (tok = strtok(NULL, " ")) != NULL)
 	{
 		if (tok[0] == ':')
 			break;
-		this->arguments.push_back(static_cast<std::string>(tok));
+		_arguments.push_back(static_cast<std::string>(tok));
 		std::cout << "Argument: " << tok << std::endl; // DEBUG
 	}
 
 	if ((last_pos = str.find(" :")) != std::string::npos)
 	{
-		this->arguments.push_back(str.substr(last_pos + 2, str.size() - last_pos - 2));
+		_arguments.push_back(str.substr(last_pos + 2, str.size() - last_pos - 2));
 		std::cout << "Argument: " << str.substr(last_pos + 2, str.size() - last_pos - 2) << std::endl; // DEBUG
 	}
 
@@ -80,21 +80,21 @@ find_fd(vector<Client*>& vect, int fd)
 */
 
 const string& Command::
-getCommand() const			{ return (this->command); }
+getCommand() const			{ return (_command); }
 
 const string &Command::
-getMessage() const			{ return (this->message); }
+getMessage() const			{ return (_message); }
 
 const string &Command::
-getPrefix() const			{ return (this->prefix); }
+getPrefix() const			{ return (_prefix); }
 
 const vector<string>& Command::
-getArgs() const				{ return this->arguments; }
+getArgs() const				{ return _arguments; }
 
 bool Command::
 check_args_number(int n) const
 {
-	if ((int)this->arguments.size() != n)
+	if ((int)_arguments.size() != n)
 		return false;
 	return true;
 }

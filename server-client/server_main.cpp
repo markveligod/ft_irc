@@ -19,5 +19,5 @@ int main(int ac, char* *av)
 		client.send_to_server();
 	}
 
-	return (0);
+	return 0;
 }

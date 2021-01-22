@@ -23,10 +23,10 @@
 ** ====================================================================
 */
 
-int Command::
+void Command::
 cmd_who(IRC& irc, int fd)
 {
-	if (arguments.empty() || arguments[0] == "0" || arguments[0] == "*")
+	if (_arguments.empty() || _arguments[0] == "0" || _arguments[0] == "*")
 	{
 		vector<User*> users = irc.get_users();
 		for (size_t i = 0; i < users.size(); i++)
@@ -41,9 +41,9 @@ cmd_who(IRC& irc, int fd)
 		}
 		irc.push_cmd_queue(fd, irc.response(RPL_ENDOFWHO, fd, "*", RPL_ENDOFWHO_MESS));
 	}
-	else if (arguments[0][0] == '&' || arguments[0][0] == '#')
+	else if (_arguments[0][0] == '&' || _arguments[0][0] == '#')
 	{
-		string channel_name = arguments[0];
+		string channel_name = _arguments[0];
 
 		size_t n = irc.get_channels().count(channel_name);
 		
@@ -62,15 +62,15 @@ cmd_who(IRC& irc, int fd)
 						prefix += "*";
 					if (channel.is_channel_operator(it->first))
 						prefix += "@";
-					irc.push_cmd_queue(fd, irc.response(RPL_WHOREPLY, fd, who_message(it->first, arguments[0], prefix), ""));
+					irc.push_cmd_queue(fd, irc.response(RPL_WHOREPLY, fd, who_message(it->first, _arguments[0], prefix), ""));
 				}
 			}
-			irc.push_cmd_queue(fd, irc.response(RPL_ENDOFWHO, fd, arguments[0], RPL_ENDOFWHO_MESS));
+			irc.push_cmd_queue(fd, irc.response(RPL_ENDOFWHO, fd, _arguments[0], RPL_ENDOFWHO_MESS));
 		}
 	}
 	else
 	{
-		int i = IRC::find_name(irc.get_users(), arguments[0]);
+		int i = IRC::find_name(irc.get_users(), _arguments[0]);
 		if (i >= 0)
 		{
 			string prefix = "H";
@@ -78,17 +78,16 @@ cmd_who(IRC& irc, int fd)
 			if (irc.is_server_operator(irc.get_users()[i]))
 				prefix += "*";
 
-			irc.push_cmd_queue(fd, irc.response(RPL_WHOREPLY, fd, who_message(irc.get_users()[i], arguments[0], prefix), ""));
+			irc.push_cmd_queue(fd, irc.response(RPL_WHOREPLY, fd, who_message(irc.get_users()[i], _arguments[0], prefix), ""));
 		}
 		else
 		{
 			irc.push_cmd_queue(fd, irc.response(ERR_NOSUCHSERVER, fd, irc.get_nickname(fd), ERR_NOSUCHSERVER_MESS));
-			return 1;
+			return;
 		}
 		
 		irc.push_cmd_queue(fd, irc.response(RPL_ENDOFWHO, fd, irc.get_nickname(fd), RPL_ENDOFWHO_MESS));
 	}
-	return 0;
 }
 
 string Command::

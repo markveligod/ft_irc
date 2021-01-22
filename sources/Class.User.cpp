@@ -40,13 +40,13 @@ operator=(const ModeUser& src)
 User::
 User(Client* src) : Client(*src)
 {
-	this->nickname		= src->getName();
-	this->hostname		= src->getHostname();
-	this->password		= src->getPassword();
-	this->hopcount		= src->getHopcount();
-	this->socket_fd		= src->getSocketFd();
-	// this->client		= src;
-	this->channel_count	= 0;
+	_nickname		= src->getName();
+	_hostname		= src->getHostname();
+	_password		= src->getPassword();
+	_hopcount		= src->getHopcount();
+	_socket_fd		= src->getSocketFd();
+	// client		= src;
+	_channel_count	= 0;
 }
 
 User::
@@ -55,23 +55,23 @@ User(const User& src) { *this = src; }
 User& User::
 operator=(const User& src)
 {
-	username = src.username;
-	hostname = src.hostname;
-	servername = src.servername;
-	realname = src.realname;
+	_username = src._username;
+	_hostname = src._hostname;
+	_servername = src._servername;
+	_realname = src._realname;
 	// client = src.client;
-	mode = src.mode;
-	channel_count = src.channel_count;
+	_mode = src._mode;
+	_channel_count = src._channel_count;
 	return *this;
 }
 
 /*User::User(const Client& src) : Client(src)
 {
-	this->nickname	= src.getName();
-	this->password	= src.getPassword();
-	this->hopcount	= src.getHopcount();
-	this->socket_fd = src.getSocketFd();
-	//this->client 	= src;
+	_nickname	= src.getName();
+	_password	= src.getPassword();
+	_hopcount	= src.getHopcount();
+	_socket_fd = src.getSocketFd();
+	//client 	= src;
 }*/
 
 /*
@@ -92,17 +92,17 @@ void User::
 user_from_client(const string& username, const string& hostname, 
 				 const string& servername, const string& realname)
 {
-	this->username		= username;
-	this->hostname		= hostname;
-	this->servername	= servername;
-	this->realname 		= realname;
-	this->mode.a		= 0;
-	this->mode.i		= 0;
-	this->mode.w	 	= 0;
-	this->mode.r		= 0;
-	this->mode.o		= 0;
-	this->mode.O		= 0;
-	this->channel_count	= 0;
+	_username		= username;
+	_hostname		= hostname;
+	_servername	= servername;
+	_realname 		= realname;
+	_mode.a		= 0;
+	_mode.i		= 0;
+	_mode.w	 	= 0;
+	_mode.r		= 0;
+	_mode.o		= 0;
+	_mode.O		= 0;
+	_channel_count	= 0;
 }
 
 void User::
@@ -110,123 +110,117 @@ user_from_client(const string& username, const string& hostname,
 				 const string& servername, const string& realname,
 				 const ModeUser& mode)
 {
-	this->username		= username;
-	this->hostname		= hostname;
-	this->servername	= servername;
-	this->realname		= realname;
-	this->mode			= mode;
-	this->channel_count	= 0;
+	_username		= username;
+	_hostname		= hostname;
+	_servername	= servername;
+	_realname		= realname;
+	_mode			= mode;
+	_channel_count	= 0;
 }
 
 void User::
 change_user(const string& username, const string& hostname,
 			const string& servername, const string& realname)
 {
-	this->username = username;
-	this->hostname = hostname;
-	this->servername = servername;
-	this->realname = realname;
+	_username = username;
+	_hostname = hostname;
+	_servername = servername;
+	_realname = realname;
 }
 
 void User::
-setUsername(const string& username)		{ this->username = username; }
+setUsername(const string& username)		{ _username = username; }
 
 void User::
-setHostname(const string& hostname)		{ this->hostname = hostname; }
+setHostname(const string& hostname)		{ _hostname = hostname; }
 
 void User::
-setServername(const string& servername)	{ this->servername = servername; }
+setServername(const string& servername)	{ _servername = servername; }
 
 void User::
-setRealname(const string& realname)		{ this->realname = realname; }
+setRealname(const string& realname)		{ _realname = realname; }
 
 void User::
-setMode(const ModeUser& mode)			{ this->mode = mode; }
+setMode(const ModeUser& mode)			{ _mode = mode; }
 
 void User::
 setMode(char mode, bool flag)
 {
 	switch (mode)
 	{
-		case 'a': this->mode.a = flag; break;
-		case 'i': this->mode.i = flag; break;
-		case 'w': this->mode.w = flag; break;
-		case 'r': this->mode.r = flag; break;
-		case 'o': this->mode.o = flag; break;
-		case 'O': this->mode.O = flag; break;
-		case 'v': this->mode.v = flag; break;
+		case 'a': _mode.a = flag; break;
+		case 'i': _mode.i = flag; break;
+		case 'w': _mode.w = flag; break;
+		case 'r': _mode.r = flag; break;
+		case 'o': _mode.o = flag; break;
+		case 'O': _mode.O = flag; break;
+		case 'v': _mode.v = flag; break;
 		default: return;
 	}
 }
 
 void User::
-setAway(const string& mess)				{ mode.away_message = mess; }
+setAway(const string& mess)				{ _mode.away_message = mess; }
 
 const string& User::
-getUsername() const						{ return (this->username); }
+getUsername() const						{ return (_username); }
 
 const string& User::
-getNickname() const						{ return this->nickname; }
+getNickname() const						{ return _nickname; }
 
 const string& User::
-getHostname() const						{ return (this->hostname); }
+getHostname() const						{ return (_hostname); }
 
 const string& User::
-getServername() const					{ return(this->servername); }
+getServername() const					{ return(_servername); }
 
 const string& User::
-getRealname() const						{ return (this->realname); }
+getRealname() const						{ return (_realname); }
 
 const ModeUser& User::
-getMode() const							{ return mode; }
+getMode() const							{ return _mode; }
 
 bool User::
 getMode(char m) const
 {
 	switch (m)
 	{	
-		case 'a': return mode.a;
-		case 'i': return mode.i;
-		case 'w': return mode.w;
-		case 'r': return mode.r;
-		case 'o': return mode.o;
-		case 'O': return mode.O;
-		case 'v': return mode.v;
+		case 'a': return _mode.a;
+		case 'i': return _mode.i;
+		case 'w': return _mode.w;
+		case 'r': return _mode.r;
+		case 'o': return _mode.o;
+		case 'O': return _mode.O;
+		case 'v': return _mode.v;
 		default: return false;
 	}
 }
 
 const string& User::
-getAway() const							{ return mode.away_message; }
+getAway() const							{ return _mode.away_message; }
 
 size_t User::
-getChannelCount() const					{ return (this->channel_count); }
+getChannelCount() const					{ return (_channel_count); }
 
 ModeUser& User::
-getModeUser() 							{ return (this->mode);}
-
-// int User::
-// getFd() const							{ return (this->client->getSocketFd()); }
-
-// int User::
-// getHopcount() const						{ return (this->client->getHopcount()); }
+getModeUser() 							{ return (_mode);}
 
 bool User::
-is_i_mode() const						{ return mode.i; }
+is_i_mode() const						{ return _mode.i; }
 
 bool User::
-is_o_mode() const						{ return mode.o; }
+is_o_mode() const						{ return _mode.o; }
 
 void User::
-inc_channel_count()						{ channel_count++; }
+inc_channel_count()						{ _channel_count++; }
 
 void User::
-dec_channel_count()						{ channel_count--; }
+dec_channel_count()						{ _channel_count--; }
 
 void User::
 print_user()
 {
-	std::cout << "socket "   << this->socket_fd << std::endl;
-	std::cout << "nick "     << this->nickname << std::endl;
-	std::cout << "username " << this->username << std::endl;
+	std::cout << "socket "   << _socket_fd << std::endl;
+	std::cout << "nick "     << _nickname << std::endl;
+	std::cout << "username " << _username << std::endl;
 }

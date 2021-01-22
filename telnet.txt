@@ -1,3 +1,0 @@
-telnet irc.atw-inter.net 6667
-nick cddoma
-user user_cddoma 8 *: cddoma

@@ -14,22 +14,22 @@
 ** =====================================================================
 */
 
-int Command::
+void Command::
 cmd_topic(IRC& irc, int fd)
 {
-	if (arguments.empty())
+	if (_arguments.empty())
 	{
-		irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, fd, command, ERR_NEEDMOREPARAMS_MESS));
-		return 1;
+		irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, fd, _command, ERR_NEEDMOREPARAMS_MESS));
+		return;
 	}
 
-	vector<string> channels = utils::split(arguments[0], ',');
+	vector<string> channels = utils::split(_arguments[0], ',');
 
 	for (size_t i = 0; i < channels.size(); i++)		// channels[i] - (#/&)channel_name
 	{
 		Channel* chann = irc.get_channel(channels[i]);
-		User* user = (prefix.size()) ? irc.get_user(prefix) : irc.get_user(fd);
-        if (!user) return 1;
+		User* user = (_prefix.size()) ? irc.get_user(_prefix) : irc.get_user(fd);
+        if (!user) return;
 
 		if (!chann || !user								// channel doesn't exist
 			|| !chann->is_user_in_channel(user))		// check, if user in channel
@@ -41,23 +41,23 @@ cmd_topic(IRC& irc, int fd)
 		{
 			irc.push_cmd_queue(fd, irc.response(ERR_CHANOPRIVSNEEDED, fd, channels[i], ERR_CHANOPRIVSNEEDED_MESS));
 		}
-		else if (arguments.size() == 1)
+		else if (_arguments.size() == 1)
 			send_topic(irc, fd, channels[i], chann->get_topic());
-		else if (arguments.size() > 2)
+		else if (_arguments.size() > 2)
 			irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, fd, channels[i], ERR_NEEDMOREPARAMS_MESS));
 		else
 		{
-			chann->set_topic(arguments[1]);
+			chann->set_topic(_arguments[1]);
 
-			string mess_to_user = 	irc.full_name(user) + " TOPIC " + chann->getName() + " :" + arguments[1];
-			string mess_to_server =	":" + user->getName() + " TOPIC " + chann->getName() + " :" + arguments[1];
+			string mess_to_user = 	irc.fullname(user) + " TOPIC " + chann->getName() + " :" + _arguments[1];
+			string mess_to_server =	":" + user->getName() + " TOPIC " + chann->getName() + " :" + _arguments[1];
 
 			irc.push_cmd_queue(fd, mess_to_user + "\r\n");
 			irc.forward_to_channel(fd,*chann, mess_to_user);
 			irc.forward_to_servers(fd, mess_to_server);
 		}
 	}
-	return 0;
+	return;
 }
 
 void Command::

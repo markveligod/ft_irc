@@ -19,14 +19,15 @@
 ** =====================================================================
 */
 
-int Command::cmd_away(IRC& irc, int fd)
+void Command::
+cmd_away(IRC& irc, int fd)
 {
-	User* user = (prefix.size()) ? irc.get_user(prefix) : irc.get_user(fd);
-	if (!user) return 1;
+	User* user = (_prefix.size()) ? irc.get_user(_prefix) : irc.get_user(fd);
+	if (!user) return;
 
 	string forward = ":" + user->getName() + " MODE " + user->getName();
 	
-	if (arguments.empty())
+	if (_arguments.empty())
 	{
 		user->setMode('a', false);
 
@@ -38,10 +39,10 @@ int Command::cmd_away(IRC& irc, int fd)
 		irc.forward_to_servers(fd, forward + " :-a");
 	}
 
-	if (arguments.size() == 1)
+	if (_arguments.size() == 1)
 	{
 		user->setMode('a', true);
-		user->setAway(" " + arguments[0]);
+		user->setAway(" " + _arguments[0]);
 
 		string replay = irc.response(RPL_NOWAWAY, fd, "", RPL_NOWAWAY_MESS);
 
@@ -50,5 +51,4 @@ int Command::cmd_away(IRC& irc, int fd)
 
 		irc.forward_to_servers(fd, forward + " :+a");
 	}
-	return 0;
 }

@@ -40,7 +40,7 @@ public:
 	void				chat();
 	void				close_connectionion();
 	void				send_to_server();
-	void set_buffer(char const* buffer) { strcpy(this->buffer, buffer);};
+	void set_buffer(char const* buffer) { strcpy(_buffer, buffer);};
 };
 
 #endif

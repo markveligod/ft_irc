@@ -11,7 +11,7 @@
 ** =============================================================
 */
 
-int Command::
+void Command::
 cmd_server(IRC& irc, int fd)
 {
 	vector<Client *>& clients	= irc.get_clients();
@@ -22,18 +22,18 @@ cmd_server(IRC& irc, int fd)
 	int				  error;
 	Server*			  new_server;
 
-	if ((error = this->server_check_errors(irc, fd)) != 1)
-		return (error);
+	if ((error = server_check_errors(irc, fd)) != 1)
+		return;
 
 
 // Создаем новый сервер
 	if (server_el < 0)
 	{
-		new_server = new Server(fd, this->arguments[0], atoi(this->arguments[1].c_str()), this->arguments[2]);
+		new_server = new Server(fd, _arguments[0], atoi(_arguments[1].c_str()), _arguments[2]);
 		new_server->getStatistics() = clients[client_el]->getStatistics();
 	}
 	else
-		new_server = new Server(fd, this->arguments[0], atoi(this->arguments[1].c_str()), this->arguments[3]);
+		new_server = new Server(fd, _arguments[0], atoi(_arguments[1].c_str()), _arguments[3]);
 	servers.push_back(new_server);
 
 // Вывод сообщения о созданном сервере
@@ -90,7 +90,7 @@ cmd_server(IRC& irc, int fd)
 				  (new_server->getHopcount() + 1) << " " << new_server->getInfo();
 	irc.forward_to_servers(fd, out_message.str());
 
-	return (0);
+	return;
 }
 
 int Command::
@@ -102,10 +102,10 @@ server_available(vector<Server *> &servers, string const &server_name) const
 	while (v_begin != v_end)
 	{
 		if (is_equal((*v_begin)->getName(), server_name))
-			return (0);
+			return 0;
 		v_begin++;
 	}
-	return (1);
+	return 1;
 }
 
 int Command::
@@ -121,20 +121,22 @@ server_check_errors(IRC& irc, int fd) const
 	{
 		utils::print_error(0, "Who the hell sent it???");
 		irc.push_cmd_queue(fd, "ERROR :SERVER DEBUG who are you?\r\n");
-		return (0);
+		return 0;
 	}
 
-	if (server_el >= 0 && arguments.size() != 4)
+	Server* srvr = irc.get_server(fd);
+
+	if (server_el >= 0 && _arguments.size() != 4)
 	{
 		utils::print_error(ERR_NEEDMOREPARAMS, "Invalid number of parameters");
-		irc.push_cmd_queue(fd, irc.response_2(ERR_NEEDMOREPARAMS, fd, "* SERVER", ERR_NEEDMOREPARAMS_MESS));
+		irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, srvr->getName(), "* SERVER", ERR_NEEDMOREPARAMS_MESS));
 		return (ERR_NEEDMOREPARAMS);
 	}
 
-	if (server_el < 0 && arguments.size() != 3)
+	if (server_el < 0 && _arguments.size() != 3)
 	{
 		utils::print_error(ERR_NEEDMOREPARAMS, "Invalid number of parameters");
-		irc.push_cmd_queue(fd, irc.response_2(ERR_NEEDMOREPARAMS, fd, "* SERVER", ERR_NEEDMOREPARAMS_MESS));
+		irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, srvr->getName(), "* SERVER", ERR_NEEDMOREPARAMS_MESS));
 		return (ERR_NEEDMOREPARAMS);
 	}
 
@@ -143,34 +145,34 @@ server_check_errors(IRC& irc, int fd) const
 	{
 		utils::print_error(0, "Registered client sent SERVER command. Why?");
 		irc.push_cmd_queue(fd, "ERROR :SERVER DEBUG You are a client, not a server!\r\n");
-		return (0);
+		return 0;
 	}
 
 	// Если сообщение от уже зарегестрированного сервера и без префикса
-	if (server_el >= 0 && prefix.empty())
+	if (server_el >= 0 && _prefix.empty())
 	{
 		utils::print_error(0, "SERVER command without prefix");
 		irc.push_cmd_queue(fd, "ERROR :SERVER command without prefix\r\n");
-		return (0);
+		return 0;
 	}
 
 	// Если префикса нет среди серверов
-	if (server_el >= 0 && !this->prefix.empty() && this->server_available(servers, prefix))
+	if (server_el >= 0 && !_prefix.empty() && server_available(servers, _prefix))
 	{
 		utils::print_error(0, "Invalid prefix");
-		irc.push_cmd_queue(fd, "ERROR :Invalid prefix \"" + prefix + "\"\r\n");
-		return (0);
+		irc.push_cmd_queue(fd, "ERROR :Invalid prefix \"" + _prefix + "\"\r\n");
+		return 0;
 	}
 
 	// Проверка на то, что сервер уже зарегестрирован
-	if (!this->prefix.empty() &&							  // если есть префикс
-		!this->server_available(servers, this->arguments[0])) // и есть сервер с именем, поданным аргументом
+	if (!_prefix.empty() &&							  // если есть префикс
+		!server_available(servers, _arguments[0])) // и есть сервер с именем, поданным аргументом
 	{
 		utils::print_error(ERR_ALREADYREGISTRED, "Already registered! Connection closed!");
 		// !!!!! и надо разорвать соединение, но как ????
 		return (ERR_ALREADYREGISTRED);
 	}
-	if (!this->server_available(servers, this->arguments[0]))// если такой servername уже существует									// и сервер с таким дескриптором уже есть
+	if (!server_available(servers, _arguments[0]))// если такой servername уже существует									// и сервер с таким дескриптором уже есть
 	{
 		utils::print_error(ERR_ALREADYREGISTRED, "Already registered!");
 		return (ERR_ALREADYREGISTRED);
@@ -178,7 +180,7 @@ server_check_errors(IRC& irc, int fd) const
 
 	// Проверка на ввод пароля
 	if (server_el < 0 &&							// Если пришло от клиента
-		!this->check_password(*clients[client_el])) // и он не ввел пароль
+		!check_password(*clients[client_el])) // и он не ввел пароль
 	{
 		irc.push_cmd_queue(fd, "ERROR :Enter valid PASS\r\n");
 		return 0;
