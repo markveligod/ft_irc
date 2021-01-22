@@ -847,7 +847,8 @@ is_numeric_response(const Command& command)
 		}
 	}
 	if (command.getCommand() == "421" ||			// игнорируем сообщение "Неизвестная команда"
-		command.getCommand() == "451")				// игнорируем сообщение "Вы не зарегистрированы"
+		command.getCommand() == "451" ||
+		command.getCommand() == "436")				// игнорируем сообщение "Вы не зарегистрированы"
 		return true;
 	return false;
 }
