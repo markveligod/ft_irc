@@ -35,7 +35,8 @@ std::string g_cmd_name[COMM_COUNT] = {"NICK",
 									  "CONNECT",
 									  "INFO",
 									  "VERSION",
-									  "LINKS"};
+									  "LINKS",
+									  "TRACE"};
 /*
 ** ----------------------------------------------------------
 ** Constructors
@@ -136,7 +137,8 @@ create_socket_network()				// network_ip, _network_port и network_pass доба
 	int fd = _network[n]._socket();
 	utils::print_line("Socket network FD done!");
 
-	_network[n]._connect();
+	if ((_network[n]._connect()) < 0)
+		return;
 	utils::print_line("Socket network connection!");
 
 	_array_fd_select[fd] = FD_CLIENT;
@@ -194,7 +196,8 @@ do_command(Command* command, int fd)
 										&Command::cmd_connect,
 										&Command::cmd_info,
 										&Command::cmd_version,
-										&Command::cmd_links
+										&Command::cmd_links,
+										&Command::cmd_trace
 										};
 
 	const string & comm 			= command->getCommand();
@@ -463,13 +466,20 @@ close_connection(Server* server)
 
 	delete_client(get_client(server));		//TODO проверить, удаялются ли серверы из _clients
 	
-	int fd = server->getSocketFd();
-	_array_fd_select.erase(fd);
-	close(fd);
+	if (server->getHopcount() == 1)
+	{
+		int fd = server->getSocketFd();
+		_array_fd_select.erase(fd);
+		close(fd);
+		utils::print_line("Connection with " + server->getName() + " terminated");
+	}
 	
 	vector<Server*>::iterator it = find(_servers.begin(), _servers.end(), server);
 	if (it != _servers.end())
+	{
 		_servers.erase(it);
+		utils::print_line("Server " + server->getName() + " deleted from server list");
+	}
 	delete server;
 }
 
@@ -722,12 +732,16 @@ get_servers()								{ return _servers; }
 Server* IRC::
 get_server(int fd)
 {
-	User* user = _users[find_fd(_users, fd)];
-	return _servers[find_name(_servers, user->getServername())];
+	int n = find_fd(_servers, fd);
+	return (n >= 0) ? _servers[n] : NULL;
 }
 
 Server* IRC::
-get_server(const string& name) const		{ return _servers[find_name(_servers, name)]; }
+get_server(const string& name) const
+{
+	int n = find_name(_servers, name);
+	return (n >= 0) ? _servers[n] : NULL;
+}
 
 const string& IRC::
 get_server_name()							{ return _server_name; }
@@ -806,7 +820,16 @@ is_numeric_response(const Command& command)
 		command.getCommand() == "005" ||
 		command.getCommand() == "242" ||
 		command.getCommand() == "364" ||
-		command.getCommand() == "365"
+		command.getCommand() == "365" ||
+		command.getCommand() == "200" ||
+		command.getCommand() == "201" ||
+		command.getCommand() == "202" ||
+		command.getCommand() == "203" ||
+		command.getCommand() == "204" ||
+		command.getCommand() == "205" ||
+		command.getCommand() == "206" ||
+		command.getCommand() == "208" ||
+		command.getCommand() == "262"
 		)
 	{
 		const vector<string>& args = command.getArgs();
@@ -934,7 +957,7 @@ void IRC::
 delete_user(User* usr)
 {
 	delete_client(get_client(usr));
-	delete_user_from_channels(usr, string(" :"));
+	delete_user_from_channels(usr, string(" QUIT :Client closed connection"));
 
 	vector<User*>::iterator it = find(_users.begin(), _users.end(), usr);
 	if (it != _users.end())
@@ -979,6 +1002,8 @@ delete_user_from_channels(User* user, const string& quit_mess)
 			}
 			else //иначе отправить всем пользователем канал сообщение о выходе юзера
 				forward_to_channel(fd, it_channels->first, fullname(user) + quit_mess);
+
+			forward_to_servers(fd, ":" + user->getName() + quit_mess);
 		}
 		// удаляем из бан списка
 		vector<User*>::iterator it_ban_start = it_channels->second.getVecBanned().begin();
