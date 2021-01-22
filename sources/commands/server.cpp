@@ -158,17 +158,20 @@ server_check_errors(IRC& irc, int fd) const
 		return 0;
 	}
 
-	// Проверка на то, что сервер уже зарегестрирован
-	if (!_prefix.empty() &&							  // если есть префикс
-		!server_available(servers, _arguments[0])) // и есть сервер с именем, поданным аргументом
+	if (server_el < 0 &&
+		IRC::find_name(servers, _arguments[0]) != -1)
 	{
 		utils::print_error(ERR_ALREADYREGISTRED, "Already registered! Connection closed!");
-		// !!!!! и надо разорвать соединение, но как ????
+		irc.push_cmd_queue(fd, "ERROR :ID \"" + _arguments[0] + "\" already registered\r\n");
+		irc.close_connection(clients[client_el]);
 		return (ERR_ALREADYREGISTRED);
 	}
-	if (!server_available(servers, _arguments[0]))// если такой servername уже существует									// и сервер с таким дескриптором уже есть
+	else if (server_el >= 0 &&
+			 IRC::find_name(servers, _arguments[0]) != -1)
 	{
-		utils::print_error(ERR_ALREADYREGISTRED, "Already registered!");
+		utils::print_error(ERR_ALREADYREGISTRED, "Already registered! Connection closed!");
+		irc.push_cmd_queue(fd, "ERROR :ID \"" + _arguments[0] + "\" already registered\r\n");
+		irc.close_connection(servers[irc.find_fd(servers, fd)]);
 		return (ERR_ALREADYREGISTRED);
 	}
 

@@ -66,7 +66,6 @@ cmd_nick(IRC& irc, int fd)
 			servers[server_el]->addClient(new_client);
 			utils::print_line("New client created");
 			curr_client = clients.size() - 1;
-			//out_mess << "NICK " << _arguments[0] << " " << (clients[curr_client]->getHopcount() + 1) << "\r\n";
 		}
 	}
 
