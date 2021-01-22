@@ -2,34 +2,108 @@
 #include "Class.IRC.hpp"
 
 /*
-** -----------------------------------------------------------------------
-** Команда: LINKS
-** -----------------------------------------------------------------------
-** Параметры: [[<remote server>] <server mask>]
-** -----------------------------------------------------------------------
-**	With LINKS, a user can list all servers which are known by the server
-**  answering the query.  The returned list of servers must match the
-**  mask, or if no mask is given, the full list is returned.
-**
-**  If <remote server> is given in addition to <server mask>, the LINKS
-**  command is forwarded to the first server found that matches that name
-**  (if any), and that server is then required to answer the query.
-**
-**	Numeric Replies:
-**			ERR_NOSUCHSERVER      RPL_LINKS       RPL_ENDOFLINKS
-** -----------------------------------------------------------------------
-**	RPL_VERSION - 351
-**    	    "<version>.<debuglevel> <server> :<comments>"
-**
-**    	  - Reply by the server showing its version details.
-**          The <version> is the version of the software being
-**		    used (including any patchlevel revisions) and the
-**          <debuglevel> is used to indicate if the server is
-**          running in "debug mode".
-**          The "comments" field may contain any comments about
-**          the version or further version details.
-** -----------------------------------------------------------------------
+* -----------------------------------------------------------------------
+* Команда: LINKS
+* -----------------------------------------------------------------------
+* Параметры: [[<remote server>] <server mask>]
+* -----------------------------------------------------------------------
+*	With LINKS, a user can list all servers which are known by the server
+*  answering the query.  The returned list of servers must match the
+*  mask, or if no mask is given, the full list is returned.
+*
+*  If <remote server> is given in addition to <server mask>, the LINKS
+*  command is forwarded to the first server found that matches that name
+*  (if any), and that server is then required to answer the query.
+*
+*	Numeric Replies:
+*			ERR_NOSUCHSERVER      RPL_LINKS       RPL_ENDOFLINKS
+* -----------------------------------------------------------------------
+*	RPL_VERSION - 351
+*    	    "<version>.<debuglevel> <server> :<comments>"
+*
+*    	  - Reply by the server showing its version details.
+*          The <version> is the version of the software being
+*		    used (including any patchlevel revisions) and the
+*          <debuglevel> is used to indicate if the server is
+*          running in "debug mode".
+*          The "comments" field may contain any comments about
+*          the version or further version details.
+* -----------------------------------------------------------------------
 */
+void Command::
+cmd_links(IRC &irc, int fd)
+{
+	vector<Client*>& 	clients		= irc.get_clients();
+	vector<Server*>& 	servers		= irc.get_servers();
+	int 				server_el	= IRC::find_fd(servers, fd);
+	int 				client_el	= IRC::find_fd(clients, fd);
+
+	string				client_name;
+	std::stringstream	out_mess;
+	bool				our_server = true;
+	vector<Server*>		output_servers;
+	Server *			remote_server = NULL;
+
+	if (links_check_errors(irc, fd, server_el, client_el) != 1)
+		return;
+
+	client_name = _prefix.empty() ? clients[client_el]->getName() : _prefix;
+
+	if (_arguments.size() == 0)
+		output_servers = irc.get_servers();
+
+	else if (_arguments.size() == 1)
+		output_servers = links_find(irc, fd, _arguments[0], irc.get_server_name(), our_server);
+
+	else if (_arguments.size() == 2)
+	{
+		if (_arguments[0].find('*') == std::string::npos)
+		{
+			server_el = IRC::find_name(servers, _arguments[0]);
+			if (server_el >= 0)
+				remote_server = servers[server_el];
+			if (_arguments[0] != irc.get_server_name())
+				our_server = false;
+		}
+		else if (find_by_mask(_arguments[0], irc, our_server).size())
+				remote_server = find_by_mask(_arguments[0], irc, our_server)[0];
+		if (remote_server == NULL && our_server == false)
+		{
+			irc.push_cmd_queue(fd, irc.response(ERR_NOSUCHSERVER, clients[client_el]->getName(), _arguments[0], ":No such server"));
+			return;
+		}
+		else if (remote_server == NULL && our_server == true)
+			output_servers = links_find(irc, fd, _arguments[1], irc.get_server_name(), our_server);
+		else if (remote_server != NULL)
+		{
+			out_mess << ":" << client_name
+					 << " LINKS "
+					 << remote_server->getName() << " "
+					 << _arguments[1] << "\r\n";
+			irc.push_cmd_queue(remote_server->getSocketFd(), out_mess.str());
+		}
+	}
+	
+
+	for (size_t i = 0; i < output_servers.size(); i++)
+	{
+		if (output_servers[i]->getHopcount() != 1)
+			out_mess << servers[IRC::find_fd(servers, output_servers[i]->getSocketFd())]->getName();
+		else
+			out_mess << irc.get_server_name();
+		out_mess << " :" << output_servers[i]->getHopcount() << " " << output_servers[i]->getInfo();
+		irc.push_cmd_queue(fd, irc.response(RPL_LINKS, client_name, output_servers[i]->getName(), out_mess.str()));
+		out_mess.str("");
+	}
+	if (our_server)
+	{
+		out_mess << irc.get_server_name() << " :0 " << INFO;
+		irc.push_cmd_queue(fd, irc.response(RPL_LINKS, client_name, irc.get_server_name(), out_mess.str()));
+		out_mess.str("");
+	}
+	irc.push_cmd_queue(fd, irc.response(RPL_ENDOFLINKS, client_name, "*", ":End of LINKS list"));
+}
+
 vector<Server *> Command::
 find_by_mask(string const &str_mask, IRC &irc, bool &our_server)
 {
@@ -163,80 +237,6 @@ links_find(IRC &irc,
 		output_servers = find_by_mask(mask, irc, our_server);
 
 	return (output_servers);
-}
-
-void Command::
-cmd_links(IRC &irc, int fd)
-{
-	vector<Client*>& 	clients		= irc.get_clients();
-	vector<Server*>& 	servers		= irc.get_servers();
-	int 				server_el	= IRC::find_fd(servers, fd);
-	int 				client_el	= IRC::find_fd(clients, fd);
-
-	string				client_name;
-	std::stringstream	out_mess;
-	bool				our_server = true;
-	vector<Server*>		output_servers;
-	Server *			remote_server = NULL;
-
-	if (links_check_errors(irc, fd, server_el, client_el) != 1)
-		return;
-
-	client_name = _prefix.empty() ? clients[client_el]->getName() : _prefix;
-
-	if (_arguments.size() == 0)
-		output_servers = irc.get_servers();
-
-	else if (_arguments.size() == 1)
-		output_servers = links_find(irc, fd, _arguments[0], irc.get_server_name(), our_server);
-
-	else if (_arguments.size() == 2)
-	{
-		if (_arguments[0].find('*') == std::string::npos)
-		{
-			server_el = IRC::find_name(servers, _arguments[0]);
-			if (server_el >= 0)
-				remote_server = servers[server_el];
-			if (_arguments[0] != irc.get_server_name())
-				our_server = false;
-		}
-		else if (find_by_mask(_arguments[0], irc, our_server).size())
-				remote_server = find_by_mask(_arguments[0], irc, our_server)[0];
-		if (remote_server == NULL && our_server == false)
-		{
-			irc.push_cmd_queue(fd, irc.response(ERR_NOSUCHSERVER, clients[client_el]->getName(), _arguments[0], ":No such server"));
-			return;
-		}
-		else if (remote_server == NULL && our_server == true)
-			output_servers = links_find(irc, fd, _arguments[1], irc.get_server_name(), our_server);
-		else if (remote_server != NULL)
-		{
-			out_mess << ":" << client_name
-					 << " LINKS "
-					 << remote_server->getName() << " "
-					 << _arguments[1] << "\r\n";
-			irc.push_cmd_queue(remote_server->getSocketFd(), out_mess.str());
-		}
-	}
-	
-
-	for (size_t i = 0; i < output_servers.size(); i++)
-	{
-		if (output_servers[i]->getHopcount() != 1)
-			out_mess << servers[IRC::find_fd(servers, output_servers[i]->getSocketFd())]->getName();
-		else
-			out_mess << irc.get_server_name();
-		out_mess << " :" << output_servers[i]->getHopcount() << " " << output_servers[i]->getInfo();
-		irc.push_cmd_queue(fd, irc.response(RPL_LINKS, client_name, output_servers[i]->getName(), out_mess.str()));
-		out_mess.str("");
-	}
-	if (our_server)
-	{
-		out_mess << irc.get_server_name() << " :0 " << INFO;
-		irc.push_cmd_queue(fd, irc.response(RPL_LINKS, client_name, irc.get_server_name(), out_mess.str()));
-		out_mess.str("");
-	}
-	irc.push_cmd_queue(fd, irc.response(RPL_ENDOFLINKS, client_name, "*", ":End of LINKS list"));
 }
 
 int Command::

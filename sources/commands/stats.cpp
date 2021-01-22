@@ -35,6 +35,41 @@
 ** published this way.
 ** =====================================================================
 */
+void Command::
+cmd_stats(IRC& irc, int fd)
+{
+	vector<Client*>& clients	= irc.get_clients();
+	vector<Server*>& servers	= irc.get_servers();
+	int server_el				= IRC::find_fd(servers, fd);
+	int client_el				= IRC::find_fd(clients, fd);
+
+	if (stats_check_errors(irc, fd) != 1)
+		return;
+
+	// если сообщение от сервера
+	if (server_el >= 0)
+		client_el = irc.find_name(clients, _prefix);
+
+	if  (_arguments.size() == 1 || 
+		(_arguments.size() == 2 && _arguments[1] == irc.get_server_name()))
+	{
+		if (_arguments[0] == "m")
+			stats_m(irc, fd, clients[client_el]);
+		else if (_arguments[0] == "l")
+			stats_l(irc, fd, clients[client_el]);
+		else if (_arguments[0] == "u")
+			stats_u(irc, fd, clients[client_el]);
+		irc.push_cmd_queue(fd, irc.response(RPL_ENDOFSTATS, clients[client_el]->getName(), _arguments[0], ":End of STATS report"));
+	}
+	else if (_arguments.size() == 2)
+	{
+		server_el = IRC::find_name(servers, _arguments[1]);
+		if (server_el < 0)
+			irc.push_cmd_queue(fd, irc.response(ERR_NOSUCHSERVER, clients[client_el]->getName(), _arguments[1], ":No such server"));
+		else
+			irc.push_cmd_queue(servers[server_el]->getSocketFd(), (_prefix.empty() ? ":" + clients[client_el]->getName() + " " : "") + _message + "\r\n");
+	}
+}
 
 void Command::
 stats_u(IRC& irc, int fd, Client* client)
@@ -143,40 +178,4 @@ stats_check_errors(IRC &irc, int fd)
 		}
 	}
 	return (1);
-}
-
-void Command::
-cmd_stats(IRC& irc, int fd)
-{
-	vector<Client*>& clients	= irc.get_clients();
-	vector<Server*>& servers	= irc.get_servers();
-	int server_el				= IRC::find_fd(servers, fd);
-	int client_el				= IRC::find_fd(clients, fd);
-
-	if (stats_check_errors(irc, fd) != 1)
-		return;
-
-	// если сообщение от сервера
-	if (server_el >= 0)
-		client_el = irc.find_name(clients, _prefix);
-
-	if  (_arguments.size() == 1 || 
-		(_arguments.size() == 2 && _arguments[1] == irc.get_server_name()))
-	{
-		if (_arguments[0] == "m")
-			stats_m(irc, fd, clients[client_el]);
-		else if (_arguments[0] == "l")
-			stats_l(irc, fd, clients[client_el]);
-		else if (_arguments[0] == "u")
-			stats_u(irc, fd, clients[client_el]);
-		irc.push_cmd_queue(fd, irc.response(RPL_ENDOFSTATS, clients[client_el]->getName(), _arguments[0], ":End of STATS report"));
-	}
-	else if (_arguments.size() == 2)
-	{
-		server_el = IRC::find_name(servers, _arguments[1]);
-		if (server_el < 0)
-			irc.push_cmd_queue(fd, irc.response(ERR_NOSUCHSERVER, clients[client_el]->getName(), _arguments[1], ":No such server"));
-		else
-			irc.push_cmd_queue(servers[server_el]->getSocketFd(), (_prefix.empty() ? ":" + clients[client_el]->getName() + " " : "") + _message + "\r\n");
-	}
 }

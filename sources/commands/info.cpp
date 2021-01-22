@@ -1,6 +1,23 @@
 #include "Class.Command.hpp"
 #include "Class.IRC.hpp"
 
+/*
+** -----------------------------------------------------------------------
+** Команда: INFO
+** -----------------------------------------------------------------------
+**  Parameters: [ <target> ]
+** -----------------------------------------------------------------------
+**	The INFO command is REQUIRED to return information describing the
+**  server: its version, when it was compiled, the patchlevel, when it
+**  was started, and any other miscellaneous information which may be
+**  considered to be relevant.
+**
+**  Wildcards are allowed in the <target> parameter.
+**
+**	Numeric Replies:
+**			ERR_NOSUCHSERVER   -  RPL_INFO    -   RPL_ENDOFINFO
+** -----------------------------------------------------------------------
+*/
 void Command::
 cmd_info(IRC &irc, int fd)
 {

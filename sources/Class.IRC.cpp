@@ -35,7 +35,8 @@ std::string g_cmd_name[COMM_COUNT] = {"NICK",
 									  "CONNECT",
 									  "INFO",
 									  "VERSION",
-									  "LINKS"};
+									  "LINKS",
+									  "TRACE"};
 /*
 ** ----------------------------------------------------------
 ** Constructors
@@ -195,7 +196,8 @@ do_command(Command* command, int fd)
 										&Command::cmd_connect,
 										&Command::cmd_info,
 										&Command::cmd_version,
-										&Command::cmd_links
+										&Command::cmd_links,
+										&Command::cmd_trace
 										};
 
 	const string & comm 			= command->getCommand();
@@ -662,7 +664,6 @@ check_buffer(int fd, const char* buffer)
 ** push_cmd_queue - пушит строку в очередь
 ** ----------------------------------------------------------
 */
-
 void IRC::
 push_cmd_queue(int fd, const string& str)
 {
@@ -671,10 +672,8 @@ push_cmd_queue(int fd, const string& str)
 
 	if (server_el >= 0)
 		_servers[server_el]->getStatistics().queued(str, true);
-	//_servers[server_el]->getStatistics().sent(str);
 	else
 		_clients[client_el]->getStatistics().queued(str, true);
-	//_clients[client_el]->getStatistics().sent(str);
 
 	std::cout << CYAN << "QUEUE #" << fd << ": " << YELLOW << str.substr(0, str.size() - 2) << RESET << std::endl;
 	_command_queue.push(std::make_pair(fd, str));
@@ -821,7 +820,16 @@ is_numeric_response(const Command& command)
 		command.getCommand() == "005" ||
 		command.getCommand() == "242" ||
 		command.getCommand() == "364" ||
-		command.getCommand() == "365"
+		command.getCommand() == "365" ||
+		command.getCommand() == "200" ||
+		command.getCommand() == "201" ||
+		command.getCommand() == "202" ||
+		command.getCommand() == "203" ||
+		command.getCommand() == "204" ||
+		command.getCommand() == "205" ||
+		command.getCommand() == "206" ||
+		command.getCommand() == "208" ||
+		command.getCommand() == "262"
 		)
 	{
 		const vector<string>& args = command.getArgs();
@@ -1014,32 +1022,25 @@ delete_user_from_channels(User* user, const string& quit_mess)
 	}
 }
 
-string IRC::
+vector<string> IRC::
 motd_generate()
 {
-	std::stringstream out_mess_to_user;
-	out_mess_to_user << "****************************************************************************\n";
-	out_mess_to_user << "*_      `-._     `-.     `.   \\      :      /   .'     .-'     _.-'      _ *\n";
-	out_mess_to_user << "* `--._     `-._    `-.    `.  `.    :    .'  .'    .-'    _.-'     _.--'  *\n";
-	out_mess_to_user << "*      `--._    `-._   `-.   `.  \\   :   /  .'   .-'   _.-'    _.--'       *\n";
-	out_mess_to_user << "*`--.__     `--._   `-._  `-.  `. `. : .' .'  .-'  _.-'   _.--'     __.--' *\n";
-	out_mess_to_user << "*__    `--.__    `--._  `-._ `-. `. \\:/ .' .-' _.-'  _.--'    __.--'    __ *\n";
-	out_mess_to_user << "*  `--..__   `--.__   `--._ `-._`-.`_=_'.-'_.-' _.--'   __.--'   __..--'   *\n";
-	out_mess_to_user << "*--..__   `--..__  `--.__  `--._`-q(-_-)p-'_.--'  __.--'  __..--'   __..-- *\n";
-	out_mess_to_user << "*      ``--..__  `--..__ `--.__ `-'_) (_`-' __.--' __..--'  __..--''       *\n";
-	out_mess_to_user << "*...___        ``--..__ `--..__`--/__/  \\--'__..--' __..--''        ___... *\n";
-	out_mess_to_user << "*      ```---...___    ``--..__`_(<_   _/)_'__..--''    ___...---'''       *\n";
-	out_mess_to_user << "*```-----....._____```---...___(__\\_\\_|_/__)___...---'''_____.....-----''' *\n";
-	out_mess_to_user << "* ___   __  ________   _______   _       _   _______    ___   __   _______ *\n";
-	out_mess_to_user << "*|| \\  ||     ||     ||_____))  \\\\     //  ||_____||  || \\\\  ||  ||_____|| *\n";
-	out_mess_to_user << "*||  \\_||  ___||___  ||     \\\\   \\\\___//   ||     ||  ||  \\\\_||  ||     || *\n";
-	out_mess_to_user << "****************************************************************************\n";
-	out_mess_to_user << "*                              Welcome to IRC                              *\n";
-	out_mess_to_user << "*\t\t" << ADMINME << "                                              *\n";
-	out_mess_to_user << "*\t\t" << ADMINLOC1 << "                                             *\n";
-	out_mess_to_user << "*\t\t" << ADMINLOC2 << "                                                   *\n";
-	out_mess_to_user << "*\t\t" << ADMINEMAIL << "                                                   *\n";
-	out_mess_to_user << "*\t\t\t" << VERSION << "                                                          *\n";
-	out_mess_to_user << "****************************************************************************\n";
-	return (out_mess_to_user.str());
+	vector<string> out_mess_to_user;
+	out_mess_to_user.push_back("****************************************************************************");
+	out_mess_to_user.push_back("*_      `-._     `-.     `.   \\      :      /   .'     .-'     _.-'      _ *");
+	out_mess_to_user.push_back("* `--._     `-._    `-.    `.  `.    :    .'  .'    .-'    _.-'     _.--'  *");
+	out_mess_to_user.push_back("*      `--._    `-._   `-.   `.  \\   :   /  .'   .-'   _.-'    _.--'       *");
+	out_mess_to_user.push_back("*`--.__     `--._   `-._  `-.  `. `. : .' .'  .-'  _.-'   _.--'     __.--' *");
+	out_mess_to_user.push_back("*__    `--.__    `--._  `-._ `-. `. \\:/ .' .-' _.-'  _.--'    __.--'    __ *");
+	out_mess_to_user.push_back("*  `--..__   `--.__   `--._ `-._`-.`_=_'.-'_.-' _.--'   __.--'   __..--'   *");
+	out_mess_to_user.push_back("*--..__   `--..__  `--.__  `--._`-q(-_-)p-'_.--'  __.--'  __..--'   __..-- *");
+	out_mess_to_user.push_back("*      ``--..__  `--..__ `--.__ `-'_) (_`-' __.--' __..--'  __..--''       *");
+	out_mess_to_user.push_back("*...___        ``--..__ `--..__`--/__/  \\--'__..--' __..--''        ___... *");
+	out_mess_to_user.push_back("*      ```---...___    ``--..__`_(<_   _/)_'__..--''    ___...---'''       *");
+	out_mess_to_user.push_back("*```-----....._____```---...___(__\\_\\_|_/__)___...---'''_____.....-----''' *");
+	out_mess_to_user.push_back("* ___   __  ________   _______   _       _   _______    ___   __   _______ *");
+	out_mess_to_user.push_back("*|| \\  ||     ||     ||_____))  \\\\     //  ||_____||  || \\\\  ||  ||_____|| *");
+	out_mess_to_user.push_back("*||  \\_||  ___||___  ||     \\\\   \\\\___//   ||     ||  ||  \\\\_||  ||     || *");
+	out_mess_to_user.push_back("****************************************************************************");
+	return (out_mess_to_user);
 }

@@ -26,7 +26,6 @@
 **          the version or further version details.
 ** -----------------------------------------------------------------------
 */
-
 void Command::
 cmd_version(IRC &irc, int fd)
 {
