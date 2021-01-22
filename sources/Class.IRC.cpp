@@ -356,6 +356,7 @@ check_fd_select()
 					do_command(&mess, it->first); // передаем в исполнение команды сообщение и сокет, из которого пришло сообщение
 				}
 				bzero(buffer, 512);
+				break;
 			}
 			//Раздел для приемки сообщений из селекта
 			if (it->second == FD_SERVER || it->second == FD_SERVER_SSL)
@@ -439,9 +440,8 @@ void IRC::close_connection(int fd, int n)
 		{
 			_array_fd_select.erase(fd);
 			close(fd);
-		}
-		
-	}	
+		}	
+	}
 }
 
 void IRC::
@@ -457,7 +457,10 @@ close_connection(User* user)
 {
 	int fd = user->getSocketFd();
 	if (!is_server(fd))
+	{
 		_array_fd_select.erase(fd);
+		close(fd);
+	}
 	delete_user(user);
 }
 
@@ -663,7 +666,6 @@ check_buffer(int fd, const char* buffer)
 ** push_cmd_queue - пушит строку в очередь
 ** ----------------------------------------------------------
 */
-
 void IRC::
 push_cmd_queue(int fd, const string& str)
 {
@@ -672,10 +674,8 @@ push_cmd_queue(int fd, const string& str)
 
 	if (server_el >= 0)
 		_servers[server_el]->getStatistics().queued(str, true);
-	//_servers[server_el]->getStatistics().sent(str);
 	else
 		_clients[client_el]->getStatistics().queued(str, true);
-	//_clients[client_el]->getStatistics().sent(str);
 
 	std::cout << CYAN << "QUEUE #" << fd << ": " << YELLOW << str.substr(0, str.size() - 2) << RESET << std::endl;
 	_command_queue.push(std::make_pair(fd, str));

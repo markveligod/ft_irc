@@ -59,20 +59,10 @@ operator=(const User& src)
 	_hostname = src._hostname;
 	_servername = src._servername;
 	_realname = src._realname;
-	// client = src.client;
 	_mode = src._mode;
 	_channel_count = src._channel_count;
 	return *this;
 }
-
-/*User::User(const Client& src) : Client(src)
-{
-	_nickname	= src.getName();
-	_password	= src.getPassword();
-	_hopcount	= src.getHopcount();
-	_socket_fd = src.getSocketFd();
-	//client 	= src;
-}*/
 
 /*
 ** ---------------------------------------------------------------

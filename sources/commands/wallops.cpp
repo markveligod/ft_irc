@@ -18,16 +18,12 @@
 void Command::
 cmd_wallops(IRC& irc, int fd)
 {
-	string recepient = (!_prefix.empty()) ? _prefix : irc.get_user(fd)->getName();
+	string sender = (!_prefix.empty()) ? _prefix : irc.get_server(fd)->getName();
 
-	if (_arguments.size() != 1)
-	{
-		irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, recepient, _command, ERR_NEEDMOREPARAMS_MESS));
-		return;
-	}
+	if (_arguments.size() != 1) return;
 
 	vector<User*>& users = irc.get_users();
-	string wallop = ":" + irc.get_server_name() + " WALLOPS :" + _arguments[0] + "\r\n";
+	string wallop = ":" + sender + " WALLOPS :" + _arguments[0] + "\r\n";
 
 	for (vector<User*>::iterator it = users.begin(); it != users.end(); it++)
 	{
