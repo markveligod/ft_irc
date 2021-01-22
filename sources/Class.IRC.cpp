@@ -289,7 +289,6 @@ do_select()
 	if ((_select_res = select(FD_SETSIZE, &_fd_set_read, &_fd_set_write, NULL, NULL)) < 0)
 	{
 		utils::print_error(ERR_SELECT, "SELECT");
-		perror("Select");
 	}
 }
 
@@ -877,6 +876,11 @@ response(int response_code, int client_fd, string command, string message)
 
 	int i = find_fd(_clients, client_fd);
 	string client_name = (i >= 0) ? _clients[i]->getName() : string();
+	if (client_name.empty())		// если не нашли среди клиентов, ищем среди серверов
+	{
+		i = find_fd(_servers, client_fd);
+		client_name = (i >= 0) ? _servers[i]->getName() : string();
+	}
 
 	string response = ":"
 					+ _server_name + " "

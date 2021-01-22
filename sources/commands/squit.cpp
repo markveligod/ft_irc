@@ -37,9 +37,12 @@
 void Command::
 cmd_squit(IRC& irc, int fd)
 {
-	string sender = (!_prefix.empty()) ? _prefix : irc.get_user(fd)->getName();
+	Server* srvr = (!_prefix.empty()) ? irc.get_server(_prefix) : irc.get_server(fd);
+	User* usr 	 = (!_prefix.empty()) ? irc.get_user(_prefix) : irc.get_user(fd);
+	if (!usr && !srvr) return;
+	string sender = (srvr) ? srvr->getName() : usr->getName();
 
-	if (!irc.is_server(fd) && !irc.get_user(fd)->getMode('o'))	// сообщение от пользовател, не являющегося оператором сервера
+	if (!irc.is_server(fd) && !usr->getMode('o'))	// сообщение от пользовател, не являющегося оператором сервера
 	{
 		irc.push_cmd_queue(fd, irc.response(ERR_NOPRIVILEGES, sender, _command, ERR_NOPRIVILEGES_MESS));
 		return;
