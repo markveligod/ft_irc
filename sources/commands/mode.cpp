@@ -471,8 +471,8 @@ cmd_mode(IRC& irc, int fd)
 	{
 		if (_arguments.size() == 3)
 		{
-			irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, oper_name, _arguments[1], ERR_NEEDMOREPARAMS_MESS));
-			return;
+			this->_arguments[0] = this->_arguments[1];
+			this->_arguments[1] = this->_arguments[2];
 		}
 		//режим пользователя
 		std::cout << "\nDEBUG: Режим пользователя DONE!\n";
