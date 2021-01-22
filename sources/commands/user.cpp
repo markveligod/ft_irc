@@ -55,31 +55,6 @@ cmd_user(IRC& irc, int fd)
 				<< curr_user->getServername() << " :"
 				<< curr_user->getRealname();
 	irc.forward_to_servers(fd, out_message.str());
-	std::stringstream out_mess_to_user;
-	out_mess_to_user << "****************************************************************************\n";
-	out_mess_to_user << "*_      `-._     `-.     `.   \\      :      /   .'     .-'     _.-'      _ *\n";
-	out_mess_to_user << "* `--._     `-._    `-.    `.  `.    :    .'  .'    .-'    _.-'     _.--'  *\n";
-	out_mess_to_user << "*      `--._    `-._   `-.   `.  \\   :   /  .'   .-'   _.-'    _.--'       *\n";
-	out_mess_to_user << "*`--.__     `--._   `-._  `-.  `. `. : .' .'  .-'  _.-'   _.--'     __.--' *\n";
-	out_mess_to_user << "*__    `--.__    `--._  `-._ `-. `. \\:/ .' .-' _.-'  _.--'    __.--'    __ *\n";
-	out_mess_to_user << "*  `--..__   `--.__   `--._ `-._`-.`_=_'.-'_.-' _.--'   __.--'   __..--'   *\n";
-	out_mess_to_user << "*--..__   `--..__  `--.__  `--._`-q(-_-)p-'_.--'  __.--'  __..--'   __..-- *\n";
-	out_mess_to_user << "*      ``--..__  `--..__ `--.__ `-'_) (_`-' __.--' __..--'  __..--''       *\n";
-	out_mess_to_user << "*...___        ``--..__ `--..__`--/__/  \\--'__..--' __..--''        ___... *\n";
-	out_mess_to_user << "*      ```---...___    ``--..__`_(<_   _/)_'__..--''    ___...---'''       *\n";
-	out_mess_to_user << "*```-----....._____```---...___(__\\_\\_|_/__)___...---'''_____.....-----''' *\n";
-	out_mess_to_user << "* ___   __  ________   _______   _       _   _______    ___   __   _______ *\n";
-	out_mess_to_user << "*|| \\  ||     ||     ||_____))  \\\\     //  ||_____||  || \\\\  ||  ||_____|| *\n";
-	out_mess_to_user << "*||  \\_||  ___||___  ||     \\\\   \\\\___//   ||     ||  ||  \\\\_||  ||     || *\n";
-	out_mess_to_user << "****************************************************************************\n";
-	out_mess_to_user << "*                              Welcome to IRC                              *\n";
-	out_mess_to_user << "*\t\t" << ADMINME << "                                              *\n";
-	out_mess_to_user << "*\t\t" << ADMINLOC1 << "                                             *\n";
-	out_mess_to_user << "*\t\t" << ADMINLOC2 << "                                                   *\n";
-	out_mess_to_user << "*\t\t" << ADMINEMAIL << "                                                   *\n";
-	out_mess_to_user << "*\t\t\t" << VERSION << "                                                          *\n";
-	out_mess_to_user << "****************************************************************************\n";
-	irc.push_cmd_queue(fd, out_mess_to_user.str());
 }
 
 void Command::
