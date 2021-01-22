@@ -52,20 +52,20 @@ Command::~Command() {}
 **           переданный fd
 ** =====================================================================
 */
+// NEED_TO_DELETE
+// vector<Client*>::iterator Command::
+// find_fd(vector<Client*>& vect, int fd)
+// {
+// 	vector<Client*>::iterator v_begin	= vect.begin();
 
-vector<Client*>::iterator Command::
-find_fd(vector<Client*>& vect, int fd)
-{
-	vector<Client*>::iterator v_begin	= vect.begin();
-
-	while (v_begin != vect.end())
-	{
-		if ((*v_begin)->getSocketFd() == fd)
-			return (v_begin);
-		v_begin++;
-	}
-	return (vect.end());
-}
+// 	while (v_begin != vect.end())
+// 	{
+// 		if ((*v_begin)->getSocketFd() == fd)
+// 			return (v_begin);
+// 		v_begin++;
+// 	}
+// 	return (vect.end());
+// }
 
 /*
 ** ==================================================

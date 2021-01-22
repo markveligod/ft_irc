@@ -661,7 +661,6 @@ check_buffer(int fd, const char* buffer)
 ** push_cmd_queue - пушит строку в очередь
 ** ----------------------------------------------------------
 */
-
 void IRC::
 push_cmd_queue(int fd, const string& str)
 {
@@ -670,10 +669,8 @@ push_cmd_queue(int fd, const string& str)
 
 	if (server_el >= 0)
 		_servers[server_el]->getStatistics().queued(str, true);
-	//_servers[server_el]->getStatistics().sent(str);
 	else
 		_clients[client_el]->getStatistics().queued(str, true);
-	//_clients[client_el]->getStatistics().sent(str);
 
 	std::cout << CYAN << "QUEUE #" << fd << ": " << YELLOW << str.substr(0, str.size() - 2) << RESET << std::endl;
 	_command_queue.push(std::make_pair(fd, str));
