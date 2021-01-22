@@ -22,11 +22,17 @@ int main(int ac, char **av)
 
 	vector<string> network;
 	if (ac == 4)
+	{
 		network = utils::split(av[1], ':');
+		network.push_back(string(av[2]));
+		network.push_back(string(av[3]));
+	}
 	else
+	{
 		network.insert(network.begin(), 3, string());
-	network.push_back(string(av[1]));
-	network.push_back(string(av[2]));
+		network.push_back(string(av[1]));
+		network.push_back(string(av[2]));
+	}
 	
 	IRC server(network[0], network[1], network[2], network[3], network[4]);
 
