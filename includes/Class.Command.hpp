@@ -47,6 +47,7 @@ private:
 	void						stats_l(IRC& irc, int fd, Client* client);
 	void						stats_u(IRC& irc, int fd, Client* client);
 
+	int 						trace_check_errors(IRC &irc, int fd, int client_el);
 	int							info_chek_errors(IRC &irc, int fd, int server_el, int client_el);
 	int							version_check_errors(IRC &irc, int fd, int server_el, int client_el);
 	int							links_check_errors(IRC &irc, int fd, int server_el, int client_el);
@@ -101,6 +102,7 @@ public:
 	void					cmd_info(IRC& irc, int fd);
 	void					cmd_version(IRC& irc, int fd);
 	void					cmd_links(IRC& irc, int fd);
+	void					cmd_trace(IRC& irc, int fd);
 
 	const string&			getCommand() const;
 	const string&			getMessage() const;
