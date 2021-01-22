@@ -180,7 +180,6 @@ nick_check_errors(int fd, int serv_client, IRC& irc)
 		utils::print_error(ERR_NICKCOLLISION, "Nick collision (this nickname already in use)");
 		irc.push_cmd_queue(fd, irc.response(ERR_NICKCOLLISION, nick_name, _arguments[0], ERR_NICKCOLLISION_MESS));
 		irc.push_cmd_queue(fd, ":" + irc.get_server_name() + " KILL " + _arguments[0] + " " + _arguments[1] + "\r\n");
-
 		return (ERR_NICKCOLLISION);
 	}
 
@@ -195,8 +194,8 @@ nick_check_errors(int fd, int serv_client, IRC& irc)
 	// Если префикс не соответствует ни одному нику
 	if (!_prefix.empty() && (IRC::find_name(clients, _prefix) < 0))
 	{
-		utils::print_error(0, "Invalid _prefix \"" + _prefix + "\"\r\n");
-		irc.push_cmd_queue(fd, "ERROR :Invalid _prefix \"" + _prefix + "\"\r\n");
+		utils::print_error(0, "Invalid prefix \"" + _prefix + "\"\r\n");
+		irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, _prefix, "NICK", ":No such nickname"));
 		return (1);
 	}
 

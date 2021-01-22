@@ -451,6 +451,7 @@ close_connection(Client* client)
 {
 	int fd = client->getSocketFd();
 	_array_fd_select.erase(fd);
+	close(fd);
 	delete_client(client);
 }
 

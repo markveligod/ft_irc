@@ -129,7 +129,7 @@ user_check_errors(IRC& irc, int fd)
 		if (_prefix.empty())
 		{
 			utils::print_error(0, "Empty prefix");
-			irc.push_cmd_queue(fd, "ERROR :Empty prefix\r\n");
+			irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, "*", "USER", ":No prefix from server"));
 			return 0;
 		}
 		if (_arguments.size() != 4)
@@ -142,14 +142,14 @@ user_check_errors(IRC& irc, int fd)
 		if ((i = irc.find_name(clients, _prefix)) < 0)
 		{
 			utils::print_error(0, "Unknown nickname in prefix");
-			irc.push_cmd_queue(fd, "ERROR :Unknown nickname in prefix\r\n");
+			irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, _prefix, "USER", ":Unknown nickname in prefix"));
 			return 0;
 		}
 		// Если пришло не с того сервера, который владеет клиентом
 		if (clients[i]->getSocketFd() != fd)
 		{
 			utils::print_error(0, "This server doesn't own user with such nickname");
-			irc.push_cmd_queue(fd, "ERROR :This server doesn't own user with such nickname\r\n");
+			//irc.push_cmd_queue(fd, "ERROR :This server doesn't own user with such nickname\r\n");
 			return 0;
 		}
 		// Если этот пользователь уже зарегестрирован
