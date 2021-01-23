@@ -511,6 +511,12 @@ cmd_mode(IRC& irc, int fd)
 			irc.push_cmd_queue(fd, irc.fullname(oper_user) + mode_mess + "\r\n");
 			irc.forward_to_channel(fd, chan_name, irc.fullname(oper_user) + mode_mess);
 		}
+		else
+		{
+			string mode_mess = ":" + this->_prefix + " MODE " + this->_arguments[0] + " " + this->_arguments[1];
+			irc.forward_to_servers(fd, mode_mess);
+			irc.forward_to_channel(fd, chan_name, mode_mess);
+		}
 	}
 }
 
