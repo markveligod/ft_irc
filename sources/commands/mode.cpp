@@ -516,6 +516,7 @@ cmd_mode(IRC& irc, int fd)
 			string mode_mess = ":" + this->_prefix + " MODE " + this->_arguments[0] + " " + this->_arguments[1];
 			irc.forward_to_servers(fd, mode_mess);
 			irc.forward_to_channel(fd, chan_name, mode_mess);
+			utils::print_line("MODE DONE!");
 		}
 	}
 }
