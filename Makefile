@@ -67,7 +67,11 @@ COMMS		= nick.cpp \
 			kill.cpp \
 			motd.cpp \
 			whois.cpp \
+<<<<<<< HEAD
 			list.cpp
+=======
+			lusers.cpp
+>>>>>>> 86fa327fac2d5aaa24172ccdc4269b02a44a0f91
 
 
 SRC			= $(addprefix $(SRC_DIR), $(SRCS))

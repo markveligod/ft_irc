@@ -108,6 +108,7 @@ public:
 	void					cmd_kill(IRC& irc, int fd);
 	void					cmd_whois(IRC& irc, int fd);
 	void					cmd_list(IRC& irc, int fd);
+	void					cmd_lusers(IRC& irc, int fd);
 
 	const string&			getCommand() const;
 	const string&			getMessage() const;

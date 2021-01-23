@@ -41,6 +41,7 @@ std::string g_cmd_name[COMM_COUNT] = {"NICK",
 									  "MOTD",
 									  "WHOIS",
 									  "LIST",
+									  "LUSERS"
 									  };
 /*
 ** ----------------------------------------------------------
@@ -201,6 +202,7 @@ do_command(Command* command, int fd)
 										&Command::cmd_motd,
 										&Command::cmd_whois,
 										&Command::cmd_list,
+										&Command::cmd_lusers
 										};
 
 	const string & comm 			= command->getCommand();
@@ -417,7 +419,24 @@ _recv(int connection_type, int fd, char* response, size_t size, int flags)
 		n = SSL_read(_ssl, reinterpret_cast<void*>(response), size);
 	
 	if (n == 0 || n < 0)
+	{
+		if (find_fd(_servers, fd) >= 0)
+		{
+			std::stringstream out_mess;
+			out_mess << ":" << _servers[find_fd(_servers, fd)]->getName()
+					 << " SQUIT " << _servers[find_fd(_servers, fd)]->getName()
+					 << " :Error accured\r\n";
+			forward_to_servers(fd, out_mess.str());
+		}
+		else if (find_fd(_users, fd) >= 0)
+		{
+			std::stringstream out_mess;
+			out_mess << ":" << _users[find_fd(_users, fd)]->getName()
+					 << " QUIT :Client closed connection\r\n";
+			forward_to_servers(fd, out_mess.str());
+		}
 		close_connection(fd, n);
+	}
 	return n;
 }
 
@@ -425,7 +444,6 @@ void IRC::close_connection(int fd, int n)
 {
 	if (n)
 		utils::print_line("message receiving failed");
-
 	if (_array_fd_select.count(fd))
 	{
 		Client* user;
@@ -577,17 +595,18 @@ add_fd(int fd, int fd_type)			{ _array_fd_select[fd] = fd_type; }
 ** нужно будет смотреть на префиксы, а не только на fd
 */
 
-void IRC::
-delete_user(int fd)
-{
-	int i;
-	if ((i = IRC::find_fd(_users, fd)) > -1)
-	{
-		User* out_user = _users[i];
-		_users.erase(_users.begin() + i);
-		delete out_user;
-	}
-}
+// NEED_TO_DELETE
+// void IRC::
+// delete_user(int fd)
+// {
+// 	int i;
+// 	if ((i = IRC::find_fd(_users, fd)) > -1)
+// 	{
+// 		User* out_user = _users[i];
+// 		_users.erase(_users.begin() + i);
+// 		delete out_user;
+// 	}
+// }
 
 /*
 ** ВАЖНО
@@ -899,7 +918,6 @@ response(int response_code, int client_fd, string command, string message)
 void IRC::
 forward_to_servers(int fd, const string& message)
 {
-	std::cout << "DEBUG: |" << message << "|\n";
 	for (size_t i = 0; i < _servers.size(); i++)
 	{
 		if (_servers[i]->getSocketFd() != fd && _servers[i]->getHopcount() == 1)
@@ -910,7 +928,6 @@ forward_to_servers(int fd, const string& message)
 void IRC::
 forward_to_clients(IRC& irc, const string& message)
 {
-	std::cout << "DEBUG: |" << message << "|\n";
 	for (size_t i = 0; i < _clients.size(); i++)
 	{
 		if (!irc.is_server(_clients[i]->getSocketFd()))
@@ -921,7 +938,6 @@ forward_to_clients(IRC& irc, const string& message)
 void IRC::
 forward_to_channel(int fd, Channel& channel, const string& message)
 {
-	std::cout << "DEBUG: |" << message << "|\n";
 	user_map& users = channel.get_users();
 
 	for (user_iterator it = users.begin(); it != users.end(); it++)
