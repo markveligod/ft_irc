@@ -255,8 +255,10 @@
 #define RPL_WHOISUSER				311		// "<nick> <user> <host>*  :<real name>"
 #define RPL_WHOISSERVER				312		// "<nick> <server> :<server info>"
 #define RPL_WHOISOPERATOR			313		// "<nick> :is an IRC operator"
+#define RPL_WHOISOPERATOR_MESS		":is an IRC operator"
 #define RPL_WHOISIDLE				317		// "<nick> <integer> :seconds idle"
 #define RPL_ENDOFWHOIS				318		// "<nick> :End of /WHOIS list"
+#define RPL_ENDOFWHOIS_MESS			":End of WHOIS list"
 
 #define RPL_WHOISCHANNELS			319		// "<nick> :{[@|+]<channel><space>}"
 										// - Replies 311 - 313, 317 - 319 are all replies

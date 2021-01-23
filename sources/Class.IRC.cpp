@@ -38,7 +38,8 @@ std::string g_cmd_name[COMM_COUNT] = {"NICK",
 									  "LINKS",
 									  "TRACE",
 									  "KILL",
-									  "MOTD"
+									  "MOTD",
+									  "WHOIS",
 									  };
 /*
 ** ----------------------------------------------------------
@@ -130,12 +131,6 @@ create_socket_network()				// network_ip, _network_port и network_pass доба
 
 	_network.push_back(Socket(_network_ip[n].c_str(), _network_port[n]));
 	utils::print_line("Socket network done!");
-	std::cout << " _network.size(): " << _network.size() << std::endl;
-	std::cout << " _port: " << _network[n]._port << std::endl;
-	std::cout << " _sin_family: " << _network[n]._sin_family << std::endl;
-	std::cout << " _type: " << _network[n]._type << std::endl;
-	std::cout << " _protocol: " << _network[n]._protocol << std::endl;
-
 
 	int fd = _network[n]._socket();
 	utils::print_line("Socket network FD done!");
@@ -148,10 +143,10 @@ create_socket_network()				// network_ip, _network_port и network_pass доба
 	_clients.push_back(new Client(_network_ip[n], fd));
 	
 	utils::print_line("Trying to connect to server!\nServer name: " +
-					  _network_ip[n] + "/" + _network_ip[n] +
+					  _network_ip[n] + "/" + utils::int_to_str(_network_port[n]) +
 					  "\nHopcount: 1\nInfo: info");
 
-	push_cmd_queue(fd, "PASS " + _network_pass[n] + "\r\nSERVER " + _server_name + " 1 info\r\n");
+	push_cmd_queue(fd, "PASS " + _network_pass[n] + "\r\nSERVER " + _server_name + " 1 :" + INFO + "\r\n");
 	_clients[_clients.size() - 1]->setIsServer(true);
 }
 
@@ -202,7 +197,8 @@ do_command(Command* command, int fd)
 										&Command::cmd_links,
 										&Command::cmd_trace,
 										&Command::cmd_kill,
-										&Command::cmd_motd
+										&Command::cmd_motd,
+										&Command::cmd_whois,
 										};
 
 	const string & comm 			= command->getCommand();

@@ -67,6 +67,7 @@ private:
 	bool						is_server(IRC& irc, int fd);
 	void						send_users_without_channel(IRC& irc, int fd);
 	void						send_topic(IRC& irc, int fd, const string& channel_name, const string& topic);
+	void						send_whois(IRC& irc, int fd, User* recepient, User* sender);
 	string						who_message(const User* user, string channel_name, string user_prefix);
 
 
@@ -105,6 +106,7 @@ public:
 	void					cmd_trace(IRC& irc, int fd);
 	void					cmd_motd(IRC& irc, int fd);
 	void					cmd_kill(IRC& irc, int fd);
+	void					cmd_whois(IRC& irc, int fd);
 
 	const string&			getCommand() const;
 	const string&			getMessage() const;
