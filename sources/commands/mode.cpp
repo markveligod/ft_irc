@@ -79,7 +79,7 @@ check_keys_of_users_mod(string arg)
 		return false;
 	
 	//проверяем ключи
-	if ((arg[0] == '+' || arg[0]  == '-') && (arg[1] == 'a' || arg[1] == 'i' || arg[1] == 'w' || arg[1] == 'r' || arg[1] == 'o' || arg[1] == 'O'))
+	if ((arg[0] == '+' || arg[0]  == '-') && (arg[1] == 'a' || arg[1] == 'i' || arg[1] == 'w' || arg[1] == 'r' || arg[1] == 'o' || arg[1] == 'O' || arg[1] == 's'))
 		return true;
 	return false;
 }
@@ -270,7 +270,6 @@ cmd_mode(IRC& irc, int fd)
 				irc.push_cmd_queue(fd, irc.response(ERR_CHANOPRIVSNEEDED, oper_name, chan_name, ERR_CHANOPRIVSNEEDED_MESS));
 				return;
 			}
-
 													//меняем моды для итераторной позиции канала
 			for (size_t i = 1; i < _arguments[1].size(); i++)
 			{
@@ -291,19 +290,24 @@ cmd_mode(IRC& irc, int fd)
 		else if (check_keys_of_channel_mod_2(_arguments[1]))
 		{
 			//флаги для взаимодействия с пользователями
+			if (!users[oper_user].o)				//проверяем на наличие операторских прав в канале
+			{
+				irc.push_cmd_queue(fd, irc.response(ERR_CHANOPRIVSNEEDED, oper_name, chan_name, ERR_CHANOPRIVSNEEDED_MESS));
+				return;
+			}
 
 			if ((_arguments[1][1] == 'O' || _arguments[1][1] == 'o' || _arguments[1][1] == 'v') && _arguments.size() == 3)
 			{
 				//ищем пользователя, которому необходимо присвоить статус создателя канала
-				User* _user = irc.get_user(_arguments[2]);
-				if (_user == NULL)
+				User* usr = irc.get_user(_arguments[2]);
+				if (usr == NULL)
 				{
 					irc.push_cmd_queue(fd, irc.response(ERR_USERSDONTMATCH, oper_name, _arguments[2], ERR_NOSUCHNICK_MESS));
 					return;
 				}
 
 				//проверяем пользователь на канале 
-				if (!ch->is_user_in_channel(_user))
+				if (!ch->is_user_in_channel(usr))
 				{
 					irc.push_cmd_queue(fd, irc.response(ERR_USERNOTINCHANNEL, oper_name, _arguments[2], ERR_USERNOTINCHANNEL_MESS));
 					return;
@@ -312,25 +316,25 @@ cmd_mode(IRC& irc, int fd)
 				if (_arguments[1][1] == 'O') // создатель
 				{
 					if (_arguments[1][0] == '+')
-						ch->set_creator(_user);
+						ch->set_creator(usr);
 					else
-						ch->del_operator(_user);
+						ch->del_operator(usr);
 				}
 				
 				if (_arguments[1][1] == 'o') // оператор
 				{
 					if (_arguments[1][0] == '+')
-						ch->set_operator(_user);
+						ch->set_operator(usr);
 					else
-						ch->del_operator(_user);
+						ch->del_operator(usr);
 				}
 
 				if (_arguments[1][1] == 'v') //право голосовать 
 				{
 					if (_arguments[1][0] == '+')
-						ch->set_voice(_user);
+						ch->set_voice(usr);
 					else
-						ch->del_voice(_user);
+						ch->del_voice(usr);
 				}
 
 				//рассылаем уведомление
@@ -361,10 +365,20 @@ cmd_mode(IRC& irc, int fd)
 				
 				if (_arguments[1][1] == 'b') //ban masks
 				{
+					User* usr = irc.get_user(_arguments[2]);
+					if (usr == NULL)
+					{
+						irc.push_cmd_queue(fd, irc.response(ERR_USERSDONTMATCH, oper_name, _arguments[2], ERR_NOSUCHNICK_MESS));
+						return;
+					}
 					if (_arguments[1][0] == '+')
+					{
+						irc.get_channels()[chan_name].getBanned().push_back(usr);
 						ch->getModeChannel()->ban_masks.push_back(_arguments[2]);
+					}
 					else
 					{
+						unban_user(irc.get_channels()[chan_name], usr);
 						ModeChannel *temp = ch->getModeChannel();
 						vector<string>::iterator it_start = temp->ban_masks.begin();
 						vector<string>::iterator it_end = temp->ban_masks.end();
@@ -428,7 +442,7 @@ cmd_mode(IRC& irc, int fd)
 
 			if ((_arguments[1][1] == 'b' || _arguments[1][1] == 'e' || _arguments[1][1] == 'I') && _arguments.size() == 2)
 			{
-				//либо рассылаем сообщание о масках либо очищаем полностью
+				//либо рассылаем сообщение о масках либо очищаем полностью
 
 				if (_arguments[1][1] == 'b') //ban masks
 				{
@@ -508,4 +522,13 @@ cmd_mode(IRC& irc, int fd)
 		}
 		std::cout << "\nDEBUG: param: " << _arguments[1] << " DONE!\n";
 	}
+}
+
+void Command::
+unban_user(Channel& channel, User* user)
+{
+	vector<User*>& banned = channel.getBanned();
+	vector<User*>::iterator it =  find(banned.begin(), banned.end(), user);
+	if (it != banned.end())
+		banned.erase(it);
 }

@@ -310,7 +310,6 @@ check_fd_select()
 	{
 		if (FD_ISSET(it->first, &_fd_set_write))
 		{
-			// std::cout << "DEBUG: Сообщение отправлено клиенту: " << _command_queue.front().second.substr(0, _command_queue.front().second.size() - 1) << std::endl;
 			int server_el = IRC::find_fd(_servers, it->first);
 			int client_el = IRC::find_fd(_clients, it->first);
 
@@ -351,6 +350,8 @@ check_fd_select()
 
 				if (buffer_cmd.size())
 					utils::print_message(it->first, buffer_cmd);
+				else
+					std::cout << "Client " << it->first << " " << buffer << std::endl;
 
 				for (size_t i = 0; i < buffer_cmd.size(); i++)
 				{
@@ -1036,14 +1037,14 @@ delete_user_from_channels(User* user, const string& quit_mess)
 			forward_to_servers(fd, ":" + user->getName() + quit_mess);
 		}
 		// удаляем из бан списка
-		vector<User*>::iterator it_ban_start = it_channels->second.getVecBanned().begin();
-		vector<User*>::iterator it_ban_end = it_channels->second.getVecBanned().end();
+		vector<User*>::iterator it_ban_start = it_channels->second.getBanned().begin();
+		vector<User*>::iterator it_ban_end = it_channels->second.getBanned().end();
 
 		while (it_ban_start != it_ban_end)
 		{
 			if ((*it_ban_start)->getNickname() == user->getNickname())
 			{
-				it_channels->second.getVecBanned().erase(it_ban_start);
+				it_channels->second.getBanned().erase(it_ban_start);
 				break;
 			}
 			++it_ban_start;

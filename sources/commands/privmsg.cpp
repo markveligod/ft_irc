@@ -78,7 +78,7 @@ cmd_privmsg(IRC& irc, int fd)
 		if (user)
 		{
 			if (user->getMode('a'))
-				irc.push_cmd_queue(fd, irc.response(RPL_AWAY, fd, recepients[i], user->getAway()));
+				irc.push_cmd_queue(fd, irc.response(RPL_AWAY, fd, recepients[i], ":" + user->getAway()));
 			else
 				irc.push_cmd_queue(user->getSocketFd(), message + "\r\n");
 			continue;

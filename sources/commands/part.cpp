@@ -24,6 +24,9 @@ cmd_part(IRC& irc, int fd)
 		return;
 	}
 
+	User* usr = (!_prefix.empty()) ? irc.get_user(_prefix) : irc.get_user(fd); 
+	if (!usr) return;
+
 	vector<string> channels = utils::split(_arguments[0], ',');			// получаем вектор каналов
 
 	channel_map& _channels = irc.get_channels();
@@ -40,7 +43,7 @@ cmd_part(IRC& irc, int fd)
 		{
 			channel_map::iterator it = _channels.find(channels[i]);
 			if (it != _channels.end())
-				leave_channel(irc, it->second, fd, exit_message);
+				leave_channel(irc, it->second, fd, exit_message, usr);
 			else
 				irc.push_cmd_queue(fd, irc.response(ERR_NOSUCHCHANNEL, fd, channels[i], ERR_NOSUCHCHANNEL_MESS));
 		}
@@ -54,28 +57,24 @@ cmd_part(IRC& irc, int fd)
 ** и fd клиента, который хочет выйти
 */
 void Command::
-leave_channel(IRC& irc, Channel& channel, int fd, string message)
+leave_channel(IRC& irc, Channel& channel, int fd, string message, User* user) // TODO искать юзера не по fd
 {
 	user_map& all_users = channel.get_users();
-	User* user = find_user(all_users, fd);
-	if (user)
-	{
-		user->dec_channel_count();
-		all_users.erase(user);
-		
-		string message1 = (irc.fullname(user))
-							   + " PART " + channel.getName() + message;
-		string message2 =  ":" + user->getName()
-							   + " PART " + channel.getName() + message;
-		
-		if (all_users.empty())
-			irc.delete_channel(channel.getName());
-		
-		if (!irc.is_server(fd))
-			irc.push_cmd_queue(fd, message1 + "\r\n");
-		irc.forward_to_channel(fd, channel, message1);
-		irc.forward_to_servers(fd, message2);
-	}
+
+	user->dec_channel_count();
+	all_users.erase(user);
+	
+	string message1 = (irc.fullname(user))
+							+ " PART " + channel.getName() + message;
+	string message2 =  ":" + user->getName()
+							+ " PART " + channel.getName() + message;
+	
+	if (all_users.empty())
+		irc.delete_channel(channel.getName());
 	else
-		irc.push_cmd_queue(fd, irc.response(RPL_ENDOFNAMES, fd, channel.getName(), RPL_ENDOFNAMES_MESS));
+		irc.forward_to_channel(fd, channel, message1);
+	
+	if (!irc.is_server(fd))
+		irc.push_cmd_queue(fd, message1 + "\r\n");
+	irc.forward_to_servers(fd, message2);
 }

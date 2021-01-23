@@ -21,6 +21,7 @@ struct ModeUser
 	bool o;
 	bool O;
 	bool v;
+	bool s;
 	string away_message;
 
 	ModeUser();

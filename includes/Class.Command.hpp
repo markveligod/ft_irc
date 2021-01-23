@@ -55,13 +55,14 @@ private:
 	vector<Server *>			links_find(IRC &irc, int fd, string const & mask,  string const & our_servername, bool & our_server);
 
 	void						join_channel(IRC &irc, const string &name, const string &key, User *user, int fd);
-	void						leave_channel(IRC& irc, Channel& channels, int fd, string message);
+	void						leave_channel(IRC& irc, Channel& channels, int fd, string message, User* user);
 
 	vector<Client*>::iterator	find_fd(vector<Client*>& vect, int fd);
 	User*						find_user(user_map& users, int fd);
 	bool						check_args_number(int n) const;
 	bool						check_password(const Client& client) const;
 	bool						check_nickname(const Client& client) const;
+	void						unban_user(Channel& channel, User* user);
 	void						send_channel_users(IRC& irc, int fd, User* user, Channel& channel);
 	bool						is_channel_visible(IRC& irc, int fd, const string& channel_name);
 	bool						is_server(IRC& irc, int fd);

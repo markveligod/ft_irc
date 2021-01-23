@@ -47,14 +47,10 @@ int main(int ac, char **av)
 	while (true)
 	{
 		server.init_fd_select();
-		// std::cout << "DEBUG: INIT DONE!\n";
 		server.do_select();
-		// std::cout << "DEBUG: DO_SELECT DONE!\n";
 		server.check_fd_select();
-		// std::cout << "DEBUG: CHECK_FD_SELECT DONE!\n";
 		if (g_exit == 1 && server.get_servers().size() == 0 && server.is_empty_queue() == true)
 			exit(EXIT_SUCCESS);
-		// std::cout << "DEBUG: G_EXIT: " << g_exit << " SERVER SIZE: " << server.get_servers().size() << " IS_EMPTY: " << server.is_empty_queue() << std::endl;
 		if (g_exit == 1 && server.get_servers().size() != 0)
 		{
 			std::cout << "DEBUG: CTRL + C DONE!\n";
