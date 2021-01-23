@@ -20,7 +20,6 @@ cmd_motd(IRC& irc, int fd)
 
     if (pos_user != -1 && this->_prefix.size() == 0) //если обратился клиент
     {
-        std::cout << "\nDEBUG: раздел если обратился клиент\n";
         if (this->_arguments.size() > 1) //много параметров
         {
             irc.push_cmd_queue(fd, irc.response(422, users[pos_user]->getName(), "422", ":MOTD File is missing"));
@@ -52,15 +51,6 @@ cmd_motd(IRC& irc, int fd)
     }
     else // если обратился сервер
     {
-        std::cout << "\nDEBUG: раздел если обратился сервер\n";
-        std::cout << "Command: " << this->_command << std::endl;
-        std::cout << "Prefix: " << this->_prefix << std::endl;
-        std::cout << "Arg:\n";
-        for (size_t i = 0; i < this->_arguments.size(); i++)
-        {
-            std::cout << "Index #" << i << " " << this->_arguments[i] << std::endl;
-        }
-        
         int pos_user_prefix = irc.find_name(users, this->_prefix);
 
         if (users[pos_user_prefix]->getHopcount() != 0 && this->_arguments.size() == 1 && irc.get_server_name() == this->_arguments[0])
@@ -81,7 +71,6 @@ cmd_motd(IRC& irc, int fd)
         }
         else
         {
-            std::cout << "DEBUG: Hopcount: " << users[pos_user_prefix]->getHopcount() << std::endl;
             std::stringstream temp;
             for (size_t i = 0; i < this->_arguments.size(); i++)
             {
@@ -91,7 +80,6 @@ cmd_motd(IRC& irc, int fd)
                 irc.push_cmd_queue(users[pos_user_prefix]->getSocketFd(), ":" + this->_prefix + " " + this->_command + " :" + temp.str() + "\r\n");
             else
                 irc.push_cmd_queue(users[pos_user_prefix]->getSocketFd(), temp.str() + "\r\n");
-            
         }
     }
 }
