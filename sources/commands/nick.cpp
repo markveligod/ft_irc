@@ -44,7 +44,6 @@ cmd_nick(IRC& irc, int fd)
 
 			if ((curr_user = IRC::find_name(users, _prefix)) >= 0)
 			{
-				irc.push_cmd_queue(fd, irc.fullname(users[curr_user]) + " NICK :" + _arguments[0] + "\r\n");
 				irc.forward_to_all_channels(users[curr_user], irc.fullname(users[curr_user]) + " NICK :" + _arguments[0]);
 				users[curr_user]->setNickname(_arguments[0]);
 			}

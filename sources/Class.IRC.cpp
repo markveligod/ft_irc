@@ -957,7 +957,7 @@ forward_to_all_channels(User* user, const string& message)
 	for (channel_iterator it = _channels.begin(); it != _channels.end(); it++)
 	{
 		user_map users = it->second.get_users();
-		if (users.count(user))
+		if (users.count(user) && !is_server(user->getSocketFd()))
 			forward_to_channel(user->getSocketFd(), it->first, message);
 	}
 }
