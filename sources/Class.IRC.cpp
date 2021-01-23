@@ -40,6 +40,7 @@ std::string g_cmd_name[COMM_COUNT] = {"NICK",
 									  "KILL",
 									  "MOTD",
 									  "WHOIS",
+									  "LUSERS"
 									  };
 /*
 ** ----------------------------------------------------------
@@ -199,6 +200,7 @@ do_command(Command* command, int fd)
 										&Command::cmd_kill,
 										&Command::cmd_motd,
 										&Command::cmd_whois,
+										&Command::cmd_lusers
 										};
 
 	const string & comm 			= command->getCommand();
