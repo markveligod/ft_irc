@@ -67,6 +67,7 @@ COMMS		= nick.cpp \
 			kill.cpp \
 			motd.cpp \
 			whois.cpp \
+			list.cpp \
 			lusers.cpp
 
 

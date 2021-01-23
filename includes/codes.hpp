@@ -287,6 +287,7 @@
 										// and it was an error).
 
 #define RPL_LISTSTART				321		// "Channel :Users  Name"
+#define RPL_LISTSTART_MESS			"Channel :Users  Name"
 #define RPL_LIST					322		// "<channel> <# visible> :<topic>"
 
 #define RPL_LISTEND					323		// ":End of /LIST"
@@ -295,6 +296,7 @@
 										// server's response to a LIST command.  If there are
 										// no channels available to return, only the start
 										// and end reply must be sent.
+#define RPL_LISTEND_MESS			":End of /LIST"
 
 #define RPL_CHANNELMODEIS			324		// "<channel> <mode> <mode params>"
 
