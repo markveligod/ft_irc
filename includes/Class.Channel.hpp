@@ -80,6 +80,7 @@ public:
 	bool		is_private() const;
 	bool		is_secret() const;
 	bool		is_invite_only() const;
+	bool		is_invited(const string& nickname) const;
 	bool		is_moderated() const;
 	bool		is_topic_only_oper() const;
 	bool		is_user_in_channel(User*) const;

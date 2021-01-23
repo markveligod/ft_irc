@@ -120,6 +120,14 @@ bool Channel::
 is_invite_only() const 								{ return _mode.i; }
 
 bool Channel::
+is_invited(const string& nickname) const
+{
+	return find(_mode.invite_masks.begin(),
+				_mode.invite_masks.end(),
+				nickname) != _mode.invite_masks.end();
+}
+
+bool Channel::
 is_moderated() const 								{ return _mode.m; }
 
 bool Channel::

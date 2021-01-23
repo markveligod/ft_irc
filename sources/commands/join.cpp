@@ -100,7 +100,7 @@ join_channel(IRC& irc,
 			return;
 		}
 
-		if (channel.is_invite_only())				// check if invite only channel
+		if (channel.is_invite_only() && !channel.is_invited(user->getNickname()))	// check if invite only channel
 		{
 			irc.push_cmd_queue(fd, irc.response(ERR_INVITEONLYCHAN, fd, channel_name, ERR_INVITEONLYCHAN_MESS));
 			return;

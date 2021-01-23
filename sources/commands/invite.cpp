@@ -38,5 +38,21 @@ cmd_invite(IRC& irc, int fd)
 		return;
 	}
 
-	// irc.push_cmd_queue(fd, irc.fullname(target) + )
+	irc.push_cmd_queue(fd, irc.fullname(target) + " " +
+							utils::int_to_str(RPL_INVITING) + " " +
+							user->getName() + " " +
+							target->getName() + " " + 
+							_arguments[1] + "\r\n");
+
+	irc.push_cmd_queue(target->getSocketFd(),
+								irc.fullname(user) +
+								" INVITE " +
+								target->getName() + " " +
+								_arguments[1] + "\r\n");
+	
+	if (irc.get_channels().count(_arguments[1]))
+	{
+		ModeChannel* mode = irc.get_channels()[_arguments[1]].getModeChannel();
+		mode->invite_masks.push_back(target->getName());
+	}
 }
