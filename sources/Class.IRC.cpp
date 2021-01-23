@@ -593,18 +593,18 @@ add_fd(int fd, int fd_type)			{ _array_fd_select[fd] = fd_type; }
 ** нужно будет смотреть на префиксы, а не только на fd
 */
 
-// DELETE
-void IRC::
-delete_user(int fd)
-{
-	int i;
-	if ((i = IRC::find_fd(_users, fd)) > -1)
-	{
-		User* out_user = _users[i];
-		_users.erase(_users.begin() + i);
-		delete out_user;
-	}
-}
+// NEED_TO_DELETE
+// void IRC::
+// delete_user(int fd)
+// {
+// 	int i;
+// 	if ((i = IRC::find_fd(_users, fd)) > -1)
+// 	{
+// 		User* out_user = _users[i];
+// 		_users.erase(_users.begin() + i);
+// 		delete out_user;
+// 	}
+// }
 
 /*
 ** ВАЖНО
