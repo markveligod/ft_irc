@@ -123,6 +123,20 @@ cmd_lusers(IRC& irc, int fd)
         else if (this->_arguments.size() == 1 && this->_prefix.size() == 0) //есть параметр
         {
             std::cout << "\nDEBUG: с параметром\n";
+            if (irc.get_server_name() == this->_arguments[0]) //если указали наш текущий сервер
+            {
+                irc.push_cmd_queue(fd, irc.response(251, users[pos_user]->getNickname(), "251 " + irc.get_server_name(), ":There are " + utils::int_to_str(users.size()) + " users and 0 services on " + utils::int_to_str(servers.size()) + " servers"));
+
+                irc.push_cmd_queue(fd, irc.response(252, users[pos_user]->getNickname(), "252 " + irc.get_server_name(), utils::int_to_str(get_count_operators(irc)) + " :operator(s) online"));
+
+                irc.push_cmd_queue(fd, irc.response(253, users[pos_user]->getNickname(), "253 " + irc.get_server_name(), utils::int_to_str(get_count_client(irc)) + " :unknown connection(s)"));
+
+                irc.push_cmd_queue(fd, irc.response(254, users[pos_user]->getNickname(), "254 " + irc.get_server_name(), utils::int_to_str(irc.get_channels().size()) + " :channels formed"));
+
+                irc.push_cmd_queue(fd, irc.response(255, users[pos_user]->getNickname(), "255 " + irc.get_server_name(), ":I have " + utils::int_to_str(get_count_my_users(irc)) + " clients and " + utils::int_to_str(get_count_my_servers(irc)) + " servers"));
+                return ;
+            }
+
             int pos_fullname_server = irc.find_name(servers, this->_arguments[0]);
 
             if (pos_fullname_server != -1) //полное имя сервера
@@ -131,7 +145,36 @@ cmd_lusers(IRC& irc, int fd)
             }
             else if (pos_fullname_server == -1 && this->_arguments[0].find("*") != std::string::npos) //маска серверов
             {
+                size_t pos_start = this->_arguments[0].find("*");
 
+                if (pos_start == (this->_arguments[0].size() - 1)) // звездочка в конце
+                {
+                    std::string temp(this->_arguments[0].begin(), --(this->_arguments[0].end()));
+                    std::cout << "DEBUG: temp: " << temp << std::endl;
+                    for (size_t i = 0; i < servers.size(); i++) //если попадают под маску другие сервера
+                    {
+                        if (servers[i]->getName().find(temp) != std::string::npos)
+                            irc.push_cmd_queue(servers[i]->getSocketFd(), ":" + users[pos_user]->getName() + " LUSERS " + servers[i]->getName() + "\r\n");
+                    }
+                    if (irc.get_server_name().find(temp) != std::string::npos) //если под маску попадает наш текущий сервер
+                    {
+                        irc.push_cmd_queue(fd, irc.response(251, users[pos_user]->getNickname(), "251 " + irc.get_server_name(), ":There are " + utils::int_to_str(users.size()) + " users and 0 services on " + utils::int_to_str(servers.size()) + " servers"));
+
+                        irc.push_cmd_queue(fd, irc.response(252, users[pos_user]->getNickname(), "252 " + irc.get_server_name(), utils::int_to_str(get_count_operators(irc)) + " :operator(s) online"));
+
+                        irc.push_cmd_queue(fd, irc.response(253, users[pos_user]->getNickname(), "253 " + irc.get_server_name(), utils::int_to_str(get_count_client(irc)) + " :unknown connection(s)"));
+
+                        irc.push_cmd_queue(fd, irc.response(254, users[pos_user]->getNickname(), "254 " + irc.get_server_name(), utils::int_to_str(irc.get_channels().size()) + " :channels formed"));
+
+                        irc.push_cmd_queue(fd, irc.response(255, users[pos_user]->getNickname(), "255 " + irc.get_server_name(), ":I have " + utils::int_to_str(get_count_my_users(irc)) + " clients and " + utils::int_to_str(get_count_my_servers(irc)) + " servers"));
+                    }
+                }
+                else
+                {
+                    std::cout << "\nDEBUG: (*_*) звездочка ты где ?\n";
+                    irc.push_cmd_queue(fd, irc.response(300, "None", "300", ":NONE"));
+                    return ;   
+                }
             }
             else //none
             {
