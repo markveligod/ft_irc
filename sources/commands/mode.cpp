@@ -504,13 +504,13 @@ cmd_mode(IRC& irc, int fd)
 		change_param_of_users_mod(_user, _arguments[1][1], ((_arguments[1][0] == '+') ? true : false));
 
 		// если нет префикса шлем уведомление клиентам и серверам об изменение мода
-		if (_prefix.size() == 0)
-		{
+		// if (_prefix.size() == 0)
+		// {
 			string mode_mess = " MODE " + chan_name + " " + _arguments[0] + " " + _arguments[1];
 			irc.forward_to_servers(fd, ":" + oper_name + mode_mess);
 			irc.push_cmd_queue(fd, irc.fullname(oper_user) + mode_mess + "\r\n");
 			irc.forward_to_channel(fd, chan_name, irc.fullname(oper_user) + mode_mess);
-		}
+		// }
 	}
 }
 
