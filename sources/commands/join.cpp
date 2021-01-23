@@ -117,10 +117,6 @@ join_channel(IRC& irc,
 		}
 		irc.forward_to_channel(fd, channel_name, mess_to_user);
 		irc.forward_to_servers(fd, mess_to_server);
-
-
-		// std::cout << "DEBUG Channel members list:\n";
-		// channels[channel_name].print_users();
 	}
 	user->inc_channel_count();											// увеличиваем количество каналов, в которых состоит пользователь
 	

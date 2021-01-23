@@ -86,29 +86,16 @@ int get_count_client(IRC& irc)
 void Command::
 cmd_lusers(IRC& irc, int fd)
 {
-    std::cout << "Command: " << this->_command << std::endl;
-    std::cout << "Prefix: " << this->_prefix << std::endl;
-    std::cout << "Arg:\n";
-    for (size_t i = 0; i < this->_arguments.size(); i++)
-    {
-        std::cout << "Index #" << i << " " << this->_arguments[i] << std::endl;
-    }
-
     vector<User*>& users 		= irc.get_users();
     vector<Server *>& servers   = irc.get_servers();
 
     int pos_user = irc.find_fd(users, fd);
     int pos_server = irc.find_fd(servers, fd);
 
-    std::cout << "User: " << pos_user << std::endl;
-    std::cout << "Server: " << pos_server << std::endl;
-
     if (pos_server == -1) // обратился клиент
     {
-        std::cout << "\nDEBUG: обратился клиент\n";
         if (this->_arguments.size() == 0 && this->_prefix.size() == 0) //нет параметров - выводим всю информацию о сети
         {
-            std::cout << "\nDEBUG: без парметров\n";
             irc.push_cmd_queue(fd, irc.response(251, users[pos_user]->getNickname(), "251 " + irc.get_server_name(), ":There are " + utils::int_to_str(users.size()) + " users and 0 services on " + utils::int_to_str(servers.size()) + " servers"));
 
             irc.push_cmd_queue(fd, irc.response(252, users[pos_user]->getNickname(), "252 " + irc.get_server_name(), utils::int_to_str(get_count_operators(irc)) + " :operator(s) online"));
@@ -122,7 +109,6 @@ cmd_lusers(IRC& irc, int fd)
         }
         else if (this->_arguments.size() == 1 && this->_prefix.size() == 0) //есть параметр
         {
-            std::cout << "\nDEBUG: с параметром\n";
             if (irc.get_server_name() == this->_arguments[0]) //если указали наш текущий сервер
             {
                 irc.push_cmd_queue(fd, irc.response(251, users[pos_user]->getNickname(), "251 " + irc.get_server_name(), ":There are " + utils::int_to_str(users.size()) + " users and 0 services on " + utils::int_to_str(servers.size()) + " servers"));
@@ -150,7 +136,6 @@ cmd_lusers(IRC& irc, int fd)
                 if (pos_start == (this->_arguments[0].size() - 1)) // звездочка в конце
                 {
                     std::string temp(this->_arguments[0].begin(), --(this->_arguments[0].end()));
-                    std::cout << "DEBUG: temp: " << temp << std::endl;
                     for (size_t i = 0; i < servers.size(); i++) //если попадают под маску другие сервера
                     {
                         if (servers[i]->getName().find(temp) != std::string::npos)
@@ -171,34 +156,29 @@ cmd_lusers(IRC& irc, int fd)
                 }
                 else
                 {
-                    std::cout << "\nDEBUG: (*_*) звездочка ты где ?\n";
-                    irc.push_cmd_queue(fd, irc.response(300, "None", "300", ":NONE"));
+                    irc.push_cmd_queue(fd, irc.response(300, "None", "300", ":(*_*) звездочка ты где ?"));
                     return ;   
                 }
             }
             else //none
             {
-                std::cout << "\nDEBUG: (*_*) как тебя распарсить ?\n";
-                irc.push_cmd_queue(fd, irc.response(300, "None", "300", ":NONE"));
+                irc.push_cmd_queue(fd, irc.response(300, "None", "300", ":(*_*) как тебя распарсить ?"));
                 return ;    
             }
             
         }
         else //none
         {
-            std::cout << "\nDEBUG: (*_*) шо такое ?\n";
-            irc.push_cmd_queue(fd, irc.response(300, "None", "300", ":NONE"));
+            irc.push_cmd_queue(fd, irc.response(300, "None", "300", ":(*_*) шо такое ?"));
             return ;
         }
     }
     else if (pos_server != -1) // обратился сервер
     {
-        std::cout << "\nDEBUG: обратился сервер\n";
         if (this->_arguments.size() == 1 && this->_prefix.size() != 0) //ищем канал на соответсвие запроса
         {
             if (this->_arguments[0] == irc.get_server_name()) //совпадают шлем инфу
             {
-                std::cout << "\nDEBUG: сервер найден\n";
                 int user_pos_before = irc.find_name(users, this->_prefix);
 
                 irc.push_cmd_queue(users[user_pos_before]->getSocketFd(), ":" + this->_prefix + " LUSERS 251 " + irc.get_server_name() +  " :There are " + utils::int_to_str(users.size()) + " users and 0 services on " + utils::int_to_str(servers.size()) + " servers\r\n");
@@ -219,7 +199,6 @@ cmd_lusers(IRC& irc, int fd)
         }
         else if (this->_arguments.size() > 1 && this->_prefix.size() != 0) //пересылаем обратно
         {
-            std::cout << "\nDEBUG: пересылка обратно пользователю\n";
             int user_pos_before = irc.find_name(users, this->_prefix);
 
             std::stringstream temp;
@@ -237,16 +216,13 @@ cmd_lusers(IRC& irc, int fd)
         }
         else //none
         {
-            std::cout << "\nDEBUG: (*_*) у тебя совесть есть ?\n";
-            irc.push_cmd_queue(fd, irc.response(300, "None", "300", ":NONE"));
+            irc.push_cmd_queue(fd, irc.response(300, "None", "300", ":(*_*) у тебя совесть есть ?"));
             return ;    
         }
     }
     else //none
     {
-        std::cout << "\nDEBUG: (*_*) кто ты ?\n";
-        irc.push_cmd_queue(fd, irc.response(300, "None", "300", ":NONE"));
+        irc.push_cmd_queue(fd, irc.response(300, "None", "300", ":(*_*) кто ты ?"));
         return ;
-    }
-    
+    }    
 }

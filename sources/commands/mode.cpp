@@ -192,12 +192,6 @@ change_param_of_channel_mod(Channel *ch, const char mod, bool param)
 void Command::
 cmd_mode(IRC& irc, int fd)
 {
-	
-	std::cout << "\nDEBUG: prefix: " << _prefix << std::endl;
-	std::cout << "DEBUG: arg:\n";
-	for (size_t i = 0; i < _arguments.size(); i++)
-		std::cout << "Index # " << i << " arg: " << _arguments[i] << std::endl;
-
 	//Находим клиента который обратился по команде MODE
 	User* oper_user = (_prefix.size()) ? irc.get_user(_prefix) : irc.get_user(fd);
 	if (!oper_user) return;
@@ -284,8 +278,6 @@ cmd_mode(IRC& irc, int fd)
 				irc.push_cmd_queue(fd, irc.fullname(oper_user) + mode_mess + "\r\n");
 				irc.forward_to_channel(fd, chan_name, irc.fullname(oper_user) + mode_mess);
 			}
-			
-			std::cout << "\nDEBUG: param: " << _arguments[1] << " DONE!\n";
 		}
 		else if (check_keys_of_channel_mod_2(_arguments[1]))
 		{
@@ -492,7 +484,6 @@ cmd_mode(IRC& irc, int fd)
 			this->_arguments[1] = this->_arguments[2];
 		}
 		//режим пользователя
-		std::cout << "\nDEBUG: Режим пользователя DONE!\n";
 		
 		//проверяем поступившие ключи от оператора
 		if (!check_keys_of_users_mod(_arguments[1]))
@@ -520,7 +511,6 @@ cmd_mode(IRC& irc, int fd)
 			irc.push_cmd_queue(fd, irc.fullname(oper_user) + mode_mess + "\r\n");
 			irc.forward_to_channel(fd, chan_name, irc.fullname(oper_user) + mode_mess);
 		}
-		std::cout << "\nDEBUG: param: " << _arguments[1] << " DONE!\n";
 	}
 }
 

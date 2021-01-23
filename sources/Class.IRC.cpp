@@ -386,9 +386,6 @@ check_fd_select()
 				else
 					new_client = new Client(_localhost_ssl.getHostname(), client_socket);
 				_clients.push_back(new_client);
-				std::cout << "DEBUG client information:\n"
-						  << "Socket FD: " << new_client->getSocketFd() << std::endl
-						  << "Hostname: " << new_client->getHostname() << std::endl;
 			}
 			_select_res--;
 		}
@@ -564,21 +561,18 @@ void IRC::
 add_network_ip(const string& ip)
 {
 	_network_ip.push_back(ip);
-	std::cout << "DEBUG: _network_ip: " << ip << std::endl;
 }
 
 void IRC::
 add_network_port(const string& port)		
 {
 	_network_port.push_back(std::atoi(port.c_str()));
-	std::cout << "DEBUG: _network_port: " << port << std::endl;
 }
 
 void IRC::
 add_network_pass(const string& pass)
 {
 	_network_pass.push_back(pass);
-	std::cout << "DEBUG: _network_pass: " << pass << std::endl;
 }
 
 void IRC::
