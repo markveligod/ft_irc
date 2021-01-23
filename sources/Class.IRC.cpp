@@ -352,6 +352,27 @@ check_fd_select()
 				{
 					Command mess(buffer_cmd[i]);
 					do_command(&mess, it->first); // передаем в исполнение команды сообщение и сокет, из которого пришло сообщение
+
+
+					// DEBUG
+					std::cout << "DEBUG all servers: \n";
+					for (size_t i = 0; i < _servers.size(); i++)
+					{
+						std::cout << _servers[i]->getName()
+								  << " " << _servers[i]->getHopcount() << "\n";
+					}
+					std::cout << "DEBUG all clients: \n";
+					for (size_t i = 0; i < _clients.size(); i++)
+					{
+						std::cout << _clients[i]->getName()
+								  << " " << _clients[i]->getHopcount() << "\n";
+					}
+					std::cout << "DEBUG all users: \n";
+					for (size_t i = 0; i < _users.size(); i++)
+					{
+						std::cout << _users[i]->getName()
+								  << " " << _users[i]->getHopcount() << "\n";
+					}
 				}
 				bzero(buffer, 512);
 				break;
@@ -415,7 +436,17 @@ _recv(int connection_type, int fd, char* response, size_t size, int flags)
 		n = SSL_read(_ssl, reinterpret_cast<void*>(response), size);
 	
 	if (n == 0 || n < 0)
+	{
+		if (find_fd(_servers, fd) >= 0)
+		{
+			std::stringstream out_mess;
+			out_mess << ":" << _servers[find_fd(_servers, fd)]->getName()
+					 << " SQUIT " << _servers[find_fd(_servers, fd)]->getName()
+					 << " :Error accured\r\n";
+			forward_to_servers(fd, out_mess.str());
+		}
 		close_connection(fd, n);
+	}
 	return n;
 }
 

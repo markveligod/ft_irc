@@ -33,6 +33,7 @@ cmd_error(IRC& irc, int fd)
 	string notice = ":" + irc.get_server_name() + " " + "NOTICE" + " ";
 	string error = " :ERROR :" + ((!_arguments.empty()) ? _arguments[0] : "") + "\r\n";
 	vector<User*> users = irc.get_users();
+	std::stringstream squit_mess;
 
 	for (size_t i = 0; i < users.size(); i++)
 	{
@@ -55,6 +56,9 @@ cmd_error(IRC& irc, int fd)
 			|| users[i]->getServername() == quit_server_name)
 			irc.delete_user(users[i]);										// удаляем пользователя из всех каналов, из _users и из _clients 
 	}
-
+	squit_mess << ":" << irc.get_server_name()
+			   << " SQUIT " << irc.get_server_name() << " :"
+			   << (_arguments.size() ? _arguments[0] : "error has accured") << "\r\n";
+	irc.forward_to_servers(fd, squit_mess.str());
 	irc.close_connection(quit_server);
 }
