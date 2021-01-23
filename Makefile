@@ -68,7 +68,8 @@ COMMS		= nick.cpp \
 			motd.cpp \
 			whois.cpp \
 			list.cpp \
-			lusers.cpp
+			lusers.cpp \
+			invite.cpp
 
 
 SRC			= $(addprefix $(SRC_DIR), $(SRCS))

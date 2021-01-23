@@ -101,7 +101,8 @@ cmd_links(IRC &irc, int fd)
 		irc.push_cmd_queue(fd, irc.response(RPL_LINKS, client_name, irc.get_server_name(), out_mess.str()));
 		out_mess.str("");
 	}
-	irc.push_cmd_queue(fd, irc.response(RPL_ENDOFLINKS, client_name, "*", ":End of LINKS list"));
+	if (output_servers.size() || our_server)
+		irc.push_cmd_queue(fd, irc.response(RPL_ENDOFLINKS, client_name, "*", ":End of LINKS list"));
 }
 
 vector<Server *> Command::

@@ -58,7 +58,7 @@ cmd_oper(IRC& irc, int fd)
 			irc.push_cmd_queue(fd, ":" + irc.get_server_name() + mode_mess);
 			irc.push_cmd_queue(fd, irc.response(RPL_YOUREOPER, usr_name, _command, RPL_YOUREOPER_MESS));
 
-			irc.forward_to_servers(fd, usr_name + mode_mess);
+			irc.forward_to_servers(fd, ":" + usr_name + mode_mess);
 		}
 		else
 			irc.push_cmd_queue(fd, irc.response(ERR_NOOPERHOST, usr_name, _command, ERR_NOOPERHOST_MESS));
