@@ -911,7 +911,6 @@ response(int response_code, int client_fd, string command, string message)
 void IRC::
 forward_to_servers(int fd, const string& message)
 {
-	std::cout << "DEBUG: |" << message << "|\n";
 	for (size_t i = 0; i < _servers.size(); i++)
 	{
 		if (_servers[i]->getSocketFd() != fd && _servers[i]->getHopcount() == 1)
@@ -922,7 +921,6 @@ forward_to_servers(int fd, const string& message)
 void IRC::
 forward_to_clients(IRC& irc, const string& message)
 {
-	std::cout << "DEBUG: |" << message << "|\n";
 	for (size_t i = 0; i < _clients.size(); i++)
 	{
 		if (!irc.is_server(_clients[i]->getSocketFd()))
@@ -933,7 +931,6 @@ forward_to_clients(IRC& irc, const string& message)
 void IRC::
 forward_to_channel(int fd, Channel& channel, const string& message)
 {
-	std::cout << "DEBUG: |" << message << "|\n";
 	user_map& users = channel.get_users();
 
 	for (user_iterator it = users.begin(); it != users.end(); it++)
