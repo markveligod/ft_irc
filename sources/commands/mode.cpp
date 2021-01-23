@@ -282,6 +282,7 @@ cmd_mode(IRC& irc, int fd)
 			{
 				string mode_mess = " MODE " + chan_name + " " + _arguments[1];
 				irc.forward_to_servers(fd, ":" + oper_name + mode_mess);
+				irc.push_cmd_queue(fd, irc.fullname(oper_user) + mode_mess + "\r\n");
 				irc.forward_to_channel(fd, chan_name, irc.fullname(oper_user) + mode_mess);
 			}
 			
@@ -335,6 +336,7 @@ cmd_mode(IRC& irc, int fd)
 				//рассылаем уведомление
 				string mode_mess = " MODE " + chan_name + " " + _arguments[1] + " " + _arguments[2];
 				irc.forward_to_servers(fd, ":" + oper_name + mode_mess);
+				irc.push_cmd_queue(fd, irc.fullname(oper_user) + mode_mess + "\r\n");
 				irc.forward_to_channel(fd, chan_name, irc.fullname(oper_user) + mode_mess);
 			}
 			if ((_arguments[1][1] == 'k' || _arguments[1][1] == 'l' || _arguments[1][1] == 'b' || _arguments[1][1] == 'e' || _arguments[1][1] == 'I') && _arguments.size() == 3)
@@ -420,6 +422,7 @@ cmd_mode(IRC& irc, int fd)
 				//рассылаем уведомление
 				string mode_mess = " MODE " + chan_name + " " + _arguments[1] + " " + _arguments[2];
 				irc.forward_to_servers(fd, ":" + oper_name + mode_mess);
+				irc.push_cmd_queue(fd, irc.fullname(oper_user) + mode_mess + "\r\n");
 				irc.forward_to_channel(fd, chan_name, irc.fullname(oper_user) + mode_mess);
 			}
 
@@ -500,6 +503,7 @@ cmd_mode(IRC& irc, int fd)
 		{
 			string mode_mess = " MODE " + chan_name + " " + _arguments[0] + " " + _arguments[1];
 			irc.forward_to_servers(fd, ":" + oper_name + mode_mess);
+			irc.push_cmd_queue(fd, irc.fullname(oper_user) + mode_mess + "\r\n");
 			irc.forward_to_channel(fd, chan_name, irc.fullname(oper_user) + mode_mess);
 		}
 		std::cout << "\nDEBUG: param: " << _arguments[1] << " DONE!\n";

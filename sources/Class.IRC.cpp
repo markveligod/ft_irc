@@ -40,6 +40,7 @@ std::string g_cmd_name[COMM_COUNT] = {"NICK",
 									  "KILL",
 									  "MOTD",
 									  "WHOIS",
+									  "LIST",
 									  };
 /*
 ** ----------------------------------------------------------
@@ -199,6 +200,7 @@ do_command(Command* command, int fd)
 										&Command::cmd_kill,
 										&Command::cmd_motd,
 										&Command::cmd_whois,
+										&Command::cmd_list,
 										};
 
 	const string & comm 			= command->getCommand();
@@ -830,7 +832,12 @@ is_numeric_response(const Command& command)
 		command.getCommand() == "205" ||
 		command.getCommand() == "206" ||
 		command.getCommand() == "208" ||
-		command.getCommand() == "262"
+		command.getCommand() == "262" ||
+		command.getCommand() == "311" ||
+		command.getCommand() == "312" ||
+		command.getCommand() == "313" ||
+		command.getCommand() == "317" ||
+		command.getCommand() == "318"
 		)
 	{
 		const vector<string>& args = command.getArgs();
