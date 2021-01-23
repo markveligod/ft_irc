@@ -136,7 +136,6 @@ cmd_lusers(IRC& irc, int fd)
                 if (pos_start == (this->_arguments[0].size() - 1)) // звездочка в конце
                 {
                     std::string temp(this->_arguments[0].begin(), --(this->_arguments[0].end()));
-                    std::cout << "DEBUG: temp: " << temp << std::endl;
                     for (size_t i = 0; i < servers.size(); i++) //если попадают под маску другие сервера
                     {
                         if (servers[i]->getName().find(temp) != std::string::npos)

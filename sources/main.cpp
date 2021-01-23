@@ -53,7 +53,6 @@ int main(int ac, char **av)
 			exit(EXIT_SUCCESS);
 		if (g_exit == 1 && server.get_servers().size() != 0)
 		{
-			std::cout << "DEBUG: CTRL + C DONE!\n";
 			for (size_t i = 0; i < server.get_servers().size(); i++)
 			{
 				int fd = server.get_servers()[i]->getSocketFd();

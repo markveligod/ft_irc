@@ -83,8 +83,6 @@ cmd_server(IRC& irc, int fd)
 			}
 		}
 		new_server->setBuffer(clients[client_el]->getBuffer());
-		//irc.delete_client(fd); // FIX
-		//utils::print_line("DEBUG: Client deleted (as it is a new connection)");
 	}
 
 	out_message << ":" << irc.get_server_name() <<

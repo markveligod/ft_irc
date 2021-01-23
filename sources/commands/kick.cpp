@@ -46,7 +46,6 @@ cmd_kick(IRC& irc, int fd)
 	{
 		for (size_t i = 0; i < channels.size(); i++)
 		{
-			std::cout << "DEBUG: channel_name " << channels[i] << std::endl;
 			if (!irc.get_channel(channels[i]))								// канала не существует
 			{
 				irc.push_cmd_queue(fd, irc.response(ERR_NOSUCHCHANNEL, fd, channels[i], ERR_NOSUCHCHANNEL_MESS));

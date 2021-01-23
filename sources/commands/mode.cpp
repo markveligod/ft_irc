@@ -484,7 +484,6 @@ cmd_mode(IRC& irc, int fd)
 			this->_arguments[1] = this->_arguments[2];
 		}
 		//режим пользователя
-		std::cout << "\nDEBUG: Режим пользователя DONE!\n";
 		
 		//проверяем поступившие ключи от оператора
 		if (!check_keys_of_users_mod(_arguments[1]))
