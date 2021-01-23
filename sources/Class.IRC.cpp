@@ -354,27 +354,6 @@ check_fd_select()
 				{
 					Command mess(buffer_cmd[i]);
 					do_command(&mess, it->first); // передаем в исполнение команды сообщение и сокет, из которого пришло сообщение
-
-
-					// DEBUG
-					std::cout << "DEBUG all servers: \n";
-					for (size_t i = 0; i < _servers.size(); i++)
-					{
-						std::cout << _servers[i]->getName()
-								  << " " << _servers[i]->getHopcount() << "\n";
-					}
-					std::cout << "DEBUG all clients: \n";
-					for (size_t i = 0; i < _clients.size(); i++)
-					{
-						std::cout << _clients[i]->getName()
-								  << " " << _clients[i]->getHopcount() << "\n";
-					}
-					std::cout << "DEBUG all users: \n";
-					for (size_t i = 0; i < _users.size(); i++)
-					{
-						std::cout << _users[i]->getName()
-								  << " " << _users[i]->getHopcount() << "\n";
-					}
 				}
 				bzero(buffer, 512);
 				break;
@@ -447,6 +426,13 @@ _recv(int connection_type, int fd, char* response, size_t size, int flags)
 					 << " :Error accured\r\n";
 			forward_to_servers(fd, out_mess.str());
 		}
+		else if (find_fd(_users, fd) >= 0)
+		{
+			std::stringstream out_mess;
+			out_mess << ":" << _users[find_fd(_users, fd)]->getName()
+					 << " QUIT :Client closed connection\r\n";
+			forward_to_servers(fd, out_mess.str());
+		}
 		close_connection(fd, n);
 	}
 	return n;
@@ -456,7 +442,6 @@ void IRC::close_connection(int fd, int n)
 {
 	if (n)
 		utils::print_line("message receiving failed");
-
 	if (_array_fd_select.count(fd))
 	{
 		Client* user;
@@ -608,6 +593,7 @@ add_fd(int fd, int fd_type)			{ _array_fd_select[fd] = fd_type; }
 ** нужно будет смотреть на префиксы, а не только на fd
 */
 
+// DELETE
 void IRC::
 delete_user(int fd)
 {
