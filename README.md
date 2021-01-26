@@ -16,8 +16,8 @@ Due to the technical simplicity of implementation, the IRC protocol was used in 
 According to the protocol specifications, an IRC network is a group of servers connected to each other. The simplest network is a single server.  
 The network should have the form of a connected tree, in which each server is the central node for the rest of the network.  
 A client is anything that is connected to the server, except for other servers. There are two types of customers:  
-custom settings;  
-service stations.  
+- custom settings;  
+- service stations.  
   
 <img src="https://github.com/markveligod/ft_irc/blob/main/img/network.svg">
   
