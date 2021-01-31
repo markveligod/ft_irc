@@ -5,6 +5,10 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     MainWindow w;
+    w.RunTextBrowser();
+    w.RunTextBrowser();
+    w.RunTextBrowser();
+    w.RunTextBrowser();
     w.show();
 
     return a.exec();
