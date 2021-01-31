@@ -1,4 +1,4 @@
 qmake;
 make;
-./test;
+./test_gui;
 make distclean
