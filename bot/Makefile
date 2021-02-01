@@ -8,7 +8,7 @@ RESET=\033[0m
 CC		= clang++ 
 RM		= rm -rf
 DEBUG	= -g
-FLAGS	= -Wall -Wextra -Werror -MMD -std=c++98
+FLAGS	= -Wall -Wextra -Werror -MMD
 INCLUDES= -I ../includes
 
 ifeq ($(UNAME), Darwin)

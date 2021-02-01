@@ -11,6 +11,8 @@
 #include "Class.Socket.hpp"
 #include "Class.Command.hpp"
 #include <fstream>
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
 using std::map;
 using std::pair;

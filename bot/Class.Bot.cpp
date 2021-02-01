@@ -79,18 +79,27 @@ check_fd_select()
 						std::ifstream file("weather.json");
 						if (!file.is_open())
 							utils::print_error(1, "file open error");
-						std::string str;
-						std::getline(file, str);
-						std::vector<std::string> vec_pars = utils::split(str, ':');
-						if (vec_pars.size() != 3)
+						json js;
+						file >> js;
+						file.close();
+
+						if (js["cod"] == "404")
 						{
-							float temp = atof(vec_pars[11].c_str()) + KELVIN;
-							std::string city(mess.getArgs()[1].begin(), (mess.getArgs()[1].end() - 2));
-							this->push_cmd_queue(it->first,  ":pogoda PRIVMSG " + mess.getPrefix() + " :Температура в " + city + " " + utils::int_to_str(temp) + " градусов цельсия\r\n");
+							this->push_cmd_queue(it->first,  ":pogoda PRIVMSG " + mess.getPrefix() + " :Error 404\r\n");
+							this->push_cmd_queue(it->first,  ":pogoda PRIVMSG " + mess.getPrefix() + " :Попробуй еще раз (^_^)\r\n");
 						}
-						else
+						else if (js["cod"] == 200)
 						{
-							this->push_cmd_queue(it->first,  ":pogoda PRIVMSG " + mess.getPrefix() + " :Сори братан город не смог найти\r\n");
+							this->push_cmd_queue(it->first,  ":pogoda PRIVMSG " + mess.getPrefix() + " :************************\r\n");
+							std::string country = js["sys"]["country"];
+							this->push_cmd_queue(it->first,  ":pogoda PRIVMSG " + mess.getPrefix() + " :*   Country: " + country + "\r\n");
+							std::string city = js["name"];
+							this->push_cmd_queue(it->first,  ":pogoda PRIVMSG " + mess.getPrefix() + " :*   City:    " + city + "\r\n");
+							std::string weat = js["weather"][0]["main"];
+							this->push_cmd_queue(it->first,  ":pogoda PRIVMSG " + mess.getPrefix() + " :*   Weather: " + weat + "\r\n");
+							std::string temp = utils::int_to_str((float)js["main"]["temp"] + KELVIN);
+							this->push_cmd_queue(it->first,  ":pogoda PRIVMSG " + mess.getPrefix() + " :*   Temp:    " + temp + "°C\r\n");
+							this->push_cmd_queue(it->first,  ":pogoda PRIVMSG " + mess.getPrefix() + " :************************\r\n");
 						}
 					}
 				}
