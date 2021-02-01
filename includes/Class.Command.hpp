@@ -111,6 +111,7 @@ public:
 	void					cmd_list(IRC& irc, int fd);
 	void					cmd_lusers(IRC& irc, int fd);
 	void					cmd_invite(IRC& irc, int fd);
+	void					cmd_pogoda(IRC& irc, int fd);
 
 	const string&			getCommand() const;
 	const string&			getMessage() const;

@@ -43,6 +43,7 @@ std::string g_cmd_name[COMM_COUNT] = {"NICK",
 									  "LIST",
 									  "LUSERS",
 									  "INVITE",
+									  "POGODA",
 									  };
 /*
 ** ----------------------------------------------------------

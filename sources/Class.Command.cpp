@@ -47,27 +47,6 @@ Command::Command(const string& str) : _message(str)
 Command::~Command() {}
 
 /*
-** =====================================================================
-** find_fd - находит в векторе итераторную позицию которая соответствует 
-**           переданный fd
-** =====================================================================
-*/
-// NEED_TO_DELETE
-// vector<Client*>::iterator Command::
-// find_fd(vector<Client*>& vect, int fd)
-// {
-// 	vector<Client*>::iterator v_begin	= vect.begin();
-
-// 	while (v_begin != vect.end())
-// 	{
-// 		if ((*v_begin)->getSocketFd() == fd)
-// 			return (v_begin);
-// 		v_begin++;
-// 	}
-// 	return (vect.end());
-// }
-
-/*
 ** ==================================================
 ** getCommand - возвращает текущую команду из буфера
 ** ==================================================
