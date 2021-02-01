@@ -86,7 +86,7 @@
 **==========================
 */
 
-#define COMM_COUNT 35
+#define COMM_COUNT 36
 extern std::string g_cmd_name[COMM_COUNT];
 
 #include "utils.hpp"
