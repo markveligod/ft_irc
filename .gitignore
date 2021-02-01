@@ -6,3 +6,5 @@
 *server
 !server-client
 *.vscode/
+*/pogoda
+*/weather.json

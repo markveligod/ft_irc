@@ -69,7 +69,8 @@ COMMS		= nick.cpp \
 			whois.cpp \
 			list.cpp \
 			lusers.cpp \
-			invite.cpp
+			invite.cpp \
+			pogoda.cpp
 
 
 OBJ			= $(patsubst %.cpp,$(OBJ_DIR)%.o,$(SRCS))

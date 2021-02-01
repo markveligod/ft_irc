@@ -20,17 +20,18 @@ cmd_pogoda(IRC& irc, int fd)
 	User* user = (!_prefix.empty()) ? irc.get_user(_prefix) : irc.get_user(fd);
 	if (!user) return;
 
-	if (_arguments.size() != 2)												// слишком много аргуменотов
+	if (!(_arguments.size() == 2 || (_prefix.empty() && _arguments.size() == 1)))												// слишком много аргуменотов
 	{
 		irc.push_cmd_queue(fd, irc.response(ERR_NEEDMOREPARAMS, fd, _command, ERR_NEEDMOREPARAMS_MESS));
 		return;
 	}
 
-	string response = ":" + user->getName() + " PRIVMSG :";
+	string response = ":" + user->getName() + " PRIVMSG pogoda :";
 	User* pogoda = irc.get_user("pogoda");
 	
 	if (!pogoda)
-		return (irc.push_cmd_queue(fd, response + "bot \"POGODA\" not available\r\n"));
+		return (irc.push_cmd_queue(fd, "Bot \"POGODA\" not available\r\n"));
 	
-	return (irc.push_cmd_queue(fd, response + _arguments[1] + "\r\n"));
+	string city = _prefix.empty() ? _arguments[0] : _arguments[1];
+	return (irc.push_cmd_queue(pogoda->getSocketFd(), response + city + "\r\n"));
 }
