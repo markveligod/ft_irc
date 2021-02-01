@@ -1,4 +1,4 @@
-#include "./main.hpp"
+#include "main.hpp"
 #include "Class.IRC.hpp"
 
 int g_exit;

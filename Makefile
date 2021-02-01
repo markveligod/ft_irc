@@ -72,8 +72,6 @@ COMMS		= nick.cpp \
 			invite.cpp
 
 
-SRC			= $(addprefix $(SRC_DIR), $(SRCS))
-COMM		= $(addprefix $(COMM_DIR), $(COMMS))
 OBJ			= $(patsubst %.cpp,$(OBJ_DIR)%.o,$(SRCS))
 OBJ_C		= $(patsubst %.cpp,$(OBJ_DIR_C)%.o,$(COMMS))
 DEP			= $(OBJ:.o=.d)
