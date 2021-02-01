@@ -22,7 +22,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::RunTextBrowser()
 {
-    for (size_t i = 0; i < this->mess.size(); i++)
+    for (int i = 0; i < this->mess.size(); i++)
     {
         this->ui->textBrowser->append(this->mess[i]);
     }

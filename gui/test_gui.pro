@@ -28,7 +28,10 @@ SOURCES += \
         mainwindow.cpp
 
 HEADERS += \
-        mainwindow.h
+        mainwindow.h \
+        ../includes/main.hpp
 
 FORMS += \
         mainwindow.ui
+
+LIBS += -L../ -lirc -L/usr/local/opt/openssl/lib -lssl -lcrypto
