@@ -5,10 +5,12 @@
 #define FD_CLIENT 1
 #define FD_SERVER 2
 #define WEATHER_SCRIPT "./weather.sh"
+#define KELVIN -273.15
 
 #include "main.hpp"
 #include "Class.Socket.hpp"
 #include "Class.Command.hpp"
+#include <fstream>
 
 using std::map;
 using std::pair;
