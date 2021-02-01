@@ -74,7 +74,25 @@ check_fd_select()
 					else if (pid == 0)
 						get_response(mess.getArgs()[1]);
 					else
+					{
 						wait(0);
+						std::ifstream file("weather.json");
+						if (!file.is_open())
+							utils::print_error(1, "file open error");
+						std::string str;
+						std::getline(file, str);
+						std::vector<std::string> vec_pars = utils::split(str, ':');
+						if (vec_pars.size() != 3)
+						{
+							float temp = atof(vec_pars[11].c_str()) + KELVIN;
+							std::string city(mess.getArgs()[1].begin(), (mess.getArgs()[1].end() - 2));
+							this->push_cmd_queue(it->first,  ":pogoda PRIVMSG " + mess.getPrefix() + " :Температура в " + city + " " + utils::int_to_str(temp) + " градусов цельсия\r\n");
+						}
+						else
+						{
+							this->push_cmd_queue(it->first,  ":pogoda PRIVMSG " + mess.getPrefix() + " :Сори братан город не смог найти\r\n");
+						}
+					}
 				}
 				bzero(buffer, 512);
 				break;

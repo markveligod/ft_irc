@@ -68,7 +68,7 @@ clean:
 	@echo "[$(RED)Deleting$(RESET)]$(RED) Object files deleted.$(RESET)"
 
 fclean: clean
-	@$(RM) $(NAME)
+	@$(RM) $(NAME) *.json
 	@echo "[$(RED)Deleting$(RESET)]$(RED) $(NAME) deleted.$(RESET)"
 
 re: fclean all
