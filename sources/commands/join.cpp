@@ -72,11 +72,9 @@ join_channel(IRC& irc,
 		irc.forward_to_channel(fd, channel_name, mess_to_user);
 		irc.forward_to_servers(fd, mess_to_server);
 		
+		channels[channel_name].set_operator(user);
 		if (!is_server(irc, fd))
-		{
-			channels[channel_name].set_operator(user);
 			irc.forward_to_servers(fd, mode_message);
-		}
 
 		utils::print_line("Channel " + channel_name + " created");
 		utils::print_line("User " + user->getNickname() + " joined channel " + channel_name);
