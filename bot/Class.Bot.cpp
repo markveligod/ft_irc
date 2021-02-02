@@ -67,6 +67,11 @@ check_fd_select()
 				Command mess(buffer_cmd);
 				if (mess.getCommand() == "PRIVMSG")
 				{
+					string prefix = ":pogoda PRIVMSG " + mess.getPrefix() + " :";
+
+					if (mess.getArgs().size() < 2 || mess.getArgs()[1] == "\r\n")
+						return this->push_cmd_queue(it->first, prefix + "Введите город\r\n");
+
 					pid_t pid = fork();
 
 					if (pid < 0)
@@ -82,8 +87,6 @@ check_fd_select()
 						json js;
 						file >> js;
 						file.close();
-
-						string prefix = ":pogoda PRIVMSG " + mess.getPrefix() + " :";
 
 						if (js["cod"] == "404")
 						{
