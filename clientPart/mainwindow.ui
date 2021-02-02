@@ -86,7 +86,13 @@
      </layout>
     </item>
     <item>
-     <widget class="QTextBrowser" name="textBrowser_log"/>
+     <widget class="QTextBrowser" name="textBrowser_log">
+      <property name="font">
+       <font>
+        <family>Ubuntu Mono</family>
+       </font>
+      </property>
+     </widget>
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
