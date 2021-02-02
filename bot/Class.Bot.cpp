@@ -78,28 +78,40 @@ check_fd_select()
 						wait(0);
 						std::ifstream file("weather.json");
 						if (!file.is_open())
-							utils::print_error(1, "file open error");
+							utils::exit_error(1, "file open error");
 						json js;
 						file >> js;
 						file.close();
 
+						string prefix = ":pogoda PRIVMSG " + mess.getPrefix() + " :";
+
 						if (js["cod"] == "404")
 						{
-							this->push_cmd_queue(it->first,  ":pogoda PRIVMSG " + mess.getPrefix() + " :Error 404\r\n");
-							this->push_cmd_queue(it->first,  ":pogoda PRIVMSG " + mess.getPrefix() + " :Попробуй еще раз (^_^)\r\n");
+							this->push_cmd_queue(it->first, prefix + "Error 404\r\n");
+							this->push_cmd_queue(it->first, prefix + "Попробуй еще раз (^_^)\r\n");
 						}
 						else if (js["cod"] == 200)
 						{
-							this->push_cmd_queue(it->first,  ":pogoda PRIVMSG " + mess.getPrefix() + " :************************\r\n");
+							std::vector<std::string> weather = get_picture(js["weather"][0]["main"]);
+
+							this->push_cmd_queue(it->first, prefix + "******************************\r\n");
+
 							std::string country = js["sys"]["country"];
-							this->push_cmd_queue(it->first,  ":pogoda PRIVMSG " + mess.getPrefix() + " :*   Country: " + country + "\r\n");
+							this->push_cmd_queue(it->first, prefix + weather[0] + "Country: " + country + "\r\n");
+
 							std::string city = js["name"];
-							this->push_cmd_queue(it->first,  ":pogoda PRIVMSG " + mess.getPrefix() + " :*   City:    " + city + "\r\n");
+							this->push_cmd_queue(it->first, prefix + weather[1] + "City:    " + city + "\r\n");
+
 							std::string weat = js["weather"][0]["main"];
-							this->push_cmd_queue(it->first,  ":pogoda PRIVMSG " + mess.getPrefix() + " :*   Weather: " + weat + "\r\n");
+							this->push_cmd_queue(it->first, prefix + weather[2] + "Weather: " + weat + "\r\n");
+
 							std::string temp = utils::int_to_str((float)js["main"]["temp"] + KELVIN);
-							this->push_cmd_queue(it->first,  ":pogoda PRIVMSG " + mess.getPrefix() + " :*   Temp:    " + temp + "°C\r\n");
-							this->push_cmd_queue(it->first,  ":pogoda PRIVMSG " + mess.getPrefix() + " :************************\r\n");
+							this->push_cmd_queue(it->first, prefix + weather[3] + "Temp:    " + temp + "°C\r\n");
+
+							std::string wind = utils::int_to_str((float)js["wind"]["speed"]);
+							this->push_cmd_queue(it->first, prefix + weather[4] + "Wind:    " + wind + " m/s\r\n");
+
+							this->push_cmd_queue(it->first, prefix + "******************************\r\n");
 						}
 					}
 				}
@@ -126,4 +138,64 @@ get_response(string city)
 	if (execve(args[0], args, env) < 0)
 		utils::exit_error(1, "execve error");
 	return 0;
+}
+
+std::vector<std::string> Bot::
+get_picture(std::string weather)
+{
+	std::vector<string> res(5, string());
+
+	if (weather == "Clear")
+	{
+		res[0] = "     \\   /     ";
+		res[1] = "      .-.      ";
+		res[2] = "   ― (   ) ―   ";
+		res[3] = "      `-’      ";
+		res[4] = "     /   \\     ";
+	}
+
+	else if (weather == "Clouds")
+	{
+		res[0] = "               ";
+		res[1] = "      .--.     ";
+		res[2] = "   .-(    ).   ";
+		res[3] = "  (  .  )  )   ";
+		res[4] = "   ‾‾ ‾‾ ‾‾    ";
+	}
+
+	else if (weather == "Mist" || weather == "Fog")
+	{
+		res[0] = "               ";
+		res[1] = "    -   -   -  ";
+		res[2] = "  ‾  -‾  -‾    ";
+		res[3] = "   ‾-  ‾-  ‾-  ";
+		res[4] = "  ‾   ‾   ‾    ";
+	}
+
+	else if (weather == "Snow")
+	{
+		res[0] = "      .-.      ";
+		res[1] = "     (   ).    ";
+		res[2] = "    (__(__)   ";
+		res[3] = "    * * * *    ";
+		res[4] = "   * * * *     ";
+	}
+
+	else if (weather == "Rain")
+	{
+		res[0] = "      .-.      ";
+		res[1] = "     (   ).    ";
+		res[2] = "    (___(__)   ";
+		res[3] = "   ‚‘‚‘‚‘‚‘    ";
+		res[4] = "   ‚’‚’‚’‚’    ";
+	}
+	else
+	{
+		res[0] = "               ";
+		res[1] = "               ";
+		res[2] = "               ";
+		res[3] = "               ";
+		res[4] = "               ";
+	}
+	return res;
 }

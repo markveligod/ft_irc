@@ -36,6 +36,7 @@ public:
 	void						check_fd_select();
 	void						push_cmd_queue(int fd, const string& str);
 	int							get_response(string city);
+	std::vector<std::string>	get_picture(std::string weather);
 };
 
 #endif
