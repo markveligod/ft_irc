@@ -1,6 +1,10 @@
-{"coord":
-    {"lon":37.6111,"lat":54.2044},
-    "weather":[
+{
+    "coord":
+    {
+        "lon":37.6111,"lat":54.2044
+    },
+    "weather":
+    [
         {
             "id":803,
             "main":"Clouds",
@@ -28,15 +32,17 @@
     },
     "clouds":
     {
-        "all":71},
-        "dt":1612227728,
-        "sys":
-        {
-            "country":"RU",
-            "sunrise":1612242938,
-            "sunset":1612275050},
-            "timezone":10800,
-            "id":480562,
-            "name":"Tula",
-            "cod":200
-        }
+        "all":71
+    },
+    "dt":1612227728,
+    "sys":
+    {
+        "country":"RU",
+        "sunrise":1612242938,
+        "sunset":1612275050
+    },
+    "timezone":10800,
+    "id":480562,
+    "name":"Tula",
+    "cod":200
+}
