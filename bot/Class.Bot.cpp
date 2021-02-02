@@ -176,7 +176,7 @@ get_picture(std::string weather)
 	{
 		res[0] = "      .-.      ";
 		res[1] = "     (   ).    ";
-		res[2] = "    (__(__)   ";
+		res[2] = "    (__(__)    ";
 		res[3] = "    * * * *    ";
 		res[4] = "   * * * *     ";
 	}
