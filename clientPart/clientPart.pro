@@ -9,10 +9,13 @@ RCC_DIR     += generated/rccs
 OBJECTS_DIR += generated/objs
 
 SOURCES += main.cpp\
+    form.cpp \
         mainwindow.cpp \
     clientStuff.cpp
 
 HEADERS  += mainwindow.h \
-    clientStuff.h
+    clientStuff.h \
+    form.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    form.ui

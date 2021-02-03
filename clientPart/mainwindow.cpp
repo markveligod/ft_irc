@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "form.h"
 #include <iostream>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
@@ -8,15 +9,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     ui->pushButton_disconnect->setVisible(false);
 
-    client = new ClientStuff("localhost", 1080);
-
-    setStatus(client->getStatus());
-
-    connect(client, &ClientStuff::hasReadSome, this, &MainWindow::receivedSomething);
-    connect(client, &ClientStuff::statusChanged, this, &MainWindow::setStatus);
-    // FIXME change this connection to the new syntax
-    connect(client->tcpSocket, SIGNAL(error(QAbstractSocket::SocketError)),
-            this, SLOT(gotError(QAbstractSocket::SocketError)));
+    setStatus(false);
 }
 
 MainWindow::~MainWindow()
@@ -75,23 +68,50 @@ void MainWindow::gotError(QAbstractSocket::SocketError err)
 
 void MainWindow::on_pushButton_connect_clicked()
 {
-    client->connect2host();
-    connect(client->tcpSocket, &QTcpSocket::readyRead, this, &MainWindow::readyRead);
-    client->tcpSocket->write((QString(tr("PASS 123\r\nNICK mark\r\nUSER client client client client\r\n"))).toLatin1());
+    Form form;
+    form.setModal(true);
+    form.exec();
+    if (form.isChecked())
+    {
+        QString pass;
+        QString port;
+        QString nick;
+        QString user;
+
+        form.getParam(pass, port, nick, user);
+
+        this->mynick = nick;
+
+        client = new ClientStuff("localhost", port.toInt());
+
+        setStatus(client->getStatus());
+
+        connect(client, &ClientStuff::hasReadSome, this, &MainWindow::receivedSomething);
+        connect(client, &ClientStuff::statusChanged, this, &MainWindow::setStatus);
+        // FIXME change this connection to the new syntax
+        connect(client->tcpSocket, SIGNAL(error(QAbstractSocket::SocketError)),
+                this, SLOT(gotError(QAbstractSocket::SocketError)));
+
+        client->connect2host();
+        connect(client->tcpSocket, &QTcpSocket::readyRead, this, &MainWindow::readyRead);
+        client->tcpSocket->write((QString(tr("PASS %1\r\nNICK %2\r\nUSER %3 %3 %3 %3\r\n").arg(pass).arg(nick).arg(user))).toLatin1());
+    }
 }
 
 void MainWindow::on_pushButton_send_clicked()
 {
-    client->tcpSocket->write(QString("%1 %2").arg(ui->lineEdit_message->text()).arg(QString(tr("\r\n"))).toLatin1());
-    this->receivedSomething(QString("%1 %2").arg(QString(tr("SEND: "))).arg(ui->lineEdit_message->text()));
-    ui->lineEdit_message->clear();
+    if (!ui->lineEdit_message->text().isEmpty())
+    {
+        client->tcpSocket->write(QString(":%1 %2 %3").arg(this->mynick).arg(ui->lineEdit_message->text()).arg(QString(tr("\r\n"))).toLatin1());
+        this->receivedSomething(QString("%1 :%2 %3").arg(QString(tr("SEND: "))).arg(this->mynick).arg(ui->lineEdit_message->text()));
+        ui->lineEdit_message->clear();
+    }
 }
 
 void MainWindow::on_pushButton_disconnect_clicked()
 {
     this->receivedSomething(QString("SEND: QUIT :я ухожу от вас"));
     client->tcpSocket->write((QString(tr("QUIT :я ухожу от вас\r\n"))).toLatin1());
-    client->closeConnection();
 }
 
 void MainWindow::readyRead()
@@ -106,4 +126,13 @@ void MainWindow::readyRead()
     }
     QString str(totol_data);
     this->receivedSomething(str);
+    QStringList stringlist;
+    stringlist = str.split(" ");
+    for (int i = 0; i < stringlist.size(); i++ ) {
+        if (stringlist[i] == "451")
+        {
+            client->closeConnection();
+            break;
+        }
+    }
 }

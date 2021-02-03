@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>Client</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">background-color:#f0f0f0;</string>
+  </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
@@ -27,7 +30,16 @@
          </font>
         </property>
         <property name="styleSheet">
-         <string notr="true"/>
+         <string notr="true">color:rgb(17,17,17);
+	border-width: 1px;
+	border-radius:6px;
+	border-top-color: rgb(255,150,60);
+	border-right-color: qlineargradient(spread:pad, x1:0, y1:1, x2:1, y2:0, stop:0 rgba(200, 70, 20, 255), stop:1 rgba(255,150,60, 255));
+	border-left-color:  qlineargradient(spread:pad, x1:1, y1:0, x2:0, y2:0, stop:0 rgba(200, 70, 20, 255), stop:1 rgba(255,150,60, 255));
+	border-bottom-color: rgb(200,70,20);
+	border-style: solid;
+	padding: 2px;
+	background-color: qlineargradient(spread:pad, x1:0.5, y1:1, x2:0.5, y2:0, stop:0 rgba(220, 220, 220, 255), stop:1 rgba(255, 255, 255, 255));</string>
         </property>
         <property name="text">
          <string>Connect to server</string>
@@ -47,7 +59,16 @@
          </font>
         </property>
         <property name="styleSheet">
-         <string notr="true"/>
+         <string notr="true">color:rgb(17,17,17);
+	border-width: 1px;
+	border-radius:6px;
+	border-top-color: rgb(255,150,60);
+	border-right-color: qlineargradient(spread:pad, x1:0, y1:1, x2:1, y2:0, stop:0 rgba(200, 70, 20, 255), stop:1 rgba(255,150,60, 255));
+	border-left-color:  qlineargradient(spread:pad, x1:1, y1:0, x2:0, y2:0, stop:0 rgba(200, 70, 20, 255), stop:1 rgba(255,150,60, 255));
+	border-bottom-color: rgb(200,70,20);
+	border-style: solid;
+	padding: 2px;
+	background-color: qlineargradient(spread:pad, x1:0.5, y1:1, x2:0.5, y2:0, stop:0 rgba(220, 220, 220, 255), stop:1 rgba(255, 255, 255, 255));</string>
         </property>
         <property name="text">
          <string>Disconnect from server</string>
@@ -68,6 +89,9 @@
           <weight>75</weight>
           <bold>true</bold>
          </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color:rgb(17,17,17);</string>
         </property>
         <property name="frameShape">
          <enum>QFrame::Box</enum>
@@ -92,19 +116,54 @@
         <family>Ubuntu Mono</family>
        </font>
       </property>
+      <property name="styleSheet">
+       <string notr="true">border-width: 2px;
+    border-radius: 8px;
+    border-style: solid;
+    border-top-color: qlineargradient(spread:pad, x1:0.5, y1:1, x2:0.5, y2:0, stop:0 #c1c9cf, stop:1 #d2d8dd);
+    border-right-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 #c1c9cf, stop:1 #d2d8dd);
+    border-bottom-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 #c1c9cf, stop:1 #d2d8dd);
+    border-left-color: qlineargradient(spread:pad, x1:1, y1:0, x2:0, y2:0, stop:0 #c1c9cf, stop:1 #d2d8dd);
+    background-color: #f4f4f4;
+    color: #3d3d3d;</string>
+      </property>
      </widget>
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
        <widget class="QPushButton" name="pushButton_send">
+        <property name="styleSheet">
+         <string notr="true">color:rgb(17,17,17);
+	border-width: 1px;
+	border-radius:6px;
+	border-top-color: rgb(255,150,60);
+	border-right-color: qlineargradient(spread:pad, x1:0, y1:1, x2:1, y2:0, stop:0 rgba(200, 70, 20, 255), stop:1 rgba(255,150,60, 255));
+	border-left-color:  qlineargradient(spread:pad, x1:1, y1:0, x2:0, y2:0, stop:0 rgba(200, 70, 20, 255), stop:1 rgba(255,150,60, 255));
+	border-bottom-color: rgb(200,70,20);
+	border-style: solid;
+	padding: 2px;
+	background-color: qlineargradient(spread:pad, x1:0.5, y1:1, x2:0.5, y2:0, stop:0 rgba(220, 220, 220, 255), stop:1 rgba(255, 255, 255, 255));</string>
+        </property>
         <property name="text">
          <string>Send:</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="lineEdit_message"/>
+       <widget class="QLineEdit" name="lineEdit_message">
+        <property name="styleSheet">
+         <string notr="true">border-width: 2px;
+    border-radius: 8px;
+    border-style: solid;
+    border-top-color: qlineargradient(spread:pad, x1:0.5, y1:1, x2:0.5, y2:0, stop:0 #c1c9cf, stop:1 #d2d8dd);
+    border-right-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 #c1c9cf, stop:1 #d2d8dd);
+    border-bottom-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 #c1c9cf, stop:1 #d2d8dd);
+    border-left-color: qlineargradient(spread:pad, x1:1, y1:0, x2:0, y2:0, stop:0 #c1c9cf, stop:1 #d2d8dd);
+    background-color: #f4f4f4;
+    color: #3d3d3d;</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>

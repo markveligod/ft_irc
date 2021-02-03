@@ -49,7 +49,6 @@ void ClientStuff::closeConnection()
 {
     timeoutTimer->stop();
 
-    //qDebug() << tcpSocket->state();
     disconnect(tcpSocket, &QTcpSocket::connected, 0, 0);
     disconnect(tcpSocket, &QTcpSocket::readyRead, 0, 0);
 
