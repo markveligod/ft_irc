@@ -162,4 +162,4 @@ class IRC
 		void print_channels() const; //DEBUG
 };
 
-#include "../Class.IRC.templates.cpp"
+#include "Class.IRC.templates.tpp"
