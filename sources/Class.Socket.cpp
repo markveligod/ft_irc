@@ -59,6 +59,9 @@ _bind() {
 	
 	int res = 0;
 
+	int optval = 1;
+	setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int)); // чтобы можно было использовать порт в состоянии TIME_WAIT
+
 	if ((res = bind(_fd, reinterpret_cast<struct sockaddr*>(&_addr), _addr_size)) < 0)
 		utils::exit_error(ERR_BIND, "Binding error");
 	return res;
